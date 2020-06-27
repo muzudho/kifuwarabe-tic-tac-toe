@@ -1,8 +1,10 @@
 mod board;
+mod piece;
 mod view;
 
 use board::Board;
 
 fn main() {
-    Board::println();
+    let board = Board::default();
+    board.println();
 }
