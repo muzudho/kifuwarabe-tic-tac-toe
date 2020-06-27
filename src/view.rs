@@ -3,6 +3,19 @@ use crate::piece::Piece;
 use std::fmt;
 
 impl Board {
+    pub fn debug_write(&self) {
+        for (i, sq) in self.squares.iter().enumerate() {
+            println!(
+                "{}: {}",
+                i,
+                if let Some(sq_val) = sq {
+                    format!("{}", sq_val)
+                } else {
+                    "None".to_string()
+                }
+            );
+        }
+    }
     fn cell(&self, index: usize) -> String {
         if let Some(piece) = self.squares[index] {
             format!("{}", piece)
@@ -14,22 +27,22 @@ impl Board {
         println!(
             "\
 +---+---+---+
-|{6}|{7}|{8}| マスを選んでください
+|{0}|{1}|{2}| マスを選んでください
 +---+---+---+
 |{3}|{4}|{5}|    7 8 9
 +---+---+---+    4 5 6
-|{0}|{1}|{2}|    1 2 3
+|{6}|{7}|{8}|    1 2 3
 +---+---+---+
 ",
-            self.cell(6),
             self.cell(7),
             self.cell(8),
-            self.cell(3),
+            self.cell(9),
             self.cell(4),
             self.cell(5),
-            self.cell(0),
+            self.cell(6),
             self.cell(1),
-            self.cell(2)
+            self.cell(2),
+            self.cell(3)
         );
     }
 }
@@ -38,8 +51,8 @@ impl fmt::Display for Piece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use crate::piece::Piece::*;
         match self {
-            Nought => write!(f, " X "),
-            Cross => write!(f, " O "),
+            Nought => write!(f, " O "),
+            Cross => write!(f, " X "),
         }
     }
 }
