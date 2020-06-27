@@ -23,3 +23,14 @@ Input:
 ```shell
 docker build --tag tic-tac-toe:0.1 .
 ```
+
+Dockerコンテナを起動するために、以下のコマンドを打鍵してください。  
+
+Input:  
+
+```shell
+docker run --name tic-tac-toe -it --rm tic-tac-toe:0.1
+```
+
+TODO カレント・ディレクトリの移動
+TODO cargo run
