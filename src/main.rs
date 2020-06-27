@@ -1,3 +1,8 @@
+mod board;
+mod view;
+
+use board::Board;
+
 fn main() {
-    println!("Hello, world!");
+    Board::println();
 }
