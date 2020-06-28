@@ -7,7 +7,7 @@ mod view;
 
 use crate::command_line::CommandLine;
 use position::Position;
-use search::go;
+use search::Search;
 use std;
 
 fn main() {
@@ -59,7 +59,8 @@ fn main() {
                 board.do_(rest);
             }
         } else if p.starts_with("go") {
-            let (address, mate) = go(&mut board);
+            let mut search = Search::default();
+            let (address, mate) = search.go(&mut board);
             if let Some(addr_val) = address {
                 println!("info mate={}", mate);
                 println!("bestmove {}", addr_val);
