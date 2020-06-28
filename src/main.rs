@@ -31,7 +31,7 @@ fn main() {
     // let xfen = "xfen 2x/3/3 x";
     // let xfen = "xfen 3/x2/3 x";
     // let xfen = "xfen 3/1x1/3 x";
-    let mut board = if let Some(board) = Position::from_xfen(xfen) {
+    let mut pos = if let Some(board) = Position::from_xfen(xfen) {
         board
     } else {
         panic!("xfen error. xfen={}", xfen);
@@ -53,17 +53,24 @@ fn main() {
         // コマンドライン☆（＾～＾） p は parser の意味で使ってるぜ☆（＾～＾）
         let mut p = CommandLine::new(&line);
 
-        if p.starts_with("pos") {
-            board.pos();
+        if p.starts_with("position") {
+            p.go_next_to("position ");
+            if let Some(rest) = p.rest() {
+                if let Some(pos_val) = position::Position::from_xfen(rest) {
+                    pos = pos_val;
+                }
+            }
+        } else if p.starts_with("pos") {
+            pos.pos();
         } else if p.starts_with("do") {
             p.go_next_to("do ");
             // println!("Debug   | rest=|{}|", p.rest());
             if let Some(rest) = p.rest() {
-                board.do_(rest);
+                pos.do_(rest);
             }
         } else if p.starts_with("go") {
             let mut search = Search::default();
-            let (address, mate) = search.go(&mut board);
+            let (address, mate) = search.go(&mut pos);
             if let Some(addr_val) = address {
                 println!("info mate={}", mate);
                 println!("bestmove {}", addr_val);
