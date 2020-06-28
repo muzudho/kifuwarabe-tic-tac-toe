@@ -53,19 +53,17 @@ impl Search {
                 self.depth += 1;
 
                 // 深い方に潜ってるときの読み筋☆（＾～＾）いわゆる前向き☆（＾～＾）
-                println!("info pv {: <17} |", self.pv());
-
                 // 勝ったかどうか判定しようぜ☆（＾～＾）？
                 if pos.is_win() {
                     // 勝ったなら☆（＾～＾）
-                    println!("info .. {: <17} | {} win LEAF", "", pos.friend);
+                    println!("info pv {: <17} | -> {} win", self.pv(), pos.friend);
 
                     // 置いたところを戻そうぜ☆（＾～＾）？
                     pos.board[addr] = None;
                     self.depth -= 1;
 
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    println!("info pv {: <17} |", self.pv());
+                    println!("info pv {: <17} | <- MATE_ZERO", self.pv());
 
                     // 探索終了だぜ☆（＾～＾）
                     return (
@@ -73,6 +71,8 @@ impl Search {
                         // 自分がメートしたら、相手はメートされてるんだぜ☆（＾～＾）
                         Some(-1),
                     );
+                } else {
+                    println!("info pv {: <17} | ->", self.pv());
                 }
 
                 pos.change_phase();
@@ -85,22 +85,30 @@ impl Search {
                 self.depth -= 1;
                 pos.change_phase();
 
-                // const MATE_MAX: i8 = 127;
-                // let mut s_mate = MATE_MAX;
-                // let mut f_mate = MATE_MAX;
-                fn s_mate_str(mate: Option<i8>) -> String {
-                    if let Some(mate) = mate {
-                        format!(" s_mate{}", mate)
-                    } else {
-                        "".to_string()
-                    }
-                }
-                fn f_mate_str(mate: Option<i8>) -> String {
-                    if let Some(mate) = mate {
-                        format!(" f_mate{}", mate)
-                    } else {
-                        "".to_string()
-                    }
+                // 後ろ向き探索のときの表示だぜ☆（＾～＾）
+                fn backward_str(
+                    pv: String,
+                    friend: Piece,
+                    addr: usize,
+                    s_mate: Option<i8>,
+                    f_mate: Option<i8>,
+                ) -> String {
+                    format!(
+                        "pv {: <17} | <- {} {}addr{}{}",
+                        pv,
+                        friend,
+                        addr,
+                        if let Some(mate) = s_mate {
+                            format!(" s_mate{}", mate)
+                        } else {
+                            "".to_string()
+                        },
+                        if let Some(mate) = f_mate {
+                            format!(" f_mate{}", mate)
+                        } else {
+                            "".to_string()
+                        }
+                    )
                 }
 
                 enum UpdateReadon {
@@ -176,6 +184,7 @@ impl Search {
                     }
                 };
 
+                // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
                 if let Some(u_reason) = update_reason {
                     // 更新することは確定☆（＾～＾）
                     best_addr = Some(addr as u8);
@@ -184,12 +193,14 @@ impl Search {
                     match u_reason {
                         UpdateReadon::GettingFirst => {
                             println!(
-                                "info .. {: <17} | {} {}addr{}{} GETTING-FIRST{}",
-                                "",
-                                pos.friend,
-                                addr,
-                                s_mate_str(shortest_mate),
-                                f_mate_str(friend_mate),
+                                "info {} GETTING-FIRST{}",
+                                backward_str(
+                                    self.pv(),
+                                    pos.friend,
+                                    addr,
+                                    shortest_mate,
+                                    friend_mate
+                                ),
                                 if let Some(s_mate) = shortest_mate {
                                     if 0 < s_mate {
                                         format!(" # So good!")
@@ -206,57 +217,63 @@ impl Search {
                         UpdateReadon::GoodCounterMate => {
                             // メート食らってたのを、メートかけるんだから、すごい良い手だぜ☆（＾～＾）！更新するぜ☆（＾～＾）
                             println!(
-                                "info pv {: <17} | {} good{}addr{}{} UPDATE # Excellent!",
-                                self.pv(),
-                                pos.friend,
-                                addr,
-                                s_mate_str(shortest_mate),
-                                f_mate_str(friend_mate),
+                                "info {} UPDATE # Excellent!",
+                                backward_str(
+                                    self.pv(),
+                                    pos.friend,
+                                    addr,
+                                    shortest_mate,
+                                    friend_mate
+                                ),
                             );
                         }
                         UpdateReadon::ShorterGoodMate => {
                             // 短手数のメートを良い方へ更新したら、更新するぜ☆（＾～＾）
                             println!(
-                                "info pv {: <17} | {} good{}addr{}{} UPDATE # Great!",
-                                self.pv(),
-                                pos.friend,
-                                addr,
-                                s_mate_str(shortest_mate),
-                                f_mate_str(friend_mate),
+                                "info {} UPDATE # Great!",
+                                backward_str(
+                                    self.pv(),
+                                    pos.friend,
+                                    addr,
+                                    shortest_mate,
+                                    friend_mate
+                                ),
                             );
                         }
                         UpdateReadon::LongerBadMate => {
                             // メートされるケースで、手数を伸ばす手を見つけたぜ☆（＾～＾）
                             println!(
-                                "info pv {: <17} | {} bad{}addr{}{} UPDATE # Increase the number of steps.",
-                                self.pv(),
-                                pos.friend,
-                                addr,
-                                s_mate_str(shortest_mate),
-                                f_mate_str(friend_mate),
+                                "info {} UPDATE # Increase the number of steps.",
+                                backward_str(
+                                    self.pv(),
+                                    pos.friend,
+                                    addr,
+                                    shortest_mate,
+                                    friend_mate
+                                ),
                             );
                         }
                         UpdateReadon::GoodDraw => {
                             // メートを食らってたのを、引き分けにできるぜ☆（＾～＾）！
                             println!(
-                                "info pv {: <17} | {} {}addr{}{} UPDATE # Good draw.",
-                                self.pv(),
-                                pos.friend,
-                                addr,
-                                s_mate_str(shortest_mate),
-                                f_mate_str(friend_mate),
+                                "info {} UPDATE # Good draw.",
+                                backward_str(
+                                    self.pv(),
+                                    pos.friend,
+                                    addr,
+                                    shortest_mate,
+                                    friend_mate
+                                ),
                             );
                         }
                     }
+                } else {
+                    // 更新がないとき☆（＾～＾）
+                    println!(
+                        "info {}",
+                        backward_str(self.pv(), pos.friend, addr, shortest_mate, friend_mate),
+                    );
                 }
-
-                // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                println!(
-                    "info pv {: <17} |{}{}",
-                    self.pv(),
-                    s_mate_str(shortest_mate),
-                    f_mate_str(friend_mate),
-                );
             }
         }
 
