@@ -2,10 +2,12 @@ mod command_line;
 mod piece;
 mod position;
 mod protocol;
+mod search;
 mod view;
 
 use crate::command_line::CommandLine;
 use position::Position;
+use search::go;
 use std;
 
 fn main() {
@@ -55,6 +57,14 @@ fn main() {
             // println!("Debug   | rest=|{}|", p.rest());
             if let Some(rest) = p.rest() {
                 board.do_(rest);
+            }
+        } else if p.starts_with("go") {
+            let (address, mate) = go(&mut board);
+            if let Some(addr_val) = address {
+                println!("info mate={}", mate);
+                println!("bestmove {}", addr_val);
+            } else {
+                println!("resign");
             }
         } else {
             println!("Debug   | Command not found. {:?}", p);
