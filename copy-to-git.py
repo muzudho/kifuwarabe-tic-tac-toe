@@ -16,6 +16,7 @@ def go():
     remove_destination_file('/.gitignore')
     remove_destination_file('/Cargo.toml')
     remove_destination_file('/copy-to-git.py')
+    remove_destination_file('/Dockerfile')
     remove_destination_file('/LICENSE')
     remove_destination_file('/README.md')
 
@@ -25,6 +26,7 @@ def go():
     copy_file('/.gitignore')
     copy_file('/Cargo.toml')
     copy_file('/copy-to-git.py')
+    copy_file('/Dockerfile')
     copy_file('/LICENSE')
     copy_file('/README.md')
 
