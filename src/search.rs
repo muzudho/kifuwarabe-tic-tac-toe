@@ -58,19 +58,21 @@ impl Search {
                 pos.change_phase();
 
                 // 相手の番だぜ☆（＾～＾）
-                let (address, mut mate) = self.node(pos);
-                if 0 < mate {
+                let (_opponent_address, opponent_mate) = self.node(pos);
+                let friend_mate = if 0 < opponent_mate {
                     // 相手がメートしたら、こっちはメートされてるんだぜ☆（＾～＾）
-                    mate = -mate - 1;
-                } else if mate < 0 {
+                    -opponent_mate - 1
+                } else if opponent_mate < 0 {
                     // 相手がメートされてるんなら、こっちはメートしてるんだぜ☆（＾～＾）
-                    mate = -mate + 1;
-                }
+                    -opponent_mate + 1
+                } else {
+                    0
+                };
 
-                if best_addr == None || mate < best_mate {
+                if best_addr == None || opponent_mate < best_mate {
                     // 最初に見つけた手か、より短手数のメートを見つけていたら、更新だぜ☆（＾～＾）
-                    best_addr = address;
-                    best_mate = mate;
+                    best_addr = Some(addr as u8);
+                    best_mate = friend_mate;
                 }
 
                 // 置いたところを戻そうぜ☆（＾～＾）？
