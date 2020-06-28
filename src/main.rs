@@ -19,18 +19,13 @@ fn main() {
     
     コマンド:
     `do 7` - 手番のプレイヤーが、 7 番地に印を付けます。
-    `pos` - 局面表示。"
+    `pos` - 局面表示。
+    `position xfen 3/3/3 o` - 初期局面に設定。"
     );
     // let board = Board::default();
 
-    // TODO テスト
+    // 初期局面
     let xfen = "xfen 3/3/3 o";
-    // let xfen = "xfen xox/3/o1o x";
-    // let xfen = "xfen x2/3/3 x";
-    // let xfen = "xfen 1x1/3/3 x";
-    // let xfen = "xfen 2x/3/3 x";
-    // let xfen = "xfen 3/x2/3 x";
-    // let xfen = "xfen 3/1x1/3 x";
     let mut pos = if let Some(board) = Position::from_xfen(xfen) {
         board
     } else {
