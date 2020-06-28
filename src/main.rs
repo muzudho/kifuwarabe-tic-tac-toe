@@ -25,7 +25,13 @@ fn main() {
     // let board = Board::default();
 
     // 初期局面
-    let xfen = "xfen 3/3/3 o";
+    // let xfen = "xfen 3/3/3 o";
+    // 一手詰め局面
+    // let xfen = "xfen oxo/xox/3 o";
+    // 二手詰め局面
+    // let xfen = "xfen oxo/xo1/3 x";
+    // ３手詰め局面
+    let xfen = "xfen oxo/x2/3 o";
     let mut pos = if let Some(board) = Position::from_xfen(xfen) {
         board
     } else {
@@ -67,7 +73,9 @@ fn main() {
             let mut search = Search::default();
             let (address, mate) = search.go(&mut pos);
             if let Some(addr_val) = address {
-                println!("info mate={}", mate);
+                if let Some(mate_val) = mate {
+                    println!("info mate={}", mate_val);
+                }
                 println!("bestmove {}", addr_val);
             } else {
                 println!("resign");

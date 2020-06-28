@@ -26,7 +26,7 @@ impl Search {
         pv.trim_end().to_string()
     }
     /// 最善の番地を返すぜ☆（＾～＾）
-    pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, i8) {
+    pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, Option<i8>) {
         match pos.friend {
             Piece::Nought => {
                 println!("info pv O X O X O X O X O");
@@ -38,10 +38,10 @@ impl Search {
         self.node(pos)
     }
 
-    fn node(&mut self, pos: &mut Position) -> (Option<u8>, i8) {
+    fn node(&mut self, pos: &mut Position) -> (Option<u8>, Option<i8>) {
         let mut best_addr = None;
-        // -1,2,-3,4... のように 負の奇数と、正の偶数が交互に出てくるぜ☆（＾～＾）
-        let mut shortest_mate = 127i8;
+        // 0,-1,2,-3,4... のように、0を除くと、 負の奇数と、正の偶数が交互に出てくるぜ☆（＾～＾）
+        let mut shortest_mate: Option<i8> = None;
 
         for addr in 1..9 {
             // 空きマスがあれば
@@ -52,21 +52,26 @@ impl Search {
                 self.moves[self.depth] = addr as u8;
                 self.depth += 1;
 
+                // 深い方に潜ってるときの読み筋☆（＾～＾）いわゆる前向き☆（＾～＾）
                 println!("info pv {: <17} |", self.pv());
 
                 // 勝ったかどうか判定しようぜ☆（＾～＾）？
                 if pos.is_win() {
                     // 勝ったなら☆（＾～＾）
-                    println!("info .. {: <17} | {} win", "", pos.friend);
+                    println!("info .. {: <17} | {} win LEAF", "", pos.friend);
 
                     // 置いたところを戻そうぜ☆（＾～＾）？
                     pos.board[addr] = None;
                     self.depth -= 1;
+
+                    // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
+                    println!("info pv {: <17} |", self.pv());
+
                     // 探索終了だぜ☆（＾～＾）
                     return (
                         Some(addr as u8),
                         // 自分がメートしたら、相手はメートされてるんだぜ☆（＾～＾）
-                        -1,
+                        Some(-1),
                     );
                 }
 
@@ -85,48 +90,70 @@ impl Search {
                     best_addr = Some(addr as u8);
                     shortest_mate = friend_mate;
                     println!(
-                        "info pv {: <17} | {} first-addr {}{} friend-mate={} UPDATE",
-                        self.pv(),
+                        "info .. {: <17} | {} {}addr{} GETTING-FIRST{}",
+                        "",
                         pos.friend,
                         addr,
-                        if shortest_mate == 0 || shortest_mate == 127 {
-                            "".to_string()
+                        if let Some(s_mate) = shortest_mate {
+                            format!(" mate {}", s_mate)
                         } else {
-                            format!(" mate {}", shortest_mate)
+                            "".to_string()
                         },
-                        friend_mate
-                    );
-                } else if friend_mate != 0 && friend_mate.abs() < shortest_mate.abs() {
-                    // より短手数のメートを見つけていたら、更新だぜ☆（＾～＾）
-                    if 0 < friend_mate {
-                        best_addr = Some(addr as u8);
-                        shortest_mate = friend_mate;
-                        println!(
-                            "info pv {: <17} | {} good-addr {}{} UPDATE",
-                            self.pv(),
-                            pos.friend,
-                            addr,
-                            if shortest_mate == 0 || shortest_mate == 127 {
-                                "".to_string()
+                        if let Some(s_mate) = shortest_mate {
+                            if 0 < s_mate {
+                                format!(" # So good!")
+                            } else if s_mate < 0 {
+                                format!(" # So bad!")
                             } else {
-                                format!(" mate {}", shortest_mate)
+                                "".to_string()
                             }
-                        );
+                        } else {
+                            "".to_string()
+                        },
+                    );
+                } else if let Some(f_mate) = friend_mate {
+                    const S_MATE_MAX: i8 = 127;
+
+                    let s_mate = if let Some(s_mate) = shortest_mate {
+                        s_mate
                     } else {
-                        println!(
-                            "info pv {: <17} | {} bad-addr {}{} friend-mate={}",
-                            self.pv(),
-                            pos.friend,
-                            addr,
-                            if shortest_mate == 0 || shortest_mate == 127 {
-                                "".to_string()
-                            } else {
-                                format!(" mate {}", shortest_mate)
-                            },
-                            friend_mate
-                        );
+                        S_MATE_MAX
+                    };
+
+                    if f_mate.abs() < s_mate.abs() {
+                        // より短手数のメートを見つけていたら、更新だぜ☆（＾～＾）
+                        if 0 < f_mate {
+                            best_addr = Some(addr as u8);
+                            shortest_mate = friend_mate;
+                            println!(
+                                "info pv {: <17} | {} good{}addr{} UPDATE",
+                                self.pv(),
+                                pos.friend,
+                                addr,
+                                if s_mate == S_MATE_MAX {
+                                    "".to_string()
+                                } else {
+                                    format!(" mate {}", s_mate)
+                                },
+                            );
+                        } else {
+                            println!(
+                                "info pv {: <17} | {} bad{}addr{} # I do not choose.",
+                                self.pv(),
+                                pos.friend,
+                                addr,
+                                if s_mate == S_MATE_MAX {
+                                    "".to_string()
+                                } else {
+                                    format!(" mate {}", s_mate)
+                                },
+                            );
+                        }
                     }
                 }
+
+                // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
+                println!("info pv {: <17} |", self.pv());
             }
         }
 
@@ -137,14 +164,16 @@ impl Search {
 
         (
             best_addr,
-            if shortest_mate == 0 || shortest_mate == 127 {
-                0
-            } else if 0 < shortest_mate {
-                // 自分がメートしたら、相手はメートされてるんだぜ☆（＾～＾）
-                -(shortest_mate + 1)
+            if let Some(s_mate) = shortest_mate {
+                if 0 < s_mate {
+                    // 自分がメートしたら、相手はメートされてるんだぜ☆（＾～＾）
+                    Some(-(s_mate + 1))
+                } else {
+                    // 自分がメートされてるんなら、相手はメートしてるんだぜ☆（＾～＾）
+                    Some(-(s_mate - 1))
+                }
             } else {
-                // 自分がメートされてるんなら、相手はメートしてるんだぜ☆（＾～＾）
-                -(shortest_mate - 1)
+                None
             },
         )
     }
