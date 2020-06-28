@@ -23,7 +23,7 @@ impl Position {
             "   ".to_string()
         }
     }
-    pub fn println(&self) {
+    pub fn pos(&self) {
         println!(
             "\
 +---+---+---+

@@ -19,11 +19,11 @@ impl Default for Position {
     }
 }
 impl Position {
-    pub fn change_phase(&mut self) -> Piece {
+    pub fn change_phase(&mut self) {
         use crate::piece::Piece::*;
-        match self.friend {
+        self.friend = match self.friend {
             Nought => Cross,
             Cross => Nought,
-        }
+        };
     }
 }

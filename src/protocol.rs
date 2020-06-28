@@ -58,7 +58,7 @@ impl Position {
     pub fn do_(&mut self, move_: &str) {
         let addr: usize = match move_.parse() {
             Ok(x) => x,
-            Err(x) => panic!("do_: move_={}", move_),
+            Err(x) => panic!("do_: move_={} {}", move_, x),
         };
 
         println!("Debug   | move_={} addr={}", move_, addr);
