@@ -27,15 +27,17 @@ fn main() {
     // let board = Board::default();
 
     // 初期局面
-    // let xfen = "xfen 3/3/3 o";
+    let xfen = "xfen 3/3/3 o";
     // 一手詰め局面
     // let xfen = "xfen oxo/xox/3 o";
     // 二手詰め局面
     // let xfen = "xfen oxo/xo1/3 x";
     // ３手詰め局面
     // let xfen = "xfen oxo/x2/3 o";
-    // 受けの一手局面
-    let xfen = "xfen 2o/1o1/xxo x";
+    // 必死の２手局面
+    // let xfen = "xfen 2o/1o1/xxo x";
+    // 受けの１手局面
+    // let xfen = "xfen 3/1ox/1o1 x";
     let mut pos = if let Some(board) = Position::from_xfen(xfen) {
         board
     } else {

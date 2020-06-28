@@ -134,14 +134,18 @@ impl Search {
                                 if 0 < f_mate {
                                     // 今まで メートされる手ばかりだったが、メートできる手を見つけたぜ☆（＾～＾）
                                     Some(UpdateReadon::GoodCounterMate)
-                                } else if f_mate < 0 && s_mate.abs() < f_mate.abs() {
-                                    // メートされるケースで、手数を伸ばす手を見つけたぜ☆（＾～＾）
-                                    Some(UpdateReadon::LongerBadMate)
+                                } else if f_mate < 0 {
+                                    if s_mate.abs() < f_mate.abs() {
+                                        // 今まで メートされる手ばかりだったが、手数を伸ばす手を見つけたぜ☆（＾～＾）
+                                        Some(UpdateReadon::LongerBadMate)
+                                    } else {
+                                        None
+                                    }
                                 } else {
-                                    None
+                                    panic!("メートは0にならないはずだぜ☆（＾～＾）！");
                                 }
                             } else {
-                                // 引き分けにできるぜ☆（＾～＾）！
+                                // 今まで メートされる手ばかりだったが、引き分けにできるぜ☆（＾～＾）！
                                 Some(UpdateReadon::GoodDraw)
                             }
                         } else if s_mate == 0 {
@@ -286,15 +290,20 @@ impl Search {
             best_addr,
             if let Some(s_mate) = shortest_mate {
                 if 0 < s_mate {
+                    let x = -(s_mate + 1);
+                    println!("s_mate={} だったんで {} にした。", s_mate, x);
                     // 自分がメートしたら、相手はメートされてるんだぜ☆（＾～＾）
-                    Some(-(s_mate + 1))
+                    Some(x)
                 } else if s_mate < 0 {
+                    let x = -(s_mate - 1);
+                    println!("s_mate={} だったんで {} にした。", s_mate, x);
                     // 自分がメートされてるんなら、相手はメートしてるんだぜ☆（＾～＾）
-                    Some(-(s_mate - 1))
+                    Some(x)
                 } else {
                     panic!("ここは通らないはずだぜ☆（＾～＾）！");
                 }
             } else {
+                println!("drawだよな☆（＾～＾）");
                 None
             },
         )
