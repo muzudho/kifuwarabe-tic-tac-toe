@@ -43,7 +43,7 @@ impl Search {
         // 0,-1,2,-3,4... のように、0を除くと、 負の奇数と、正の偶数が交互に出てくるぜ☆（＾～＾）
         let mut shortest_mate: Option<i8> = None;
 
-        for addr in 1..9 {
+        for addr in 1..10 {
             // 空きマスがあれば
             if let None = pos.board[addr] {
                 // とりあえず置いてみようぜ☆（＾～＾）

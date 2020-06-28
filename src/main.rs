@@ -16,22 +16,24 @@ fn main() {
     test();
     println!(
         "〇×ゲーム
-    
-    コマンド:
-    `do 7` - 手番のプレイヤーが、 7 番地に印を付けます。
-    `pos` - 局面表示。
-    `position xfen 3/3/3 o` - 初期局面に設定。"
+
+コマンド:
+`do 7` - 手番のプレイヤーが、 7 番地に印を付けます。
+`pos` - 局面表示。
+`position xfen 3/3/3 o` - 初期局面に設定。
+`xfen` - 現局面のxfen文字列表示。
+"
     );
     // let board = Board::default();
 
     // 初期局面
-    // let xfen = "xfen 3/3/3 o";
+    let xfen = "xfen 3/3/3 o";
     // 一手詰め局面
     // let xfen = "xfen oxo/xox/3 o";
     // 二手詰め局面
     // let xfen = "xfen oxo/xo1/3 x";
     // ３手詰め局面
-    let xfen = "xfen oxo/x2/3 o";
+    // let xfen = "xfen oxo/x2/3 o";
     let mut pos = if let Some(board) = Position::from_xfen(xfen) {
         board
     } else {
@@ -80,6 +82,8 @@ fn main() {
             } else {
                 println!("resign");
             }
+        } else if p.starts_with("xfen") {
+            println!("{}", pos.to_xfen());
         } else {
             println!("Debug   | Command not found. {:?}", p);
         }

@@ -3,6 +3,55 @@ use crate::piece::Piece;
 use crate::position::Position;
 
 impl Position {
+    /// 現局面を xfen に変換するぜ☆（＾～＾）
+    pub fn to_xfen(&self) -> String {
+        let mut xfen = String::default();
+        xfen.push_str("xfen ");
+
+        // Board
+        let mut spaces = 0;
+        for addr in [7, 8, 9, 4, 5, 6, 1, 2, 3].iter() {
+            // println!("addr={} spaces={} xfen={}", addr, spaces, xfen);
+            if let Some(piece) = self.board[*addr as usize] {
+                if 0 < spaces {
+                    xfen.push_str(&spaces.to_string());
+                    spaces = 0;
+                }
+                xfen.push(match piece {
+                    Piece::Nought => 'o',
+                    Piece::Cross => 'x',
+                });
+            } else {
+                spaces += 1;
+            }
+
+            if *addr == 9 || *addr == 6 {
+                if 0 < spaces {
+                    xfen.push_str(&spaces.to_string());
+                    spaces = 0;
+                }
+                xfen.push('/');
+            }
+        }
+
+        // 残ってるスペースの flush を忘れないぜ☆（＾～＾）
+        if 0 < spaces {
+            xfen.push_str(&spaces.to_string());
+        }
+
+        // Phase
+        match self.friend {
+            Piece::Nought => {
+                xfen.push_str(" o");
+            }
+            Piece::Cross => {
+                xfen.push_str(" x");
+            }
+        }
+
+        xfen.to_string()
+    }
+
     /// xfen を board に変換するぜ☆（＾～＾）
     pub fn from_xfen(xfen: &str) -> Option<Position> {
         if !xfen.starts_with("xfen ") {
