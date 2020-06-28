@@ -291,19 +291,19 @@ impl Search {
             if let Some(s_mate) = shortest_mate {
                 if 0 < s_mate {
                     let x = -(s_mate + 1);
-                    println!("s_mate={} だったんで {} にした。", s_mate, x);
+                    // println!("s_mate={} だったんで {} にした。", s_mate, x);
                     // 自分がメートしたら、相手はメートされてるんだぜ☆（＾～＾）
                     Some(x)
                 } else if s_mate < 0 {
                     let x = -(s_mate - 1);
-                    println!("s_mate={} だったんで {} にした。", s_mate, x);
+                    // println!("s_mate={} だったんで {} にした。", s_mate, x);
                     // 自分がメートされてるんなら、相手はメートしてるんだぜ☆（＾～＾）
                     Some(x)
                 } else {
                     panic!("ここは通らないはずだぜ☆（＾～＾）！");
                 }
             } else {
-                println!("drawだよな☆（＾～＾）");
+                // println!("drawだよな☆（＾～＾）");
                 None
             },
         )
