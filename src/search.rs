@@ -85,56 +85,111 @@ impl Search {
                 self.depth -= 1;
                 pos.change_phase();
 
+                // const MATE_MAX: i8 = 127;
+                // let mut s_mate = MATE_MAX;
+                // let mut f_mate = MATE_MAX;
+                fn s_mate_str(mate: Option<i8>) -> String {
+                    if let Some(mate) = mate {
+                        format!(" s_mate{}", mate)
+                    } else {
+                        "".to_string()
+                    }
+                }
+                fn f_mate_str(mate: Option<i8>) -> String {
+                    if let Some(mate) = mate {
+                        format!(" f_mate{}", mate)
+                    } else {
+                        "".to_string()
+                    }
+                }
+
                 enum UpdateReadon {
                     /// 置ける場所があれば、必ず置かなければならないから、最初の１個はとりあえず選ぶぜ☆（＾～＾）
                     GettingFirst,
                     /// 短手数でメートかけれるなら更新しないとな☆（＾～＾）
                     ShorterGoodMate,
-                    /// 短手数のメートを食らうなら更新しないぜ☆（＾～＾）
-                    ShorterBadMate,
+                    /// メートされるケースで、手数を伸ばす手を見つけたぜ☆（＾～＾）
+                    LongerBadMate,
                     /// メート食らってたのを、メートかけるんだから、すごい良い手だぜ☆（＾～＾）！更新するぜ☆（＾～＾）
                     GoodCounterMate,
+                    /// メートを食らってたのを、引き分けにできるぜ☆（＾～＾）！
+                    GoodDraw,
                 }
-                const S_MATE_MAX: i8 = 127;
-                let mut s_mate = S_MATE_MAX;
                 let update_reason = if best_addr == None {
                     // 置ける場所があれば必ず選ばなければならないから、最初に見つけた置ける場所をひとまず調べるぜ☆（＾～＾）
                     Some(UpdateReadon::GettingFirst)
                 } else {
-                    if let Some(f_mate) = friend_mate {
-                        if let Some(s_mate2) = shortest_mate {
-                            s_mate = s_mate2
-                        }
-                        // 既に同じか、より短手数のメートを見つけていたら、更新しないぜ☆（＾～＾）
-                        if s_mate < 0 && 0 < f_mate {
-                            Some(UpdateReadon::GoodCounterMate)
-                        } else if s_mate.abs() <= f_mate.abs() {
-                            None
-                        } else if 0 < f_mate {
-                            Some(UpdateReadon::ShorterGoodMate)
+                    if let Some(s_mate) = shortest_mate {
+                        if s_mate < 0 {
+                            // 今までの手は、メート食らう手のとき☆（／＿＼）
+                            if let Some(f_mate) = friend_mate {
+                                if 0 < f_mate {
+                                    // 今まで メートされる手ばかりだったが、メートできる手を見つけたぜ☆（＾～＾）
+                                    Some(UpdateReadon::GoodCounterMate)
+                                } else if f_mate < 0 && s_mate.abs() < f_mate.abs() {
+                                    // メートされるケースで、手数を伸ばす手を見つけたぜ☆（＾～＾）
+                                    Some(UpdateReadon::LongerBadMate)
+                                } else {
+                                    None
+                                }
+                            } else {
+                                // 引き分けにできるぜ☆（＾～＾）！
+                                Some(UpdateReadon::GoodDraw)
+                            }
+                        } else if s_mate == 0 {
+                            // 今までの手は、引き分けのとき☆（ー＿ー）
+                            if let Some(f_mate) = friend_mate {
+                                if 0 < f_mate {
+                                    // 今まで 引き分けの手ばかりだったが、メートできる手を見つけたぜ☆（＾～＾）
+                                    Some(UpdateReadon::GoodCounterMate)
+                                } else {
+                                    None
+                                }
+                            } else {
+                                None
+                            }
                         } else {
-                            Some(UpdateReadon::ShorterBadMate)
+                            // 今までの手は、メート掛ける手のとき☆（＾ｑ＾）
+                            if let Some(f_mate) = friend_mate {
+                                if 0 < f_mate && f_mate.abs() < s_mate.abs() {
+                                    // より短手数のメートをかける手を見つけてたら、更新するぜ☆（＾～＾）
+                                    Some(UpdateReadon::ShorterGoodMate)
+                                } else {
+                                    None
+                                }
+                            } else {
+                                None
+                            }
                         }
                     } else {
-                        None
+                        // 今まで、引き分けの手だけ見つけているケースで。
+                        if let Some(f_mate) = friend_mate {
+                            if 0 < f_mate {
+                                // こっちからメートする手を見つけたぜ☆（＾～＾）
+                                Some(UpdateReadon::ShorterGoodMate)
+                            } else {
+                                None
+                            }
+                        } else {
+                            None
+                        }
                     }
                 };
 
                 if let Some(u_reason) = update_reason {
+                    // 更新することは確定☆（＾～＾）
+                    best_addr = Some(addr as u8);
+                    shortest_mate = friend_mate;
+
                     match u_reason {
                         UpdateReadon::GettingFirst => {
-                            best_addr = Some(addr as u8);
-                            shortest_mate = friend_mate;
                             println!(
-                                "info .. {: <17} | {} {}addr{} GETTING-FIRST{}",
+                                "info .. {: <17} | {} {}addr{}{} GETTING-FIRST{}",
                                 "",
                                 pos.friend,
                                 addr,
-                                if let Some(s_mate) = shortest_mate {
-                                    format!(" mate {}", s_mate)
-                                } else {
-                                    "".to_string()
-                                },
+                                s_mate_str(shortest_mate),
+                                f_mate_str(friend_mate),
                                 if let Some(s_mate) = shortest_mate {
                                     if 0 < s_mate {
                                         format!(" # So good!")
@@ -150,55 +205,58 @@ impl Search {
                         }
                         UpdateReadon::GoodCounterMate => {
                             // メート食らってたのを、メートかけるんだから、すごい良い手だぜ☆（＾～＾）！更新するぜ☆（＾～＾）
-                            best_addr = Some(addr as u8);
-                            shortest_mate = friend_mate;
                             println!(
-                                "info pv {: <17} | {} good{}addr{} UPDATE # Excellent!",
+                                "info pv {: <17} | {} good{}addr{}{} UPDATE # Excellent!",
                                 self.pv(),
                                 pos.friend,
                                 addr,
-                                if s_mate == S_MATE_MAX {
-                                    "".to_string()
-                                } else {
-                                    format!(" mate {}", s_mate)
-                                },
+                                s_mate_str(shortest_mate),
+                                f_mate_str(friend_mate),
                             );
                         }
                         UpdateReadon::ShorterGoodMate => {
                             // 短手数のメートを良い方へ更新したら、更新するぜ☆（＾～＾）
-                            best_addr = Some(addr as u8);
-                            shortest_mate = friend_mate;
                             println!(
-                                "info pv {: <17} | {} good{}addr{} UPDATE # Great!",
+                                "info pv {: <17} | {} good{}addr{}{} UPDATE # Great!",
                                 self.pv(),
                                 pos.friend,
                                 addr,
-                                if s_mate == S_MATE_MAX {
-                                    "".to_string()
-                                } else {
-                                    format!(" mate {}", s_mate)
-                                },
+                                s_mate_str(shortest_mate),
+                                f_mate_str(friend_mate),
                             );
                         }
-                        UpdateReadon::ShorterBadMate => {
-                            // 短手数のメートを悪い方へ更新したら、更新しないぜ☆（＾～＾）
+                        UpdateReadon::LongerBadMate => {
+                            // メートされるケースで、手数を伸ばす手を見つけたぜ☆（＾～＾）
                             println!(
-                                "info pv {: <17} | {} bad{}addr{} # I do not choose.",
+                                "info pv {: <17} | {} bad{}addr{}{} UPDATE # Increase the number of steps.",
                                 self.pv(),
                                 pos.friend,
                                 addr,
-                                if s_mate == S_MATE_MAX {
-                                    "".to_string()
-                                } else {
-                                    format!(" mate {}", s_mate)
-                                },
+                                s_mate_str(shortest_mate),
+                                f_mate_str(friend_mate),
+                            );
+                        }
+                        UpdateReadon::GoodDraw => {
+                            // メートを食らってたのを、引き分けにできるぜ☆（＾～＾）！
+                            println!(
+                                "info pv {: <17} | {} {}addr{}{} UPDATE # Good draw.",
+                                self.pv(),
+                                pos.friend,
+                                addr,
+                                s_mate_str(shortest_mate),
+                                f_mate_str(friend_mate),
                             );
                         }
                     }
                 }
 
                 // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                println!("info pv {: <17} |", self.pv());
+                println!(
+                    "info pv {: <17} |{}{}",
+                    self.pv(),
+                    s_mate_str(shortest_mate),
+                    f_mate_str(friend_mate),
+                );
             }
         }
 
