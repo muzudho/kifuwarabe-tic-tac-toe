@@ -117,6 +117,11 @@ impl Position {
         }
 
         self.board[addr] = Some(self.friend);
+
+        // 勝ち負け判定☆（*＾～＾*）
+        if self.is_win() {
+            println!("win {}", self.friend);
+        }
         self.change_phase();
     }
 }
