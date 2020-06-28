@@ -52,10 +52,12 @@ impl Search {
                 self.moves[self.depth] = addr as u8;
                 self.depth += 1;
 
+                println!("info pv {: <17} |", self.pv());
+
                 // 勝ったかどうか判定しようぜ☆（＾～＾）？
                 if pos.is_win() {
                     // 勝ったなら☆（＾～＾）
-                    println!("info pv {: <17} | {} win", self.pv(), pos.friend);
+                    println!("info .. {: <17} | {} win", "", pos.friend);
 
                     // 置いたところを戻そうぜ☆（＾～＾）？
                     pos.board[addr] = None;
@@ -78,12 +80,12 @@ impl Search {
                 self.depth -= 1;
                 pos.change_phase();
 
-                if best_addr == None && -1 < friend_mate {
-                    // 最初に見つけた手でメートを掛けられていなければ、とりあえず採用☆（＾～＾）
+                if best_addr == None {
+                    // 置ける場所があれば必ず選ばなければならないから、最初に見つけた置ける場所をひとまず調べるぜ☆（＾～＾）
                     best_addr = Some(addr as u8);
                     shortest_mate = friend_mate;
                     println!(
-                        "info pv {: <17} | {} first-addr {}{} UPDATE",
+                        "info pv {: <17} | {} first-addr {}{} friend-mate={} UPDATE",
                         self.pv(),
                         pos.friend,
                         addr,
@@ -91,10 +93,11 @@ impl Search {
                             "".to_string()
                         } else {
                             format!(" mate {}", shortest_mate)
-                        }
+                        },
+                        friend_mate
                     );
-                } else if friend_mate.abs() <= shortest_mate.abs() {
-                    // 同じ手数、または、より短手数のメートを見つけていたら、更新だぜ☆（＾～＾）
+                } else if friend_mate != 0 && friend_mate.abs() < shortest_mate.abs() {
+                    // より短手数のメートを見つけていたら、更新だぜ☆（＾～＾）
                     if 0 < friend_mate {
                         best_addr = Some(addr as u8);
                         shortest_mate = friend_mate;
@@ -111,7 +114,7 @@ impl Search {
                         );
                     } else {
                         println!(
-                            "info pv {: <17} | {} bad-addr {}{}",
+                            "info pv {: <17} | {} bad-addr {}{} friend-mate={}",
                             self.pv(),
                             pos.friend,
                             addr,
@@ -119,7 +122,8 @@ impl Search {
                                 "".to_string()
                             } else {
                                 format!(" mate {}", shortest_mate)
-                            }
+                            },
+                            friend_mate
                         );
                     }
                 }
@@ -128,7 +132,7 @@ impl Search {
 
         if let None = best_addr {
             // 置くところが無かったのなら☆（＾～＾）
-            println!("info pv {: <17} | draw", self.pv());
+            println!("info .. {: <17} | draw", "");
         }
 
         (

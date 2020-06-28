@@ -66,7 +66,10 @@ impl Position {
                     ' ' => {
                         machine_state = MachineState::Phase;
                     }
-                    _ => panic!("xfen board error: {}", ch),
+                    _ => {
+                        println!("Error   | xfen board error: {}", ch);
+                        return None;
+                    }
                 },
                 MachineState::Phase => {
                     match ch {
@@ -76,7 +79,10 @@ impl Position {
                         'o' => {
                             board.friend = Piece::Nought;
                         }
-                        _ => panic!("xfen phase error: {}", ch),
+                        _ => {
+                            println!("Error   | xfen phase error: {}", ch);
+                            return None;
+                        }
                     }
                     break;
                 }
