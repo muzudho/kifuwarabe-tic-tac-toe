@@ -25,18 +25,19 @@ impl Position {
     }
     pub fn pos(&self) {
         println!(
-            "[Go{}]
+            "[Go {}]
 ",
             self.friend
         );
+        // 書式を指定したりで、桁がずれるのは仕方ないぜ☆（＾～＾）
         println!(
             "\
 +---+---+---+
-|{0}|{1}|{2}| マスを選んでください。例 `do 7`
+|{0: ^3}|{1: ^3}|{2: ^3}| マスを選んでください。例 `do 7`
 +---+---+---+
-|{3}|{4}|{5}|    7 8 9
+|{3: ^3}|{4: ^3}|{5: ^3}|    7 8 9
 +---+---+---+    4 5 6
-|{6}|{7}|{8}|    1 2 3
+|{6: ^3}|{7: ^3}|{8: ^3}|    1 2 3
 +---+---+---+
 ",
             self.cell(7),
@@ -56,8 +57,8 @@ impl fmt::Display for Piece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use crate::piece::Piece::*;
         match self {
-            Nought => write!(f, " O "),
-            Cross => write!(f, " X "),
+            Nought => write!(f, "O"),
+            Cross => write!(f, "X"),
         }
     }
 }

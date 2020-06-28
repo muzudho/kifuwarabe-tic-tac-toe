@@ -3,14 +3,17 @@ mod piece;
 mod position;
 mod protocol;
 mod search;
+mod test;
 mod view;
 
 use crate::command_line::CommandLine;
 use position::Position;
 use search::Search;
 use std;
+use test::test;
 
 fn main() {
+    test();
     println!(
         "〇×ゲーム
     
