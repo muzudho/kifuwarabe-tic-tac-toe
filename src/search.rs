@@ -38,8 +38,8 @@ fn node(pos: &mut Position) -> (Option<u8>, i8) {
                 mate = -mate + 1;
             }
 
-            if best_mate < mate {
-                // 更新☆（＾～＾）
+            if best_addr == None || mate < best_mate {
+                // 最初に見つけた手か、より短手数のメートを見つけていたら、更新だぜ☆（＾～＾）
                 best_addr = address;
                 best_mate = mate;
             }
