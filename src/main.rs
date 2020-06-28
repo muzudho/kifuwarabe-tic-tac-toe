@@ -1,9 +1,9 @@
-mod board;
 mod piece;
+mod position;
 mod protocol;
 mod view;
 
-use board::Board;
+use position::Position;
 
 fn main() {
     // let board = Board::default();
@@ -15,7 +15,7 @@ fn main() {
     // let xfen = "xfen 2x/3/3 x";
     // let xfen = "xfen 3/x2/3 x";
     // let xfen = "xfen 3/1x1/3 x";
-    let board = if let Some(board) = Board::from_xfen(xfen) {
+    let board = if let Some(board) = Position::from_xfen(xfen) {
         board
     } else {
         panic!("xfen error. xfen={}", xfen);

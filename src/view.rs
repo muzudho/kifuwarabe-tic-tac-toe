@@ -1,10 +1,10 @@
-use crate::board::Board;
 use crate::piece::Piece;
+use crate::position::Position;
 use std::fmt;
 
-impl Board {
+impl Position {
     pub fn debug_write(&self) {
-        for (i, sq) in self.squares.iter().enumerate() {
+        for (i, sq) in self.board.iter().enumerate() {
             println!(
                 "{}: {}",
                 i,
@@ -17,7 +17,7 @@ impl Board {
         }
     }
     fn cell(&self, index: usize) -> String {
-        if let Some(piece) = self.squares[index] {
+        if let Some(piece) = self.board[index] {
             format!("{}", piece)
         } else {
             "   ".to_string()

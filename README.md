@@ -34,3 +34,11 @@ docker run --name tic-tac-toe -it --rm tic-tac-toe:0.1
 
 TODO カレント・ディレクトリの移動
 TODO cargo run
+
+# How to make
+
+* [x] 空っぽの盤の表示
+* [x] XFENを作成して、駒の配置の入力
+* [x] 駒を置いての盤の表示
+* [ ] `do` コマンドを作って、駒を置く
+* [ ] 
