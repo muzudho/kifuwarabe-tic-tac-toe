@@ -32,8 +32,12 @@ impl CommandLine {
         self.starts += expected.len();
     }
 
-    pub fn rest(&self) -> &str {
-        &self.line[self.starts..]
+    pub fn rest(&self) -> Option<&str> {
+        if self.starts < self.line.len() {
+            Some(&self.line[self.starts..])
+        } else {
+            None
+        }
     }
 }
 impl fmt::Debug for CommandLine {

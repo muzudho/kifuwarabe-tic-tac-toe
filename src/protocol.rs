@@ -18,34 +18,71 @@ impl Position {
         // 4 5 6
         // 1 2 3
         let mut addr = 7;
+
+        #[derive(Debug)]
+        enum MachineState {
+            /// 最初☆（＾～＾）
+            Start,
+            /// 盤の解析中☆（＾～＾）
+            Board,
+            /// 手番の解析中☆（＾～＾）
+            Phase,
+        }
+        let mut machine_state = MachineState::Start;
         // Rust言語では文字列に配列のインデックスを使ったアクセスはできないので、
         // 一手間かけるぜ☆（＾～＾）
         for ch in xfen.chars() {
             // 先にカウントアップ☆（＾～＾）
             count += 1;
-            if count < "xfen ".len() as isize {
-                // 先頭のキーワードは読み飛ばすぜ☆（＾～＾）
-                continue;
-            }
-            match ch {
-                'x' => {
-                    board.board[addr] = Some(Piece::Cross);
-                    addr += 1;
+
+            // 分け分からんバグが出たらデバッグ・ライトしろだぜ☆（＾～＾）
+            /*
+            println!(
+                "Trace   | machine_state={:?}, addr={} count={} ch={}",
+                machine_state, addr, count, ch
+            );
+            */
+
+            match machine_state {
+                MachineState::Start => {
+                    if count + 1 == "xfen ".len() as isize {
+                        // 先頭のキーワードを読み飛ばしたら次へ☆（＾～＾）
+                        machine_state = MachineState::Board;
+                    }
                 }
-                'o' => {
-                    board.board[addr] = Some(Piece::Nought);
-                    addr += 1;
+                MachineState::Board => match ch {
+                    'x' => {
+                        board.board[addr] = Some(Piece::Cross);
+                        addr += 1;
+                    }
+                    'o' => {
+                        board.board[addr] = Some(Piece::Nought);
+                        addr += 1;
+                    }
+                    '1' => addr += 1,
+                    '2' => addr += 2,
+                    '3' => addr += 3,
+                    '/' => addr -= 6,
+                    ' ' => {
+                        machine_state = MachineState::Phase;
+                    }
+                    _ => panic!("xfen board error: {}", ch),
+                },
+                MachineState::Phase => {
+                    match ch {
+                        'x' => {
+                            board.friend = Piece::Cross;
+                        }
+                        'o' => {
+                            board.friend = Piece::Nought;
+                        }
+                        _ => panic!("xfen phase error: {}", ch),
+                    }
+                    break;
                 }
-                '1' => addr += 1,
-                '2' => addr += 2,
-                '3' => addr += 3,
-                '/' => addr -= 6,
-                ' ' => break,
-                _ => panic!("xfen error: {}", ch),
             }
         }
 
-        // TODO 次の手番
         Some(board)
     }
 
@@ -58,18 +95,25 @@ impl Position {
     pub fn do_(&mut self, move_: &str) {
         let addr: usize = match move_.parse() {
             Ok(x) => x,
-            Err(x) => panic!("do_: move_={} {}", move_, x),
+            Err(_x) => {
+                println!(
+                    "Error   | `do 数字` で入力してくれだぜ☆（＾～＾） 入力=|{}|",
+                    move_
+                );
+                return;
+            }
         };
 
-        println!("Debug   | move_={} addr={}", move_, addr);
+        // println!("Debug   | move_={} addr={}", move_, addr);
 
         // 合法手チェック☆（＾～＾）
         // 移動先のマスに駒があってはダメ☆（＾～＾）
         if let Some(_piece_val) = self.board[addr as usize] {
-            panic!(
-                "移動先のマスに駒があってはダメだぜ☆（＾～＾） addr={}",
+            println!(
+                "Error   | 移動先のマスに駒があってはダメだぜ☆（＾～＾） 番地={}",
                 addr
-            )
+            );
+            return;
         }
 
         self.board[addr] = Some(self.friend);

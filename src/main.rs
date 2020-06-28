@@ -19,7 +19,8 @@ fn main() {
     // let board = Board::default();
 
     // TODO テスト
-    let xfen = "xfen xox/3/o1o x";
+    let xfen = "xfen 3/3/3 o";
+    // let xfen = "xfen xox/3/o1o x";
     // let xfen = "xfen x2/3/3 x";
     // let xfen = "xfen 1x1/3/3 x";
     // let xfen = "xfen 2x/3/3 x";
@@ -31,8 +32,8 @@ fn main() {
         panic!("xfen error. xfen={}", xfen);
     };
 
-    print!("xfen={}", xfen);
-    board.debug_write();
+    // println!("xfen={}", xfen);
+    // board.debug_write();
 
     // [Ctrl]+[C] でループを終了
     loop {
@@ -51,8 +52,10 @@ fn main() {
             board.pos();
         } else if p.starts_with("do") {
             p.go_next_to("do ");
-            println!("Debug   | rest=|{}|", p.rest());
-            board.do_(p.rest());
+            // println!("Debug   | rest=|{}|", p.rest());
+            if let Some(rest) = p.rest() {
+                board.do_(rest);
+            }
         } else {
             println!("Debug   | Command not found. {:?}", p);
         }
