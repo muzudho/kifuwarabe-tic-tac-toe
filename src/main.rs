@@ -2,6 +2,7 @@ mod command_line;
 mod piece;
 mod position;
 mod protocol;
+mod result;
 mod search;
 mod test;
 mod view;

@@ -3,6 +3,7 @@ use crate::position::Position;
 use std::fmt;
 
 impl Position {
+    /*
     pub fn debug_write(&self) {
         for (i, sq) in self.board.iter().enumerate() {
             println!(
@@ -16,6 +17,7 @@ impl Position {
             );
         }
     }
+    */
     fn cell(&self, index: usize) -> String {
         if let Some(piece) = self.board[index] {
             format!("{}", piece)

@@ -1,6 +1,7 @@
 //! 局面データを文字列にしたり、文字列を局面データに復元するのに使うぜ☆（＾～＾）
 use crate::piece::Piece;
 use crate::position::Position;
+use crate::result::GameResult;
 
 impl Position {
     /// 現局面を xfen に変換するぜ☆（＾～＾）
@@ -173,6 +174,7 @@ impl Position {
     ///
     /// * `move_` - 指し手。ここでは駒を置く場所。 `1` とか `7` など。
     pub fn do_(&mut self, line: &str) {
+        // println!("Trace   | do_ line={}", line);
         let addr: usize = match line.parse() {
             Ok(x) => x,
             Err(_x) => {
@@ -199,8 +201,15 @@ impl Position {
         self.board[addr] = Some(self.friend);
 
         // 勝ち負け判定☆（*＾～＾*）
-        if self.is_win() {
-            println!("win {}", self.friend);
+        if let Some(result) = self.get_result() {
+            match result {
+                GameResult::FriendWin => {
+                    println!("win {}", self.friend);
+                }
+                GameResult::Draw => {
+                    println!("draw");
+                }
+            }
         }
 
         self.add_move(addr as u8);

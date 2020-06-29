@@ -1,4 +1,5 @@
 use crate::piece::Piece;
+use crate::result::GameResult;
 
 /// 1スタートで9まで☆（＾～＾） 配列には0番地もあるから、要素数は10だぜ☆（＾～＾）
 const BOARD_LEN: usize = 10;
@@ -50,6 +51,17 @@ impl Position {
             Nought => Cross,
             Cross => Nought,
         };
+    }
+
+    /// 勝敗結果を返すぜ☆（＾～＾）
+    pub fn get_result(&self) -> Option<GameResult> {
+        if self.is_win() {
+            Some(GameResult::FriendWin)
+        } else if self.is_draw() {
+            Some(GameResult::Draw)
+        } else {
+            None
+        }
     }
     /// 手番を持ってる方が３つ並べてたら真だぜ☆（＾～＾）
     pub fn is_win(&self) -> bool {
@@ -103,5 +115,16 @@ impl Position {
         || (Some(self.friend) == self.board[9]
             && Some(self.friend) == self.board[5]
             && Some(self.friend) == self.board[1])
+    }
+
+    /// 全てのマスが埋まってたら引き分けだぜ☆（＾～＾）
+    fn is_draw(&self) -> bool {
+        for addr in 1..BOARD_LEN {
+            if let None = self.board[addr] {
+                return false;
+            }
+        }
+
+        true
     }
 }
