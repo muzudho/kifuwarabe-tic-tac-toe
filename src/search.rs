@@ -116,9 +116,7 @@ impl Search {
 
                 enum UpdateReadon {
                     /// 置ける場所があれば、必ず置かなければならないから、最初の１個はとりあえず選ぶぜ☆（＾～＾）
-                    GettingGoodFirst,
-                    GettingEvenFirst,
-                    GettingBadFirst,
+                    GettingFirst(String),
                     /// 短手数でメートかけれるなら更新しないとな☆（＾～＾）
                     ShorterGoodMate,
                     /// メートされるケースで、手数を伸ばす手を見つけたぜ☆（＾～＾）
@@ -132,14 +130,14 @@ impl Search {
                     // 置ける場所があれば必ず選ばなければならないから、最初に見つけた置ける場所をひとまず調べるぜ☆（＾～＾）
                     if let Some(s_mate) = shortest_mate {
                         if 0 < s_mate {
-                            Some(UpdateReadon::GettingGoodFirst)
+                            Some(UpdateReadon::GettingFirst("So good.".to_string()))
                         } else if s_mate < 0 {
-                            Some(UpdateReadon::GettingBadFirst)
+                            Some(UpdateReadon::GettingFirst("So bad.".to_string()))
                         } else {
-                            Some(UpdateReadon::GettingEvenFirst)
+                            Some(UpdateReadon::GettingFirst("".to_string()))
                         }
                     } else {
-                        Some(UpdateReadon::GettingEvenFirst)
+                        Some(UpdateReadon::GettingFirst("".to_string()))
                     }
                 } else {
                     if let Some(s_mate) = shortest_mate {
@@ -210,7 +208,7 @@ impl Search {
                     shortest_mate = friend_mate;
 
                     match u_reason {
-                        UpdateReadon::GettingGoodFirst => {
+                        UpdateReadon::GettingFirst(comment) => {
                             println!(
                                 "info {} GETTING-FIRST{}",
                                 backward_str(
@@ -220,32 +218,11 @@ impl Search {
                                     shortest_mate,
                                     friend_mate
                                 ),
-                                format!(" # So good!"),
-                            );
-                        }
-                        UpdateReadon::GettingEvenFirst => {
-                            println!(
-                                "info {} GETTING-FIRST",
-                                backward_str(
-                                    self.pv(),
-                                    pos.friend,
-                                    addr,
-                                    shortest_mate,
-                                    friend_mate
-                                ),
-                            );
-                        }
-                        UpdateReadon::GettingBadFirst => {
-                            println!(
-                                "info {} GETTING-FIRST{}",
-                                backward_str(
-                                    self.pv(),
-                                    pos.friend,
-                                    addr,
-                                    shortest_mate,
-                                    friend_mate
-                                ),
-                                format!(" # So bad!"),
+                                if comment != "" {
+                                    format!(" # {}", comment)
+                                } else {
+                                    comment
+                                }
                             );
                         }
                         UpdateReadon::GoodCounterMate => {
