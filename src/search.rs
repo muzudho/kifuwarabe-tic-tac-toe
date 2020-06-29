@@ -75,15 +75,17 @@ impl Search {
                     println!("info pv {: <17} | ->", self.pv());
                 }
 
+                pos.add_move(addr as u8);
                 pos.change_phase();
 
                 // 相手の番だぜ☆（＾～＾）
                 let (_opponent_address, friend_mate) = self.node(pos);
 
                 // 相手が置いたところを戻そうぜ☆（＾～＾）？
-                pos.board[addr] = None;
-                self.depth -= 1;
                 pos.change_phase();
+                pos.remove_move();
+                self.depth -= 1;
+                pos.board[addr] = None;
 
                 // 後ろ向き探索のときの表示だぜ☆（＾～＾）
                 fn backward_str(

@@ -1,5 +1,11 @@
 use crate::piece::Piece;
 
+/// 1スタートで9まで☆（＾～＾） 配列には0番地もあるから、要素数は10だぜ☆（＾～＾）
+const BOARD_LEN: usize = 10;
+
+/// ９マスしか置くとこないから最大９手なんだが、配列の 0 はややこしいんで使わないことにして、要素数は10だぜ☆（＾～＾）
+const MOVES_LEN: usize = 10;
+
 pub struct Position {
     /// 次に盤に置く駒☆（＾～＾）
     /// 英語では 手番は your turn, 相手版は your opponent's turn なんで 手番という英語は無い☆（＾～＾）
@@ -8,17 +14,32 @@ pub struct Position {
     pub friend: Piece,
 
     /// 盤のマス☆（＾～＾） [0] は未使用☆（＾～＾）
-    pub board: [Option<Piece>; 10],
+    pub board: [Option<Piece>; BOARD_LEN],
+
+    /// 棋譜だぜ☆（＾～＾）駒を置いた番地を並べてけだぜ☆（＾～＾）
+    pub moves: [u8; MOVES_LEN],
+
+    /// 何手目かだぜ☆（＾～＾）初期局面では 1 ☆（＾～＾） 0 は使わないぜ☆（＾～＾）
+    pub moves_num: usize,
 }
 impl Default for Position {
     fn default() -> Self {
         Position {
             friend: Piece::Nought,
-            board: [None; 10],
+            board: [None; BOARD_LEN],
+            moves: [0; MOVES_LEN],
+            moves_num: 1,
         }
     }
 }
 impl Position {
+    pub fn add_move(&mut self, addr: u8) {
+        self.moves[self.moves_num] = addr;
+        self.moves_num += 1;
+    }
+    pub fn remove_move(&mut self) {
+        self.moves_num -= 1;
+    }
     pub fn change_phase(&mut self) {
         use crate::piece::Piece::*;
         self.friend = match self.friend {

@@ -49,6 +49,15 @@ impl Position {
             }
         }
 
+        // Moves
+        if 1 < self.moves_num {
+            // TODO
+            xfen.push_str(" moves");
+            for i in 1..self.moves_num {
+                xfen.push_str(&format!(" {}", self.moves[i].to_string()));
+            }
+        }
+
         xfen.to_string()
     }
 
@@ -76,6 +85,8 @@ impl Position {
             Board,
             /// 手番の解析中☆（＾～＾）
             Phase,
+            /// 棋譜の解析中☆（＾～＾）
+            Moves,
         }
         let mut machine_state = MachineState::Start;
         // Rust言語では文字列に配列のインデックスを使ったアクセスはできないので、
@@ -133,6 +144,10 @@ impl Position {
                             return None;
                         }
                     }
+                    machine_state = MachineState::Moves;
+                }
+                MachineState::Moves => {
+                    // TODO
                     break;
                 }
             }
@@ -177,6 +192,8 @@ impl Position {
         if self.is_win() {
             println!("win {}", self.friend);
         }
+
+        self.add_move(addr as u8);
         self.change_phase();
     }
 }
