@@ -62,25 +62,33 @@ impl Search {
                 // 勝ったかどうか判定しようぜ☆（＾～＾）？
                 if pos.is_win() {
                     // 勝ったなら☆（＾～＾）
-                    println!("info pv {: <17} | -> {} win", self.pv(), pos.friend);
+                    println!(
+                        "info pv {: <17} | -> {} win",
+                        self.pv(),
+                        if pos.friend == self.root_friend {
+                            "+".to_string()
+                        } else {
+                            "-".to_string()
+                        }
+                    );
 
                     // 置いたところを戻そうぜ☆（＾～＾）？
                     pos.board[addr] = None;
                     self.depth -= 1;
 
+                    // メートが出るぜ☆（＾～＾）
+                    // 偶数手番は相手の勝ちなんで負数に、奇数手番は自分の勝ちなんで正の数にしろだぜ☆（＾～＾）
+                    let mate = if self.depth % 2 == 0 {
+                        -(self.depth as i8)
+                    } else {
+                        self.depth as i8
+                    };
+
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    println!("info pv {: <17} | <- Found lion-catch.", self.pv());
+                    println!("info pv {: <17} | <- Found mate {}.", self.pv(), mate);
 
                     // 探索終了だぜ☆（＾～＾）
-                    return (
-                        Some(addr as u8),
-                        // 偶数手番は相手の勝ちなんで負数に、奇数手番は自分の勝ちなんで正の数にしろだぜ☆（＾～＾）
-                        Some(if self.depth % 2 == 0 {
-                            -(self.depth as i8)
-                        } else {
-                            self.depth as i8
-                        }),
-                    );
+                    return (Some(addr as u8), Some(mate));
                 } else {
                     println!("info pv {: <17} | ->", self.pv());
                 }
@@ -145,10 +153,13 @@ impl Search {
                 let update_reason = if best_addr == None {
                     // 置ける場所があれば必ず選ばなければならないから、最初に見つけた置ける場所をひとまず調べるぜ☆（＾～＾）
                     if let Some(child_mate) = child_mate {
-                        // メート0 は負数（負け）扱いで☆（＾～＾）
-                        if 0 < child_mate {
+                        if (0 < child_mate && pos.friend == self.root_friend)
+                            || (child_mate <= 0 && pos.friend != self.root_friend)
+                        {
+                            // （メートが正の数で、探索している方のターン）または、（メートが０または負数で、探索していない方のターン）なら、そいつの勝ちだぜ☆（＾～＾）
                             Some(UpdateReadon::GettingFirst("Good.".to_string()))
                         } else {
+                            // 負け☆（＾～＾）
                             Some(UpdateReadon::GettingFirst("Bad.".to_string()))
                         }
                     } else {
@@ -217,7 +228,7 @@ impl Search {
                     match u_reason {
                         UpdateReadon::GettingFirst(comment) => {
                             println!(
-                                "info {} At first.{}",
+                                "info {} UPDATE at first.{}",
                                 backward_str(
                                     self.pv(),
                                     if pos.friend == self.root_friend {
