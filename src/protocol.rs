@@ -13,7 +13,7 @@ impl Position {
         let mut spaces = 0;
         for addr in [7, 8, 9, 4, 5, 6, 1, 2, 3].iter() {
             // println!("addr={} spaces={} xfen={}", addr, spaces, xfen);
-            if let Some(piece) = self.board[*addr as usize] {
+            if let Some(piece) = self.starting_board[*addr as usize] {
                 if 0 < spaces {
                     xfen.push_str(&spaces.to_string());
                     spaces = 0;
