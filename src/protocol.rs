@@ -67,10 +67,10 @@ impl Position {
             return None;
         }
 
-        let mut board = Position::default();
+        let mut pos = Position::default();
 
         // 文字数☆（＾～＾）
-        let mut count = -1isize;
+        let mut starts = 0usize;
         // 番地☆（＾～＾） 0 は未使用☆（＾～＾）
         // 7 8 9
         // 4 5 6
@@ -85,16 +85,15 @@ impl Position {
             Board,
             /// 手番の解析中☆（＾～＾）
             Phase,
+            /// ` moves ` 読取中☆（＾～＾）
+            MovesLabel,
             /// 棋譜の解析中☆（＾～＾）
             Moves,
         }
         let mut machine_state = MachineState::Start;
         // Rust言語では文字列に配列のインデックスを使ったアクセスはできないので、
         // 一手間かけるぜ☆（＾～＾）
-        for ch in xfen.chars() {
-            // 先にカウントアップ☆（＾～＾）
-            count += 1;
-
+        for (i, ch) in xfen.chars().enumerate() {
             // 分け分からんバグが出たらデバッグ・ライトしろだぜ☆（＾～＾）
             /*
             println!(
@@ -105,18 +104,18 @@ impl Position {
 
             match machine_state {
                 MachineState::Start => {
-                    if count + 1 == "xfen ".len() as isize {
+                    if i + 1 == "xfen ".len() {
                         // 先頭のキーワードを読み飛ばしたら次へ☆（＾～＾）
                         machine_state = MachineState::Board;
                     }
                 }
                 MachineState::Board => match ch {
                     'x' => {
-                        board.board[addr] = Some(Piece::Cross);
+                        pos.board[addr] = Some(Piece::Cross);
                         addr += 1;
                     }
                     'o' => {
-                        board.board[addr] = Some(Piece::Nought);
+                        pos.board[addr] = Some(Piece::Nought);
                         addr += 1;
                     }
                     '1' => addr += 1,
@@ -134,26 +133,35 @@ impl Position {
                 MachineState::Phase => {
                     match ch {
                         'x' => {
-                            board.friend = Piece::Cross;
+                            pos.friend = Piece::Cross;
                         }
                         'o' => {
-                            board.friend = Piece::Nought;
+                            pos.friend = Piece::Nought;
                         }
                         _ => {
                             println!("Error   | xfen phase error: {}", ch);
                             return None;
                         }
                     }
-                    machine_state = MachineState::Moves;
+                    // 一時記憶。
+                    starts = i;
+                    machine_state = MachineState::MovesLabel;
+                }
+                MachineState::MovesLabel => {
+                    if starts + " moves ".len() <= i {
+                        machine_state = MachineState::Moves;
+                    }
                 }
                 MachineState::Moves => {
-                    // TODO
-                    break;
+                    if ch == ' ' {
+                    } else {
+                        pos.do_(&ch.to_string());
+                    }
                 }
             }
         }
 
-        Some(board)
+        Some(pos)
     }
 
     /// 駒を置く
@@ -162,13 +170,13 @@ impl Position {
     /// # Arguments
     ///
     /// * `move_` - 指し手。ここでは駒を置く場所。 `1` とか `7` など。
-    pub fn do_(&mut self, move_: &str) {
-        let addr: usize = match move_.parse() {
+    pub fn do_(&mut self, line: &str) {
+        let addr: usize = match line.parse() {
             Ok(x) => x,
             Err(_x) => {
                 println!(
                     "Error   | `do 数字` で入力してくれだぜ☆（＾～＾） 入力=|{}|",
-                    move_
+                    line
                 );
                 return;
             }
