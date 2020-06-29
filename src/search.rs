@@ -5,6 +5,8 @@ use crate::position::MOVES_LEN;
 
 /// 探索部☆（＾～＾）
 pub struct Search {
+    /// この探索を始めたのはどっち側か☆（＾～＾）
+    pub root_friend: Piece,
     /// 現在局面からの、棋譜☆（＾～＾）ややこしいんで [0] は使わないぜ☆（＾～＾）
     pub moves: [u8; 10],
     /// 現在局面からの読みの深さ☆（＾～＾）1スタート☆（＾～＾）
@@ -13,6 +15,7 @@ pub struct Search {
 impl Default for Search {
     fn default() -> Self {
         Search {
+            root_friend: Piece::Nought,
             moves: [0; MOVES_LEN],
             depth: 1,
         }
@@ -29,6 +32,7 @@ impl Search {
     }
     /// 最善の番地を返すぜ☆（＾～＾）
     pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, Option<i8>) {
+        self.root_friend = pos.friend;
         match pos.friend {
             Piece::Nought => {
                 println!("info pv O X O X O X O X O");
@@ -96,7 +100,7 @@ impl Search {
                 // 後ろ向き探索のときの表示だぜ☆（＾～＾）
                 fn backward_str(
                     pv: String,
-                    friend: Piece,
+                    friend: String,
                     addr: usize,
                     cur_mate: Option<i8>,
                     child_mate: Option<i8>,
@@ -114,7 +118,7 @@ impl Search {
                                 } else {
                                     // 長手数のメートは要らないぜ☆（＾～＾）
                                     format!(
-                                        " Ignore mate {}. It's longer than {}.",
+                                        " Ignore mate {}. It's longer than(or equals) {}.",
                                         child_mate, cur_mate
                                     )
                                 }
@@ -214,7 +218,17 @@ impl Search {
                         UpdateReadon::GettingFirst(comment) => {
                             println!(
                                 "info {} At first.{}",
-                                backward_str(self.pv(), pos.friend, addr, cur_mate, child_mate),
+                                backward_str(
+                                    self.pv(),
+                                    if pos.friend == self.root_friend {
+                                        "+".to_string()
+                                    } else {
+                                        "-".to_string()
+                                    },
+                                    addr,
+                                    cur_mate,
+                                    child_mate
+                                ),
                                 if comment != "" {
                                     format!(" # {}", comment)
                                 } else {
@@ -226,7 +240,17 @@ impl Search {
                             // 短手数のメートを良い方へ更新したら、更新するぜ☆（＾～＾）
                             println!(
                                 "info {} UPDATE # {}",
-                                backward_str(self.pv(), pos.friend, addr, cur_mate, child_mate,),
+                                backward_str(
+                                    self.pv(),
+                                    if pos.friend == self.root_friend {
+                                        "+".to_string()
+                                    } else {
+                                        "-".to_string()
+                                    },
+                                    addr,
+                                    cur_mate,
+                                    child_mate,
+                                ),
                                 comment
                             );
                         }
@@ -235,7 +259,17 @@ impl Search {
                     // 更新がないとき☆（＾～＾）
                     println!(
                         "info {}",
-                        backward_str(self.pv(), pos.friend, addr, cur_mate, child_mate),
+                        backward_str(
+                            self.pv(),
+                            if pos.friend == self.root_friend {
+                                "+".to_string()
+                            } else {
+                                "-".to_string()
+                            },
+                            addr,
+                            cur_mate,
+                            child_mate
+                        ),
                     );
                 }
             }

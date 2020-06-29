@@ -51,4 +51,5 @@ TODO cargo run
 * [x] `is_win` 関数を作成し、３つ並んでいれば `win` と表示します
 * [x] `is_draw` 関数を作成し、置き場所が無ければ `draw` と表示します
 * [x] `position.add_move()`、`position.remove_move()`を作成し、`position.moves` に、指し手を並べます。
+* [x] `undo` コマンドを作って、駒を取り除く
 * [x] `go` コマンドを作って コンピューターが思考開始、何か手を１つ返す

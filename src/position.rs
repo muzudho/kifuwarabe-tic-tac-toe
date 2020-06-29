@@ -7,6 +7,7 @@ pub const BOARD_LEN: usize = 10;
 /// ９マスしか置くとこないから最大９手なんだが、配列の 0 はややこしいんで使わないことにして、要素数は10だぜ☆（＾～＾）
 pub const MOVES_LEN: usize = 10;
 
+#[derive(Debug)]
 pub struct Position {
     /// 次に盤に置く駒☆（＾～＾）
     /// 英語では 手番は your turn, 相手版は your opponent's turn なんで 手番という英語は無い☆（＾～＾）
@@ -42,8 +43,10 @@ impl Position {
         self.moves[self.moves_num] = addr;
         self.moves_num += 1;
     }
-    pub fn remove_move(&mut self) {
+    pub fn remove_move(&mut self) -> u8 {
+        // 手数は次の要素を指しているんで、先に戻してから、配列の中身を取り出せだぜ☆（＾～＾）
         self.moves_num -= 1;
+        self.moves[self.moves_num]
     }
     pub fn change_phase(&mut self) {
         use crate::piece::Piece::*;

@@ -52,7 +52,6 @@ impl Position {
 
         // Moves
         if 1 < self.moves_num {
-            // TODO
             xfen.push_str(" moves");
             for i in 1..self.moves_num {
                 xfen.push_str(&format!(" {}", self.moves[i].to_string()));
@@ -214,5 +213,13 @@ impl Position {
 
         self.add_move(addr as u8);
         self.change_phase();
+    }
+
+    /// 駒を戻す
+    pub fn undo(&mut self) {
+        self.change_phase();
+        let addr = self.remove_move();
+        // println!("Trace   | undo addr={}", addr);
+        self.board[addr as usize] = None;
     }
 }

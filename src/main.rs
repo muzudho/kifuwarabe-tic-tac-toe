@@ -61,16 +61,8 @@ fn main() {
         // コマンドライン☆（＾～＾） p は parser の意味で使ってるぜ☆（＾～＾）
         let mut p = CommandLine::new(&line);
 
-        if p.starts_with("position") {
-            p.go_next_to("position ");
-            if let Some(rest) = p.rest() {
-                if let Some(pos_val) = position::Position::from_xfen(rest) {
-                    pos = pos_val;
-                }
-            }
-        } else if p.starts_with("pos") {
-            pos.pos();
-        } else if p.starts_with("do") {
+        // よく使うコマンド順に並べた方が高速だが、先に見つけた方が選ばれるので後ろの方を漏らしやすいし、アルファベット順に並べた方が見やすいぜ☆（＾～＾）
+        if p.starts_with("do") {
             p.go_next_to("do ");
             // println!("Debug   | rest=|{}|", p.rest());
             if let Some(rest) = p.rest() {
@@ -87,6 +79,17 @@ fn main() {
             } else {
                 println!("resign");
             }
+        } else if p.starts_with("position") {
+            p.go_next_to("position ");
+            if let Some(rest) = p.rest() {
+                if let Some(pos_val) = position::Position::from_xfen(rest) {
+                    pos = pos_val;
+                }
+            }
+        } else if p.starts_with("pos") {
+            pos.pos();
+        } else if p.starts_with("undo") {
+            pos.undo();
         } else if p.starts_with("xfen") {
             println!("{}", pos.to_xfen());
         } else {

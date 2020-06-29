@@ -26,10 +26,11 @@ impl Position {
         }
     }
     pub fn pos(&self) {
+        // println!("Debug   | position={:?}", self);
         println!(
-            "[Go {}]
+            "[{} move(s) | Go {}]
 ",
-            self.friend
+            self.moves_num, self.friend
         );
         // 書式を指定したりで、桁がずれるのは仕方ないぜ☆（＾～＾）
         println!(
