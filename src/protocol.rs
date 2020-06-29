@@ -8,7 +8,7 @@ impl Position {
         let mut xfen = String::default();
         xfen.push_str("xfen ");
 
-        // Board
+        // StartingBoard
         let mut spaces = 0;
         for addr in [7, 8, 9, 4, 5, 6, 1, 2, 3].iter() {
             // println!("addr={} spaces={} xfen={}", addr, spaces, xfen);
@@ -81,8 +81,8 @@ impl Position {
         enum MachineState {
             /// 最初☆（＾～＾）
             Start,
-            /// 盤の解析中☆（＾～＾）
-            Board,
+            /// 初期局面の盤上を解析中☆（＾～＾）
+            StartingBoard,
             /// 手番の解析中☆（＾～＾）
             Phase,
             /// ` moves ` 読取中☆（＾～＾）
@@ -106,16 +106,16 @@ impl Position {
                 MachineState::Start => {
                     if i + 1 == "xfen ".len() {
                         // 先頭のキーワードを読み飛ばしたら次へ☆（＾～＾）
-                        machine_state = MachineState::Board;
+                        machine_state = MachineState::StartingBoard;
                     }
                 }
-                MachineState::Board => match ch {
+                MachineState::StartingBoard => match ch {
                     'x' => {
-                        pos.board[addr] = Some(Piece::Cross);
+                        pos.starting_board[addr] = Some(Piece::Cross);
                         addr += 1;
                     }
                     'o' => {
-                        pos.board[addr] = Some(Piece::Nought);
+                        pos.starting_board[addr] = Some(Piece::Nought);
                         addr += 1;
                     }
                     '1' => addr += 1,
@@ -123,10 +123,12 @@ impl Position {
                     '3' => addr += 3,
                     '/' => addr -= 6,
                     ' ' => {
+                        // 明示的にクローン☆（＾～＾）
+                        pos.board = pos.starting_board.clone();
                         machine_state = MachineState::Phase;
                     }
                     _ => {
-                        println!("Error   | xfen board error: {}", ch);
+                        println!("Error   | xfen starting_board error: {}", ch);
                         return None;
                     }
                 },

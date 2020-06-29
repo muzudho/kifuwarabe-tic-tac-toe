@@ -13,7 +13,10 @@ pub struct Position {
     /// あまり被らない 味方(friend) を手番の意味で たまたま使ってるだけだぜ☆（＾～＾）
     pub friend: Piece,
 
-    /// 盤のマス☆（＾～＾） [0] は未使用☆（＾～＾）
+    /// 開始局面の盤の各マス☆（＾～＾） [0] は未使用☆（＾～＾）
+    pub starting_board: [Option<Piece>; BOARD_LEN],
+
+    /// 現状の盤の各マス☆（＾～＾） [0] は未使用☆（＾～＾）
     pub board: [Option<Piece>; BOARD_LEN],
 
     /// 棋譜だぜ☆（＾～＾）駒を置いた番地を並べてけだぜ☆（＾～＾）
@@ -26,6 +29,7 @@ impl Default for Position {
     fn default() -> Self {
         Position {
             friend: Piece::Nought,
+            starting_board: [None; BOARD_LEN],
             board: [None; BOARD_LEN],
             moves: [0; MOVES_LEN],
             moves_num: 1,
