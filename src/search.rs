@@ -41,7 +41,7 @@ impl Search {
 
     fn node(&mut self, pos: &mut Position) -> (Option<u8>, Option<i8>) {
         let mut best_addr = None;
-        // 0,-1,2,-3,4... のように、0を除くと、 負の奇数と、正の偶数が交互に出てくるぜ☆（＾～＾）
+        // 0,1,-2,3,-4... のように、0を除くと、 正の奇数（勝ち）と、負の偶数（負け）が交互に出てくるぜ☆（＾～＾）
         let mut shortest_mate: Option<i8> = None;
 
         for addr in 1..BOARD_LEN {
@@ -64,13 +64,13 @@ impl Search {
                     self.depth -= 1;
 
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    println!("info pv {: <17} | <- Found mate 0.", self.pv());
+                    println!("info pv {: <17} | <- Found lion-catch.", self.pv());
 
                     // 探索終了だぜ☆（＾～＾）
                     return (
                         Some(addr as u8),
                         // 自分がメートしたら、相手はメートされてるんだぜ☆（＾～＾）
-                        Some(-1),
+                        Some(-2),
                     );
                 } else {
                     println!("info pv {: <17} | ->", self.pv());
@@ -134,43 +134,40 @@ impl Search {
                 let update_reason = if best_addr == None {
                     // 置ける場所があれば必ず選ばなければならないから、最初に見つけた置ける場所をひとまず調べるぜ☆（＾～＾）
                     if let Some(s_mate) = shortest_mate {
+                        // メート0 は負数（負け）扱いで☆（＾～＾）
                         if 0 < s_mate {
                             Some(UpdateReadon::GettingFirst("Good.".to_string()))
-                        } else if s_mate < 0 {
-                            Some(UpdateReadon::GettingFirst("Bad.".to_string()))
                         } else {
-                            Some(UpdateReadon::GettingFirst("".to_string()))
+                            Some(UpdateReadon::GettingFirst("Bad.".to_string()))
                         }
                     } else {
                         Some(UpdateReadon::GettingFirst("".to_string()))
                     }
                 } else {
                     if let Some(s_mate) = shortest_mate {
+                        // メート0 は負数（負け）扱いで☆（＾～＾）
                         if s_mate < 0 {
                             // 今までの手は、メート食らう手のとき☆（／＿＼）
                             if let Some(f_mate) = friend_mate {
+                                // メート0 は負数（負け）扱いで☆（＾～＾）
                                 if 0 < f_mate {
                                     // 今まで メートされる手ばかりだったが、メートできる手を見つけたぜ☆（＾～＾）
                                     // メート食らってたのを、メートかけるんだから、すごい良い手だぜ☆（＾～＾）！更新するぜ☆（＾～＾）
                                     Some(UpdateReadon::Better(
                                         "Cross-counter checkmate.".to_string(),
                                     ))
-                                } else if f_mate < 0 {
+                                } else {
                                     if s_mate.abs() < f_mate.abs() {
                                         // 今まで メートされる手ばかりだったが、手数を伸ばす手を見つけたぜ☆（＾～＾）
                                         Some(UpdateReadon::Better("Delayed the bad.".to_string()))
                                     } else {
                                         None
                                     }
-                                } else {
-                                    panic!("メートは0にならないはずだぜ☆（＾～＾）！");
                                 }
                             } else {
                                 // 今まで メートされる手ばかりだったが、引き分けにできるぜ☆（＾～＾）！
                                 Some(UpdateReadon::Better("Found the draw.".to_string()))
                             }
-                        } else if s_mate == 0 {
-                            panic!("メートは0にならないはずだぜ☆（＾～＾）！");
                         } else {
                             // 今までの手は、メート掛ける手のとき☆（＾ｑ＾）
                             if let Some(f_mate) = friend_mate {
@@ -187,6 +184,7 @@ impl Search {
                     } else {
                         // 今まで、引き分けの手だけ見つけているケースで。
                         if let Some(f_mate) = friend_mate {
+                            // メート0 は負数（負け）扱いで☆（＾～＾）
                             if 0 < f_mate {
                                 // こっちからメートする手を見つけたぜ☆（＾～＾）
                                 Some(UpdateReadon::Better("Found checkmate.".to_string()))
@@ -256,18 +254,17 @@ impl Search {
         (
             best_addr,
             if let Some(s_mate) = shortest_mate {
+                // メート0 は負数（負け）扱いで☆（＾～＾）
                 if 0 < s_mate {
                     let x = -(s_mate + 1);
                     // println!("s_mate={} だったんで {} にした。", s_mate, x);
                     // 自分がメートしたら、相手はメートされてるんだぜ☆（＾～＾）
                     Some(x)
-                } else if s_mate < 0 {
+                } else {
                     let x = -(s_mate - 1);
                     // println!("s_mate={} だったんで {} にした。", s_mate, x);
                     // 自分がメートされてるんなら、相手はメートしてるんだぜ☆（＾～＾）
                     Some(x)
-                } else {
-                    panic!("ここは通らないはずだぜ☆（＾～＾）！");
                 }
             } else {
                 // println!("drawだよな☆（＾～＾）");
