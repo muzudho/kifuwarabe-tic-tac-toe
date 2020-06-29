@@ -2,10 +2,10 @@ use crate::piece::Piece;
 use crate::result::GameResult;
 
 /// 1スタートで9まで☆（＾～＾） 配列には0番地もあるから、要素数は10だぜ☆（＾～＾）
-const BOARD_LEN: usize = 10;
+pub const BOARD_LEN: usize = 10;
 
 /// ９マスしか置くとこないから最大９手なんだが、配列の 0 はややこしいんで使わないことにして、要素数は10だぜ☆（＾～＾）
-const MOVES_LEN: usize = 10;
+pub const MOVES_LEN: usize = 10;
 
 pub struct Position {
     /// 次に盤に置く駒☆（＾～＾）

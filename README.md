@@ -49,5 +49,6 @@ TODO cargo run
 * [x] `do` コマンドを作って、駒を置く
 * [x] ポジション構造体に 手番(friend) 変数を追加。`do` コマンドで置かれる駒を交互にします
 * [x] `is_win` 関数を作成し、３つ並んでいれば `win` と表示します
-* [ ] `position.add_move()`、`position.remove_move()`を作成し、`position.moves` に、指し手を並べます。
+* [x] `is_draw` 関数を作成し、置き場所が無ければ `draw` と表示します
+* [x] `position.add_move()`、`position.remove_move()`を作成し、`position.moves` に、指し手を並べます。
 * [x] `go` コマンドを作って コンピューターが思考開始、何か手を１つ返す

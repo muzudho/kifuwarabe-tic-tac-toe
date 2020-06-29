@@ -1,5 +1,6 @@
 use crate::piece::Piece;
 use crate::position::Position;
+use crate::position::BOARD_LEN;
 
 /// 探索部☆（＾～＾）
 pub struct Search {
@@ -43,7 +44,7 @@ impl Search {
         // 0,-1,2,-3,4... のように、0を除くと、 負の奇数と、正の偶数が交互に出てくるぜ☆（＾～＾）
         let mut shortest_mate: Option<i8> = None;
 
-        for addr in 1..10 {
+        for addr in 1..BOARD_LEN {
             // 空きマスがあれば
             if let None = pos.board[addr] {
                 // とりあえず置いてみようぜ☆（＾～＾）
@@ -115,7 +116,9 @@ impl Search {
 
                 enum UpdateReadon {
                     /// 置ける場所があれば、必ず置かなければならないから、最初の１個はとりあえず選ぶぜ☆（＾～＾）
-                    GettingFirst,
+                    GettingGoodFirst,
+                    GettingEvenFirst,
+                    GettingBadFirst,
                     /// 短手数でメートかけれるなら更新しないとな☆（＾～＾）
                     ShorterGoodMate,
                     /// メートされるケースで、手数を伸ばす手を見つけたぜ☆（＾～＾）
@@ -127,7 +130,17 @@ impl Search {
                 }
                 let update_reason = if best_addr == None {
                     // 置ける場所があれば必ず選ばなければならないから、最初に見つけた置ける場所をひとまず調べるぜ☆（＾～＾）
-                    Some(UpdateReadon::GettingFirst)
+                    if let Some(s_mate) = shortest_mate {
+                        if 0 < s_mate {
+                            Some(UpdateReadon::GettingGoodFirst)
+                        } else if s_mate < 0 {
+                            Some(UpdateReadon::GettingBadFirst)
+                        } else {
+                            Some(UpdateReadon::GettingEvenFirst)
+                        }
+                    } else {
+                        Some(UpdateReadon::GettingEvenFirst)
+                    }
                 } else {
                     if let Some(s_mate) = shortest_mate {
                         if s_mate < 0 {
@@ -197,7 +210,7 @@ impl Search {
                     shortest_mate = friend_mate;
 
                     match u_reason {
-                        UpdateReadon::GettingFirst => {
+                        UpdateReadon::GettingGoodFirst => {
                             println!(
                                 "info {} GETTING-FIRST{}",
                                 backward_str(
@@ -207,17 +220,32 @@ impl Search {
                                     shortest_mate,
                                     friend_mate
                                 ),
-                                if let Some(s_mate) = shortest_mate {
-                                    if 0 < s_mate {
-                                        format!(" # So good!")
-                                    } else if s_mate < 0 {
-                                        format!(" # So bad!")
-                                    } else {
-                                        "".to_string()
-                                    }
-                                } else {
-                                    "".to_string()
-                                },
+                                format!(" # So good!"),
+                            );
+                        }
+                        UpdateReadon::GettingEvenFirst => {
+                            println!(
+                                "info {} GETTING-FIRST",
+                                backward_str(
+                                    self.pv(),
+                                    pos.friend,
+                                    addr,
+                                    shortest_mate,
+                                    friend_mate
+                                ),
+                            );
+                        }
+                        UpdateReadon::GettingBadFirst => {
+                            println!(
+                                "info {} GETTING-FIRST{}",
+                                backward_str(
+                                    self.pv(),
+                                    pos.friend,
+                                    addr,
+                                    shortest_mate,
+                                    friend_mate
+                                ),
+                                format!(" # So bad!"),
                             );
                         }
                         UpdateReadon::GoodCounterMate => {
