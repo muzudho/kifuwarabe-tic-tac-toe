@@ -64,7 +64,7 @@ impl Search {
                     self.depth -= 1;
 
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    println!("info pv {: <17} | <- MATE_ZERO", self.pv());
+                    println!("info pv {: <17} | <- Found mate 0.", self.pv());
 
                     // 探索終了だぜ☆（＾～＾）
                     return (
@@ -97,20 +97,31 @@ impl Search {
                     f_mate: Option<i8>,
                 ) -> String {
                     format!(
-                        "pv {: <17} | <- {} {}addr{}{}",
+                        "pv {: <17} | <- {} [{}]{}",
                         pv,
                         friend,
                         addr,
-                        if let Some(mate) = s_mate {
-                            format!(" s_mate{}", mate)
+                        if let Some(s_mate) = s_mate {
+                            if let Some(f_mate) = f_mate {
+                                if f_mate.abs() < s_mate.abs() {
+                                    format!(" Faster mate {} rather than {}.", f_mate, s_mate)
+                                } else if f_mate.abs() == s_mate.abs() {
+                                    // 最初に見つけたメートか、既に見つけているメートと手数が同じかは区別できない。
+                                    format!(" Found mate {}.", f_mate)
+                                } else {
+                                    format!(" Ignore mate {} rather than {}.", f_mate, s_mate)
+                                }
+                            } else {
+                                format!(" Not change mate {}.", s_mate)
+                            }
                         } else {
-                            "".to_string()
+                            if let Some(f_mate) = f_mate {
+                                // 新しく見つけたメート。
+                                format!(" Found mate {}.", f_mate)
+                            } else {
+                                "".to_string()
+                            }
                         },
-                        if let Some(mate) = f_mate {
-                            format!(" f_mate{}", mate)
-                        } else {
-                            "".to_string()
-                        }
                     )
                 }
 
@@ -197,7 +208,7 @@ impl Search {
                     match u_reason {
                         UpdateReadon::GettingFirst(comment) => {
                             println!(
-                                "info {} GETTING-FIRST{}",
+                                "info {} At first.{}",
                                 backward_str(
                                     self.pv(),
                                     pos.friend,
@@ -239,7 +250,7 @@ impl Search {
 
         if let None = best_addr {
             // 置くところが無かったのなら☆（＾～＾）
-            println!("info .. {: <17} | draw", "");
+            println!("info .. {: <17} |    Found draw.", "");
         }
 
         (
