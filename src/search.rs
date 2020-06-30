@@ -103,7 +103,7 @@ impl Search {
                 if pos.is_win() {
                     // 勝ったなら☆（＾～＾）
                     println!(
-                        "info pv {: <17} | .       depth {} | {} [{}] | win     |",
+                        "info pv {: <17} | .       depth {} | {} [{}] | {:4}    |",
                         self.pv(),
                         self.depth - 1,
                         if pos.friend == self.root_friend {
@@ -111,7 +111,12 @@ impl Search {
                         } else {
                             "-".to_string()
                         },
-                        addr
+                        addr,
+                        if pos.friend == self.root_friend {
+                            "win".to_string()
+                        } else {
+                            "lose".to_string()
+                        },
                     );
 
                     // 置いたところを戻そうぜ☆（＾～＾）？
@@ -143,10 +148,9 @@ impl Search {
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), Some(mate));
                 } else if MAX_MOVES - self.root_move_num + 1 < self.depth {
-                    // 勝っていなくて、深さ上限に達したら☆（＾～＾）
-                    // 相手に手番を回さないぜ☆（＾～＾）
+                    // 勝っていなくて、深さ上限に達したら、〇×ゲームでは 他に置く場所もないから引き分け確定だぜ☆（＾～＾）
                     println!(
-                        "info pv {: <17} | .       depth {} | {} [{}] |{}| Leaf.",
+                        "info pv {: <17} | .       depth {} | {} [{}] |{}| Draw.",
                         self.pv(),
                         self.depth - 1,
                         if pos.friend == self.root_friend {
@@ -164,6 +168,19 @@ impl Search {
                     // 次の枝の探索へ☆（＾～＾）
                     self.depth -= 1;
                     pos.board[addr] = None;
+                    // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
+                    println!(
+                        "info pv {: <17} | <- from depth {} | {} [{}] |         |",
+                        self.pv(),
+                        self.depth,
+                        if pos.friend == self.root_friend {
+                            "+".to_string()
+                        } else {
+                            "-".to_string()
+                        },
+                        addr
+                    );
+
                     continue;
                 } else {
                     // 勝ってないなら☆（＾～＾）
@@ -339,10 +356,12 @@ impl Search {
             }
         }
 
+        /*
         if let None = best_addr {
             // 置くところが無かったのなら☆（＾～＾）
             println!("info .. {: <17} |    Found draw.", "");
         }
+        */
 
         (best_addr, cur_mate)
     }
