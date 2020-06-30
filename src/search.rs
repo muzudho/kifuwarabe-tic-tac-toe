@@ -44,6 +44,46 @@ impl Search {
         self.node(pos)
     }
 
+    // 後ろ向き探索のときの表示だぜ☆（＾～＾）
+    fn backward_str(
+        pv: String,
+        friend: String,
+        addr: usize,
+        cur_mate: Option<i8>,
+        child_mate: Option<i8>,
+    ) -> String {
+        format!(
+            "pv {: <17} | <- {} [{}] | {} |{}",
+            pv,
+            friend,
+            addr,
+            if let Some(child_mate) = child_mate {
+                format!("mate {: >2}", child_mate)
+            } else {
+                "       ".to_string()
+            },
+            if let Some(cur_mate) = cur_mate {
+                if let Some(child_mate) = child_mate {
+                    if child_mate.abs() < cur_mate.abs() {
+                        // より短手数のメートを見つけたら。
+                        format!(" Faster mate rather than {}.", cur_mate)
+                    } else {
+                        // 長手数のメートは要らないぜ☆（＾～＾）
+                        format!(" Ignore mate. It's longer than(or equals) {}.", cur_mate)
+                    }
+                } else {
+                    format!(" Not change mate {}.", cur_mate)
+                }
+            } else {
+                if let Some(_) = child_mate {
+                    // 新しく見つけたメート。
+                    format!(" Found mate.")
+                } else {
+                    "".to_string()
+                }
+            },
+        )
+    }
     fn node(&mut self, pos: &mut Position) -> (Option<u8>, Option<i8>) {
         let mut best_addr = None;
         // 0,1,-2,3,-4... のように、0を除くと、 正の奇数（勝ち）と、負の偶数（負け）が交互に出てくるぜ☆（＾～＾）
@@ -85,7 +125,17 @@ impl Search {
                     };
 
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    println!("info pv {: <17} | <- Found mate {}.", self.pv(), mate);
+                    println!(
+                        "info pv {: <17} | <- {} [{}] | mate {: >2} |",
+                        self.pv(),
+                        if pos.friend == self.root_friend {
+                            "+".to_string()
+                        } else {
+                            "-".to_string()
+                        },
+                        addr,
+                        mate
+                    );
 
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), Some(mate));
@@ -104,45 +154,6 @@ impl Search {
                 pos.remove_move();
                 self.depth -= 1;
                 pos.board[addr] = None;
-
-                // 後ろ向き探索のときの表示だぜ☆（＾～＾）
-                fn backward_str(
-                    pv: String,
-                    friend: String,
-                    addr: usize,
-                    cur_mate: Option<i8>,
-                    child_mate: Option<i8>,
-                ) -> String {
-                    format!(
-                        "pv {: <17} | <- {} [{}]{}",
-                        pv,
-                        friend,
-                        addr,
-                        if let Some(cur_mate) = cur_mate {
-                            if let Some(child_mate) = child_mate {
-                                if child_mate.abs() < cur_mate.abs() {
-                                    // より短手数のメートを見つけたら。
-                                    format!(" Faster mate {} rather than {}.", child_mate, cur_mate)
-                                } else {
-                                    // 長手数のメートは要らないぜ☆（＾～＾）
-                                    format!(
-                                        " Ignore mate {}. It's longer than(or equals) {}.",
-                                        child_mate, cur_mate
-                                    )
-                                }
-                            } else {
-                                format!(" Not change mate {}.", cur_mate)
-                            }
-                        } else {
-                            if let Some(child_mate) = child_mate {
-                                // 新しく見つけたメート。
-                                format!(" Found mate {}.", child_mate)
-                            } else {
-                                "".to_string()
-                            }
-                        },
-                    )
-                }
 
                 enum UpdateReadon {
                     /// 置ける場所があれば、必ず置かなければならないから、最初の１個はとりあえず選ぶぜ☆（＾～＾）
@@ -229,7 +240,7 @@ impl Search {
                         UpdateReadon::GettingFirst(comment) => {
                             println!(
                                 "info {} UPDATE at first.{}",
-                                backward_str(
+                                Search::backward_str(
                                     self.pv(),
                                     if pos.friend == self.root_friend {
                                         "+".to_string()
@@ -251,7 +262,7 @@ impl Search {
                             // 短手数のメートを良い方へ更新したら、更新するぜ☆（＾～＾）
                             println!(
                                 "info {} UPDATE # {}",
-                                backward_str(
+                                Search::backward_str(
                                     self.pv(),
                                     if pos.friend == self.root_friend {
                                         "+".to_string()
@@ -270,7 +281,7 @@ impl Search {
                     // 更新がないとき☆（＾～＾）
                     println!(
                         "info {}",
-                        backward_str(
+                        Search::backward_str(
                             self.pv(),
                             if pos.friend == self.root_friend {
                                 "+".to_string()
