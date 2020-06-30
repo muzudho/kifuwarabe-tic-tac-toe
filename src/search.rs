@@ -103,18 +103,20 @@ impl Search {
                 if pos.is_win() {
                     // 勝ったなら☆（＾～＾）
                     println!(
-                        "info pv {: <17} | -> {} win",
+                        "info pv {: <17} | .       depth {} | {} [{}] | win     |",
                         self.pv(),
+                        self.depth - 1,
                         if pos.friend == self.root_friend {
                             "+".to_string()
                         } else {
                             "-".to_string()
-                        }
+                        },
+                        addr
                     );
 
                     // 置いたところを戻そうぜ☆（＾～＾）？
-                    pos.board[addr] = None;
                     self.depth -= 1;
+                    pos.board[addr] = None;
 
                     // メートが出るぜ☆（＾～＾）
                     // 偶数手番は相手の勝ちなんで負数に、奇数手番は自分の勝ちなんで正の数にしろだぜ☆（＾～＾）
@@ -140,15 +142,13 @@ impl Search {
 
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), Some(mate));
-                } else if MAX_MOVES - self.root_move_num <= self.depth {
+                } else if MAX_MOVES - self.root_move_num + 1 < self.depth {
                     // 勝っていなくて、深さ上限に達したら☆（＾～＾）
-                    // 相手に回さないぜ☆（＾～＾）
-                    self.depth -= 1;
-                    pos.board[addr] = None;
+                    // 相手に手番を回さないぜ☆（＾～＾）
                     println!(
-                        "info pv {: <17} | .       depth {} | {} [{}] |{}|",
+                        "info pv {: <17} | .       depth {} | {} [{}] |{}| Leaf.",
                         self.pv(),
-                        self.depth,
+                        self.depth - 1,
                         if pos.friend == self.root_friend {
                             "+".to_string()
                         } else {
@@ -159,9 +159,11 @@ impl Search {
                             format!("     ({: >2})", cur_mate)
                         } else {
                             "         ".to_string()
-                        }
+                        },
                     );
                     // 次の枝の探索へ☆（＾～＾）
+                    self.depth -= 1;
+                    pos.board[addr] = None;
                     continue;
                 } else {
                     // 勝ってないなら☆（＾～＾）
