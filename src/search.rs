@@ -6,22 +6,23 @@ use crate::position::MOVES_LEN;
 /// 探索部☆（＾～＾）
 pub struct Search {
     /// この探索を始めたのはどっち側か☆（＾～＾）
-    pub root_friend: Piece,
+    root_friend: Piece,
+    /// この探索を始めたときは何手目だったか☆（＾～＾）
+    root_moves_num: usize,
     /// 現在局面からの、棋譜☆（＾～＾）ややこしいんで [0] は使わないぜ☆（＾～＾）
-    pub moves: [u8; 10],
+    moves: [u8; 10],
     /// 現在局面からの読みの深さ☆（＾～＾）1スタート☆（＾～＾）
-    pub depth: usize,
+    depth: usize,
 }
-impl Default for Search {
-    fn default() -> Self {
+impl Search {
+    pub fn new(friend: Piece, moves_num: usize) -> Self {
         Search {
-            root_friend: Piece::Nought,
+            root_friend: friend,
+            root_moves_num: moves_num,
             moves: [0; MOVES_LEN],
             depth: 1,
         }
     }
-}
-impl Search {
     /// Principal variation. 今読んでる読み筋☆（＾～＾）
     pub fn pv(&self) -> String {
         let mut pv = String::new();
@@ -32,7 +33,6 @@ impl Search {
     }
     /// 最善の番地を返すぜ☆（＾～＾）
     pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, Option<i8>) {
-        self.root_friend = pos.friend;
         match pos.friend {
             Piece::Nought => {
                 println!("info pv O X O X O X O X O");
@@ -46,6 +46,7 @@ impl Search {
 
     // 後ろ向き探索のときの表示だぜ☆（＾～＾）
     fn backward_str(
+        &self,
         pv: String,
         friend: String,
         addr: usize,
@@ -53,10 +54,11 @@ impl Search {
         child_mate: Option<i8>,
     ) -> String {
         format!(
-            "pv {: <17} | <- {} [{}] | {} |{}",
+            "pv {: <17} | <- {} [{}] | {}move(s) | {} |{}",
             pv,
             friend,
             addr,
+            self.root_moves_num + self.depth - 1,
             if let Some(child_mate) = child_mate {
                 format!("mate {: >2}", child_mate)
             } else {
@@ -126,7 +128,7 @@ impl Search {
 
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
                     println!(
-                        "info pv {: <17} | <- {} [{}] | mate {: >2} |",
+                        "info pv {: <17} | <- {} [{}] | {}move(s) | mate {: >2} |",
                         self.pv(),
                         if pos.friend == self.root_friend {
                             "+".to_string()
@@ -134,6 +136,7 @@ impl Search {
                             "-".to_string()
                         },
                         addr,
+                        self.root_moves_num + self.depth - 1,
                         mate
                     );
 
@@ -240,7 +243,7 @@ impl Search {
                         UpdateReadon::GettingFirst(comment) => {
                             println!(
                                 "info {} UPDATE at first.{}",
-                                Search::backward_str(
+                                self.backward_str(
                                     self.pv(),
                                     if pos.friend == self.root_friend {
                                         "+".to_string()
@@ -262,7 +265,7 @@ impl Search {
                             // 短手数のメートを良い方へ更新したら、更新するぜ☆（＾～＾）
                             println!(
                                 "info {} UPDATE # {}",
-                                Search::backward_str(
+                                self.backward_str(
                                     self.pv(),
                                     if pos.friend == self.root_friend {
                                         "+".to_string()
@@ -281,7 +284,7 @@ impl Search {
                     // 更新がないとき☆（＾～＾）
                     println!(
                         "info {}",
-                        Search::backward_str(
+                        self.backward_str(
                             self.pv(),
                             if pos.friend == self.root_friend {
                                 "+".to_string()

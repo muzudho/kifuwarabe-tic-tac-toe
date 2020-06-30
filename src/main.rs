@@ -69,7 +69,7 @@ fn main() {
                 pos.do_(rest);
             }
         } else if p.starts_with("go") {
-            let mut search = Search::default();
+            let mut search = Search::new(pos.friend, pos.moves_num);
             let (address, mate) = search.go(&mut pos);
             if let Some(addr_val) = address {
                 if let Some(mate_val) = mate {
