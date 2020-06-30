@@ -5,13 +5,13 @@ use crate::position::{Position, BOARD_LEN, MAX_MOVES, MOVES_LEN};
 /// 探索部☆（＾～＾）
 pub struct Search {
     /// この探索を始めたのはどっち側か☆（＾～＾）
-    root_friend: Piece,
+    pub root_friend: Piece,
     /// この探索を始めたのは何手目か☆（＾～＾）
     root_move_num: usize,
     /// 現在局面からの、棋譜☆（＾～＾）ややこしいんで [0] は使わないぜ☆（＾～＾）
     moves: [u8; 10],
     /// 現在局面からの読みの深さ☆（＾～＾）1スタート☆（＾～＾）
-    depth: usize,
+    pub depth: usize,
 }
 impl Search {
     pub fn new(friend: Piece, move_num: usize) -> Self {
@@ -43,48 +43,6 @@ impl Search {
         self.node(pos)
     }
 
-    // 後ろ向き探索のときの表示だぜ☆（＾～＾）
-    fn backward_str(
-        &self,
-        pv: String,
-        friend: String,
-        addr: usize,
-        cur_mate: Option<i8>,
-        child_mate: Option<i8>,
-    ) -> String {
-        format!(
-            "pv {: <17} | <- from depth {} | {} [{}] | {} |{}",
-            pv,
-            self.depth,
-            friend,
-            addr,
-            if let Some(child_mate) = child_mate {
-                format!("mate {: >2}", child_mate)
-            } else {
-                "       ".to_string()
-            },
-            if let Some(cur_mate) = cur_mate {
-                if let Some(child_mate) = child_mate {
-                    if child_mate.abs() < cur_mate.abs() {
-                        // より短手数のメートを見つけたら。
-                        format!(" Faster mate rather than {}.", cur_mate)
-                    } else {
-                        // 長手数のメートは要らないぜ☆（＾～＾）
-                        format!(" Ignore mate. It's longer than(or equals) {}.", cur_mate)
-                    }
-                } else {
-                    format!(" Not change mate {}.", cur_mate)
-                }
-            } else {
-                if let Some(_) = child_mate {
-                    // 新しく見つけたメート。
-                    format!(" Found mate.")
-                } else {
-                    "".to_string()
-                }
-            },
-        )
-    }
     fn node(&mut self, pos: &mut Position) -> (Option<u8>, Option<i8>) {
         let mut best_addr = None;
         // 0,1,-2,3,-4... のように、0を除くと、 正の奇数（勝ち）と、負の偶数（負け）が交互に出てくるぜ☆（＾～＾）
@@ -103,22 +61,7 @@ impl Search {
                 // 勝ったかどうか判定しようぜ☆（＾～＾）？
                 if pos.is_win() {
                     // 勝ったなら☆（＾～＾）
-                    Log::println(&format!(
-                        "info pv {: <17} | .       depth {} | {} [{}] | {:4}    |",
-                        self.pv(),
-                        self.depth - 1,
-                        if pos.friend == self.root_friend {
-                            "+".to_string()
-                        } else {
-                            "-".to_string()
-                        },
-                        addr,
-                        if pos.friend == self.root_friend {
-                            "win".to_string()
-                        } else {
-                            "lose".to_string()
-                        },
-                    ));
+                    self.info_win_up(pos, addr);
 
                     // 置いたところを戻そうぜ☆（＾～＾）？
                     self.depth -= 1;
@@ -133,74 +76,23 @@ impl Search {
                     };
 
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    Log::println(&format!(
-                        "info pv {: <17} | <- from depth {} | {} [{}] | mate {: >2} |",
-                        self.pv(),
-                        self.depth,
-                        if pos.friend == self.root_friend {
-                            "+".to_string()
-                        } else {
-                            "-".to_string()
-                        },
-                        addr,
-                        mate
-                    ));
+                    self.info_win_down(pos, addr, mate);
 
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), Some(mate));
                 } else if MAX_MOVES - self.root_move_num + 1 < self.depth {
                     // 勝っていなくて、深さ上限に達したら、〇×ゲームでは 他に置く場所もないから引き分け確定だぜ☆（＾～＾）
-                    Log::println(&format!(
-                        "info pv {: <17} | .       depth {} | {} [{}] |{}| Draw.",
-                        self.pv(),
-                        self.depth - 1,
-                        if pos.friend == self.root_friend {
-                            "+".to_string()
-                        } else {
-                            "-".to_string()
-                        },
-                        addr,
-                        if let Some(cur_mate) = cur_mate {
-                            format!("     ({: >2})", cur_mate)
-                        } else {
-                            "         ".to_string()
-                        },
-                    ));
+                    self.info_draw_up(pos, addr);
                     // 次の枝の探索へ☆（＾～＾）
                     self.depth -= 1;
                     pos.board[addr] = None;
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    Log::println(&format!(
-                        "info pv {: <17} | <- from depth {} | {} [{}] |         |",
-                        self.pv(),
-                        self.depth,
-                        if pos.friend == self.root_friend {
-                            "+".to_string()
-                        } else {
-                            "-".to_string()
-                        },
-                        addr
-                    ));
+                    self.info_draw_down(pos, addr);
 
                     continue;
                 } else {
                     // 勝ってないなら☆（＾～＾）
-                    Log::println(&format!(
-                        "info pv {: <17} | ->   to depth {} | {} [{}] |{}|",
-                        self.pv(),
-                        self.depth,
-                        if pos.friend == self.root_friend {
-                            "+".to_string()
-                        } else {
-                            "-".to_string()
-                        },
-                        addr,
-                        if let Some(cur_mate) = cur_mate {
-                            format!("     ({: >2})", cur_mate)
-                        } else {
-                            "         ".to_string()
-                        }
-                    ));
+                    self.info_forward(pos, addr, cur_mate);
                 }
 
                 pos.add_move(addr as u8);
@@ -228,14 +120,18 @@ impl Search {
                             || (child_mate <= 0 && pos.friend != self.root_friend)
                         {
                             // （メートが正の数で、探索している方のターン）または、（メートが０または負数で、探索していない方のターン）なら、そいつの勝ちだぜ☆（＾～＾）
-                            Some(UpdateReadon::GettingFirst("Good.".to_string()))
+                            Some(UpdateReadon::GettingFirst(
+                                "At first, mate is good.".to_string(),
+                            ))
                         } else {
                             // 負け☆（＾～＾）合法手だが、こんな手は採用してはいけないぜ☆（＾～＾）
                             // Some(UpdateReadon::GettingFirst("Bad.".to_string()))
                             None
                         }
                     } else {
-                        Some(UpdateReadon::GettingFirst("Draw.".to_string()))
+                        Some(UpdateReadon::GettingFirst(
+                            "At first, draw is good.".to_string(),
+                        ))
                     }
                 } else {
                     if let Some(cur_mate) = cur_mate {
@@ -248,26 +144,30 @@ impl Search {
                                     // 今まで メートされる手ばかりだったが、メートできる手を見つけたぜ☆（＾～＾）
                                     // メート食らってたのを、メートかけるんだから、すごい良い手だぜ☆（＾～＾）！更新するぜ☆（＾～＾）
                                     Some(UpdateReadon::Better(
-                                        "Cross-counter checkmate.".to_string(),
+                                        "Cross-counter checkmate is better.".to_string(),
                                     ))
                                 } else {
                                     if cur_mate.abs() < child_mate.abs() {
                                         // 今まで メートされる手ばかりだったが、手数を伸ばす手を見つけたぜ☆（＾～＾）
-                                        Some(UpdateReadon::Better("Delayed the bad.".to_string()))
+                                        Some(UpdateReadon::Better(
+                                            "Delayed the bad is better.".to_string(),
+                                        ))
                                     } else {
                                         None
                                     }
                                 }
                             } else {
                                 // 今まで メートされる手ばかりだったが、引き分けにできるぜ☆（＾～＾）！
-                                Some(UpdateReadon::Better("Found the draw.".to_string()))
+                                Some(UpdateReadon::Better("Draw is better.".to_string()))
                             }
                         } else {
                             // 今までの手は、メート掛ける手のとき☆（＾ｑ＾）
                             if let Some(cihld_mate) = child_mate {
                                 if 0 < cihld_mate && cihld_mate.abs() < cur_mate.abs() {
                                     // より短手数のメートをかける手を見つけてたら、更新するぜ☆（＾～＾）
-                                    Some(UpdateReadon::Better("Shorter checkmate.".to_string()))
+                                    Some(UpdateReadon::Better(
+                                        "Shorter checkmate is better.".to_string(),
+                                    ))
                                 } else {
                                     None
                                 }
@@ -281,7 +181,7 @@ impl Search {
                             // メート0 は負数（負け）扱いで☆（＾～＾）
                             if 0 < child_mate {
                                 // こっちからメートする手を見つけたぜ☆（＾～＾）
-                                Some(UpdateReadon::Better("Found checkmate.".to_string()))
+                                Some(UpdateReadon::Better("Checkmate is better.".to_string()))
                             } else {
                                 None
                             }
@@ -300,7 +200,7 @@ impl Search {
                     match u_reason {
                         UpdateReadon::GettingFirst(comment) => {
                             Log::println(&format!(
-                                "info {} UPDATE at first.{}",
+                                "info {} {}",
                                 self.backward_str(
                                     self.pv(),
                                     if pos.friend == self.root_friend {
@@ -309,20 +209,15 @@ impl Search {
                                         "-".to_string()
                                     },
                                     addr,
-                                    cur_mate,
                                     child_mate
                                 ),
-                                if comment != "" {
-                                    format!(" # {}", comment)
-                                } else {
-                                    comment
-                                }
+                                comment
                             ));
                         }
                         UpdateReadon::Better(comment) => {
                             // 短手数のメートを良い方へ更新したら、更新するぜ☆（＾～＾）
                             Log::println(&format!(
-                                "info {} UPDATE # {}",
+                                "info {} {}",
                                 self.backward_str(
                                     self.pv(),
                                     if pos.friend == self.root_friend {
@@ -331,7 +226,6 @@ impl Search {
                                         "-".to_string()
                                     },
                                     addr,
-                                    cur_mate,
                                     child_mate,
                                 ),
                                 comment
@@ -350,7 +244,6 @@ impl Search {
                                 "-".to_string()
                             },
                             addr,
-                            cur_mate,
                             child_mate
                         ),
                     ));
