@@ -7,6 +7,9 @@ pub const BOARD_LEN: usize = 10;
 /// ９マスしか置くとこないから最大９手なんだが、配列の 0 はややこしいんで使わないことにして、要素数は10だぜ☆（＾～＾）
 pub const MOVES_LEN: usize = 10;
 
+/// 最大９手☆（＾～＾） これを超える深さの探索はしないぜ☆（＾～＾）
+pub const MAX_MOVES: usize = 9;
+
 #[derive(Debug)]
 pub struct Position {
     /// 次に盤に置く駒☆（＾～＾）

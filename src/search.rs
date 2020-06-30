@@ -1,24 +1,22 @@
 use crate::piece::Piece;
-use crate::position::Position;
-use crate::position::BOARD_LEN;
-use crate::position::MOVES_LEN;
+use crate::position::{Position, BOARD_LEN, MAX_MOVES, MOVES_LEN};
 
 /// 探索部☆（＾～＾）
 pub struct Search {
     /// この探索を始めたのはどっち側か☆（＾～＾）
     root_friend: Piece,
-    /// この探索を始めたときは何手目だったか☆（＾～＾）
-    root_moves_num: usize,
+    /// この探索を始めたのは何手目か☆（＾～＾）
+    root_move_num: usize,
     /// 現在局面からの、棋譜☆（＾～＾）ややこしいんで [0] は使わないぜ☆（＾～＾）
     moves: [u8; 10],
     /// 現在局面からの読みの深さ☆（＾～＾）1スタート☆（＾～＾）
     depth: usize,
 }
 impl Search {
-    pub fn new(friend: Piece, moves_num: usize) -> Self {
+    pub fn new(friend: Piece, move_num: usize) -> Self {
         Search {
             root_friend: friend,
-            root_moves_num: moves_num,
+            root_move_num: move_num,
             moves: [0; MOVES_LEN],
             depth: 1,
         }
@@ -54,11 +52,11 @@ impl Search {
         child_mate: Option<i8>,
     ) -> String {
         format!(
-            "pv {: <17} | <- {} [{}] | {}move(s) | {} |{}",
+            "pv {: <17} | <- from depth {} | {} [{}] | {} |{}",
             pv,
+            self.depth,
             friend,
             addr,
-            self.root_moves_num + self.depth - 1,
             if let Some(child_mate) = child_mate {
                 format!("mate {: >2}", child_mate)
             } else {
@@ -128,22 +126,61 @@ impl Search {
 
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
                     println!(
-                        "info pv {: <17} | <- {} [{}] | {}move(s) | mate {: >2} |",
+                        "info pv {: <17} | <- from depth {} | {} [{}] | mate {: >2} |",
                         self.pv(),
+                        self.depth,
                         if pos.friend == self.root_friend {
                             "+".to_string()
                         } else {
                             "-".to_string()
                         },
                         addr,
-                        self.root_moves_num + self.depth - 1,
                         mate
                     );
 
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), Some(mate));
+                } else if MAX_MOVES - self.root_move_num <= self.depth {
+                    // 勝っていなくて、深さ上限に達したら☆（＾～＾）
+                    // 相手に回さないぜ☆（＾～＾）
+                    self.depth -= 1;
+                    pos.board[addr] = None;
+                    println!(
+                        "info pv {: <17} | .       depth {} | {} [{}] |{}|",
+                        self.pv(),
+                        self.depth,
+                        if pos.friend == self.root_friend {
+                            "+".to_string()
+                        } else {
+                            "-".to_string()
+                        },
+                        addr,
+                        if let Some(cur_mate) = cur_mate {
+                            format!("     ({: >2})", cur_mate)
+                        } else {
+                            "         ".to_string()
+                        }
+                    );
+                    // 次の枝の探索へ☆（＾～＾）
+                    continue;
                 } else {
-                    println!("info pv {: <17} | ->", self.pv());
+                    // 勝ってないなら☆（＾～＾）
+                    println!(
+                        "info pv {: <17} | ->   to depth {} | {} [{}] |{}|",
+                        self.pv(),
+                        self.depth,
+                        if pos.friend == self.root_friend {
+                            "+".to_string()
+                        } else {
+                            "-".to_string()
+                        },
+                        addr,
+                        if let Some(cur_mate) = cur_mate {
+                            format!("     ({: >2})", cur_mate)
+                        } else {
+                            "         ".to_string()
+                        }
+                    );
                 }
 
                 pos.add_move(addr as u8);
