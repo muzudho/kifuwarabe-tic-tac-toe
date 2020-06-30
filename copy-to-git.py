@@ -18,6 +18,7 @@ def go():
     remove_destination_file('/copy-to-git.py')
     remove_destination_file('/Dockerfile')
     remove_destination_file('/LICENSE')
+    remove_destination_file('/maybe-a-complete-analysis.log')
     remove_destination_file('/README.md')
 
     print('Trace   | Copy.')
@@ -28,6 +29,7 @@ def go():
     copy_file('/copy-to-git.py')
     copy_file('/Dockerfile')
     copy_file('/LICENSE')
+    copy_file('/maybe-a-complete-analysis.log')
     copy_file('/README.md')
 
     print('Trace   | Git hub.')

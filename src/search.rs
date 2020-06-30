@@ -89,7 +89,8 @@ impl Search {
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
                     self.info_draw_down(pos, addr);
 
-                    continue;
+                    // 探索終了だぜ☆（＾～＾）
+                    return (Some(addr as u8), None);
                 } else {
                     // 勝ってないなら☆（＾～＾）
                     self.info_forward(pos, addr, cur_mate);
