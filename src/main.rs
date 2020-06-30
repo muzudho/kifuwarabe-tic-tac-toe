@@ -1,4 +1,8 @@
+#[macro_use]
+extern crate lazy_static;
+
 mod command_line;
+mod log;
 mod piece;
 mod position;
 mod protocol;
@@ -8,6 +12,7 @@ mod test;
 mod view;
 
 use crate::command_line::CommandLine;
+use crate::log::Log;
 use position::Position;
 use search::Search;
 use std;
@@ -15,7 +20,7 @@ use test::test;
 
 fn main() {
     test();
-    println!(
+    Log::println(
         "〇×ゲーム
 
 コマンド:
@@ -23,7 +28,7 @@ fn main() {
 `pos` - 局面表示。
 `position xfen 3/3/3 o moves 5 1 2 8 4 6 3 7 9` - 初期局面と棋譜を入力。
 `xfen` - 現局面のxfen文字列表示。
-"
+",
     );
     // let board = Board::default();
 
@@ -45,7 +50,7 @@ fn main() {
         panic!("xfen error. xfen={}", xfen);
     };
 
-    // println!("xfen={}", xfen);
+    // Log::println("xfen={}", xfen);
     // board.debug_write();
 
     // [Ctrl]+[C] でループを終了
@@ -64,7 +69,7 @@ fn main() {
         // よく使うコマンド順に並べた方が高速だが、先に見つけた方が選ばれるので後ろの方を漏らしやすいし、アルファベット順に並べた方が見やすいぜ☆（＾～＾）
         if p.starts_with("do") {
             p.go_next_to("do ");
-            // println!("Debug   | rest=|{}|", p.rest());
+            // Log::println("Debug   | rest=|{}|", p.rest());
             if let Some(rest) = p.rest() {
                 pos.do_(rest);
             }
@@ -73,11 +78,11 @@ fn main() {
             let (address, mate) = search.go(&mut pos);
             if let Some(addr_val) = address {
                 if let Some(mate_val) = mate {
-                    println!("info mate={}", mate_val);
+                    Log::println(&format!("info mate={}", mate_val));
                 }
-                println!("bestmove {}", addr_val);
+                Log::println(&format!("bestmove {}", addr_val));
             } else {
-                println!("resign");
+                Log::println("resign");
             }
         } else if p.starts_with("position") {
             p.go_next_to("position ");
@@ -91,9 +96,9 @@ fn main() {
         } else if p.starts_with("undo") {
             pos.undo();
         } else if p.starts_with("xfen") {
-            println!("{}", pos.to_xfen());
+            Log::println(&format!("{}", pos.to_xfen()));
         } else {
-            println!("Debug   | Command not found. {:?}", p);
+            Log::println(&format!("Debug   | Command not found. {:?}", p));
         }
     }
 }

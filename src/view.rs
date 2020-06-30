@@ -1,3 +1,4 @@
+use crate::log::Log;
 use crate::piece::Piece;
 use crate::position::Position;
 use std::fmt;
@@ -6,7 +7,7 @@ impl Position {
     /*
     pub fn debug_write(&self) {
         for (i, sq) in self.board.iter().enumerate() {
-            println!(
+            Log::println(&format!(
                 "{}: {}",
                 i,
                 if let Some(sq_val) = sq {
@@ -14,7 +15,7 @@ impl Position {
                 } else {
                     "None".to_string()
                 }
-            );
+            ));
         }
     }
     */
@@ -26,14 +27,14 @@ impl Position {
         }
     }
     pub fn pos(&self) {
-        // println!("Debug   | position={:?}", self);
-        println!(
+        // Log::println(&format!("Debug   | position={:?}", self));
+        Log::println(&format!(
             "[{} move(s) | Go {}]
 ",
             self.moves_num, self.friend
-        );
+        ));
         // 書式を指定したりで、桁がずれるのは仕方ないぜ☆（＾～＾）
-        println!(
+        Log::println(&format!(
             "\
 +---+---+---+
 |{0: ^3}|{1: ^3}|{2: ^3}| マスを選んでください。例 `do 7`
@@ -52,7 +53,7 @@ impl Position {
             self.cell(1),
             self.cell(2),
             self.cell(3)
-        );
+        ));
     }
 }
 

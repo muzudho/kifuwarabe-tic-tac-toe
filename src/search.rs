@@ -1,3 +1,4 @@
+use crate::log::Log;
 use crate::piece::Piece;
 use crate::position::{Position, BOARD_LEN, MAX_MOVES, MOVES_LEN};
 
@@ -33,10 +34,10 @@ impl Search {
     pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, Option<i8>) {
         match pos.friend {
             Piece::Nought => {
-                println!("info pv O X O X O X O X O");
+                Log::println("info pv O X O X O X O X O");
             }
             Piece::Cross => {
-                println!("info pv X O X O X O X O X");
+                Log::println(&format!("info pv X O X O X O X O X"));
             }
         }
         self.node(pos)
@@ -102,7 +103,7 @@ impl Search {
                 // 勝ったかどうか判定しようぜ☆（＾～＾）？
                 if pos.is_win() {
                     // 勝ったなら☆（＾～＾）
-                    println!(
+                    Log::println(&format!(
                         "info pv {: <17} | .       depth {} | {} [{}] | {:4}    |",
                         self.pv(),
                         self.depth - 1,
@@ -117,7 +118,7 @@ impl Search {
                         } else {
                             "lose".to_string()
                         },
-                    );
+                    ));
 
                     // 置いたところを戻そうぜ☆（＾～＾）？
                     self.depth -= 1;
@@ -132,7 +133,7 @@ impl Search {
                     };
 
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    println!(
+                    Log::println(&format!(
                         "info pv {: <17} | <- from depth {} | {} [{}] | mate {: >2} |",
                         self.pv(),
                         self.depth,
@@ -143,13 +144,13 @@ impl Search {
                         },
                         addr,
                         mate
-                    );
+                    ));
 
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), Some(mate));
                 } else if MAX_MOVES - self.root_move_num + 1 < self.depth {
                     // 勝っていなくて、深さ上限に達したら、〇×ゲームでは 他に置く場所もないから引き分け確定だぜ☆（＾～＾）
-                    println!(
+                    Log::println(&format!(
                         "info pv {: <17} | .       depth {} | {} [{}] |{}| Draw.",
                         self.pv(),
                         self.depth - 1,
@@ -164,12 +165,12 @@ impl Search {
                         } else {
                             "         ".to_string()
                         },
-                    );
+                    ));
                     // 次の枝の探索へ☆（＾～＾）
                     self.depth -= 1;
                     pos.board[addr] = None;
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    println!(
+                    Log::println(&format!(
                         "info pv {: <17} | <- from depth {} | {} [{}] |         |",
                         self.pv(),
                         self.depth,
@@ -179,12 +180,12 @@ impl Search {
                             "-".to_string()
                         },
                         addr
-                    );
+                    ));
 
                     continue;
                 } else {
                     // 勝ってないなら☆（＾～＾）
-                    println!(
+                    Log::println(&format!(
                         "info pv {: <17} | ->   to depth {} | {} [{}] |{}|",
                         self.pv(),
                         self.depth,
@@ -199,7 +200,7 @@ impl Search {
                         } else {
                             "         ".to_string()
                         }
-                    );
+                    ));
                 }
 
                 pos.add_move(addr as u8);
@@ -229,8 +230,9 @@ impl Search {
                             // （メートが正の数で、探索している方のターン）または、（メートが０または負数で、探索していない方のターン）なら、そいつの勝ちだぜ☆（＾～＾）
                             Some(UpdateReadon::GettingFirst("Good.".to_string()))
                         } else {
-                            // 負け☆（＾～＾）
-                            Some(UpdateReadon::GettingFirst("Bad.".to_string()))
+                            // 負け☆（＾～＾）合法手だが、こんな手は採用してはいけないぜ☆（＾～＾）
+                            // Some(UpdateReadon::GettingFirst("Bad.".to_string()))
+                            None
                         }
                     } else {
                         Some(UpdateReadon::GettingFirst("Draw.".to_string()))
@@ -297,7 +299,7 @@ impl Search {
 
                     match u_reason {
                         UpdateReadon::GettingFirst(comment) => {
-                            println!(
+                            Log::println(&format!(
                                 "info {} UPDATE at first.{}",
                                 self.backward_str(
                                     self.pv(),
@@ -315,11 +317,11 @@ impl Search {
                                 } else {
                                     comment
                                 }
-                            );
+                            ));
                         }
                         UpdateReadon::Better(comment) => {
                             // 短手数のメートを良い方へ更新したら、更新するぜ☆（＾～＾）
-                            println!(
+                            Log::println(&format!(
                                 "info {} UPDATE # {}",
                                 self.backward_str(
                                     self.pv(),
@@ -333,12 +335,12 @@ impl Search {
                                     child_mate,
                                 ),
                                 comment
-                            );
+                            ));
                         }
                     }
                 } else {
                     // 更新がないとき☆（＾～＾）
-                    println!(
+                    Log::println(&format!(
                         "info {}",
                         self.backward_str(
                             self.pv(),
@@ -351,17 +353,10 @@ impl Search {
                             cur_mate,
                             child_mate
                         ),
-                    );
+                    ));
                 }
             }
         }
-
-        /*
-        if let None = best_addr {
-            // 置くところが無かったのなら☆（＾～＾）
-            println!("info .. {: <17} |    Found draw.", "");
-        }
-        */
 
         (best_addr, cur_mate)
     }

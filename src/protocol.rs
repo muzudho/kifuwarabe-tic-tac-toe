@@ -1,4 +1,5 @@
 //! 局面データを文字列にしたり、文字列を局面データに復元するのに使うぜ☆（＾～＾）
+use crate::log::Log;
 use crate::piece::Piece;
 use crate::position::Position;
 use crate::result::GameResult;
@@ -12,7 +13,7 @@ impl Position {
         // StartingBoard
         let mut spaces = 0;
         for addr in [7, 8, 9, 4, 5, 6, 1, 2, 3].iter() {
-            // println!("addr={} spaces={} xfen={}", addr, spaces, xfen);
+            // Log::println(&format("addr={} spaces={} xfen={}", addr, spaces, xfen));
             if let Some(piece) = self.starting_board[*addr as usize] {
                 if 0 < spaces {
                     xfen.push_str(&spaces.to_string());
@@ -96,10 +97,10 @@ impl Position {
         for (i, ch) in xfen.chars().enumerate() {
             // 分け分からんバグが出たらデバッグ・ライトしろだぜ☆（＾～＾）
             /*
-            println!(
+            Log::println(&format(
                 "Trace   | machine_state={:?}, addr={} count={} ch={}",
                 machine_state, addr, count, ch
-            );
+            ));
             */
 
             match machine_state {
@@ -128,7 +129,7 @@ impl Position {
                         machine_state = MachineState::Phase;
                     }
                     _ => {
-                        println!("Error   | xfen starting_board error: {}", ch);
+                        Log::println(&format!("Error   | xfen starting_board error: {}", ch));
                         return None;
                     }
                 },
@@ -141,7 +142,7 @@ impl Position {
                             pos.friend = Piece::Nought;
                         }
                         _ => {
-                            println!("Error   | xfen phase error: {}", ch);
+                            Log::println(&format!("Error   | xfen phase error: {}", ch));
                             return None;
                         }
                     }
@@ -173,27 +174,27 @@ impl Position {
     ///
     /// * `move_` - 指し手。ここでは駒を置く場所。 `1` とか `7` など。
     pub fn do_(&mut self, line: &str) {
-        // println!("Trace   | do_ line={}", line);
+        // Log::println(&format("Trace   | do_ line={}", line));
         let addr: usize = match line.parse() {
             Ok(x) => x,
             Err(_x) => {
-                println!(
+                Log::println(&format!(
                     "Error   | `do 数字` で入力してくれだぜ☆（＾～＾） 入力=|{}|",
                     line
-                );
+                ));
                 return;
             }
         };
 
-        // println!("Debug   | move_={} addr={}", move_, addr);
+        // Log::println(&format("Debug   | move_={} addr={}", move_, addr));
 
         // 合法手チェック☆（＾～＾）
         // 移動先のマスに駒があってはダメ☆（＾～＾）
         if let Some(_piece_val) = self.board[addr as usize] {
-            println!(
+            Log::println(&format!(
                 "Error   | 移動先のマスに駒があってはダメだぜ☆（＾～＾） 番地={}",
                 addr
-            );
+            ));
             return;
         }
 
@@ -203,10 +204,10 @@ impl Position {
         if let Some(result) = self.get_result() {
             match result {
                 GameResult::FriendWin => {
-                    println!("win {}", self.friend);
+                    Log::println(&format!("win {}", self.friend));
                 }
                 GameResult::Draw => {
-                    println!("draw");
+                    Log::println(&format!("draw"));
                 }
             }
         }
@@ -219,7 +220,7 @@ impl Position {
     pub fn undo(&mut self) {
         self.change_phase();
         let addr = self.remove_move();
-        // println!("Trace   | undo addr={}", addr);
+        Log::println(&format!("Trace   | undo addr={}", addr));
         self.board[addr as usize] = None;
     }
 }
