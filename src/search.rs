@@ -69,6 +69,11 @@ impl Search {
                         } else {
                             "lose".to_string()
                         },
+                        if pos.friend == self.root_friend {
+                            Some("Hooray!".to_string())
+                        } else {
+                            Some("Damn!".to_string())
+                        },
                     );
 
                     // 置いたところを戻そうぜ☆（＾～＾）？
@@ -84,24 +89,24 @@ impl Search {
                     };
 
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    self.info_down_from_leaf(pos, addr, Some(mate));
+                    self.info_backward(pos, addr, Some(mate), None);
 
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), Some(mate));
                 } else if MAX_MOVES - self.root_move_num + 1 < self.depth {
                     // 勝っていなくて、深さ上限に達したら、〇×ゲームでは 他に置く場所もないから引き分け確定だぜ☆（＾～＾）
-                    self.info_leaf(pos, addr, "draw".to_string());
+                    self.info_leaf(pos, addr, "draw".to_string(), Some("Fmmm.".to_string()));
                     // 次の枝の探索へ☆（＾～＾）
                     self.depth -= 1;
                     pos.board[addr] = None;
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    self.info_down_from_leaf(pos, addr, None);
+                    self.info_backward(pos, addr, None, None);
 
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), None);
                 } else {
                     // 勝ってないなら☆（＾～＾）
-                    self.info_forward(pos, addr, cur_mate);
+                    self.info_forward(pos, addr, cur_mate, Some("Search.".to_string()));
                 }
 
                 pos.add_move(addr as u8);
@@ -117,20 +122,20 @@ impl Search {
                 pos.board[addr] = None;
 
                 // 子枝のメートを見て、採用するか棄却するか選ぶぜ☆（＾～＾）
-                let update_reason: Option<String> = if best_addr == None {
+                let (update, comment) = if best_addr == None {
                     // 置ける場所があれば必ず選ばなければならないから、最初に見つけた置ける場所をひとまず調べるぜ☆（＾～＾）
                     if let Some(child_mate) = child_mate {
                         if (0 < child_mate && pos.friend == self.root_friend)
                             || (child_mate <= 0 && pos.friend != self.root_friend)
                         {
                             // （メートが正の数で、探索している方のターン）または、（メートが０または負数で、探索していない方のターン）なら、そいつの勝ちだぜ☆（＾～＾）
-                            Some("At first, mate is good.".to_string())
+                            (true, Some("At first, mate is good.".to_string()))
                         } else {
                             // 負け☆（＾～＾）合法手だが、こんな手は採用してはいけないぜ☆（＾～＾）
-                            None
+                            (false, Some("Damn!".to_string()))
                         }
                     } else {
-                        Some("At first, draw is good.".to_string())
+                        (true, Some("At first, draw is good.".to_string()))
                     }
                 } else {
                     if let Some(cur_mate) = cur_mate {
@@ -142,30 +147,32 @@ impl Search {
                                 if 0 < child_mate {
                                     // 今まで メートされる手ばかりだったが、メートできる手を見つけたぜ☆（＾～＾）
                                     // メート食らってたのを、メートかけるんだから、すごい良い手だぜ☆（＾～＾）！更新するぜ☆（＾～＾）
-                                    Some("Cross-counter checkmate is better.".to_string())
+                                    (true, Some("Cross-counter checkmate is better.".to_string()))
                                 } else {
                                     if cur_mate.abs() < child_mate.abs() {
                                         // 今まで メートされる手ばかりだったが、手数を伸ばす手を見つけたぜ☆（＾～＾）
-                                        Some("Delayed the bad is better.".to_string())
+                                        (true, Some("Delayed the bad is better.".to_string()))
                                     } else {
-                                        None
+                                        (false, Some("Oh, No!".to_string()))
                                     }
                                 }
                             } else {
                                 // 今まで メートされる手ばかりだったが、引き分けにできるぜ☆（＾～＾）！
-                                Some("Draw is better.".to_string())
+                                (true, Some("Draw is better.".to_string()))
                             }
                         } else {
                             // 今までの手は、メート掛ける手のとき☆（＾ｑ＾）
                             if let Some(cihld_mate) = child_mate {
                                 if 0 < cihld_mate && cihld_mate.abs() < cur_mate.abs() {
                                     // より短手数のメートをかける手を見つけてたら、更新するぜ☆（＾～＾）
-                                    Some("Shorter checkmate is better.".to_string())
+                                    (true, Some("Shorter checkmate is better.".to_string()))
                                 } else {
-                                    None
+                                    // メートが長手数になるとか、メートが外れるとか☆（＾～＾）
+                                    (false, Some("No.".to_string()))
                                 }
                             } else {
-                                None
+                                // メートしてたのに引き分けになるなんて☆（＾～＾）
+                                (false, Some("No.".to_string()))
                             }
                         }
                     } else {
@@ -174,33 +181,25 @@ impl Search {
                             // メート0 は負数（負け）扱いで☆（＾～＾）
                             if 0 < child_mate {
                                 // こっちからメートする手を見つけたぜ☆（＾～＾）
-                                Some("Checkmate is better.".to_string())
+                                (true, Some("Checkmate is better.".to_string()))
                             } else {
-                                None
+                                // 引き分けだったのにメートになるなんて☆（＾～＾）
+                                (false, Some("No.".to_string()))
                             }
                         } else {
-                            None
+                            // 引き分けが変わってなければ☆（＾～＾）
+                            (false, Some("It's ok.".to_string()))
                         }
                     }
                 };
 
                 // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                if let Some(_) = update_reason {
+                if update {
                     // 更新することは確定☆（＾～＾）
                     best_addr = Some(addr as u8);
                     cur_mate = child_mate;
                 }
-                self.info_backward(
-                    self.pv(),
-                    if pos.friend == self.root_friend {
-                        "+".to_string()
-                    } else {
-                        "-".to_string()
-                    },
-                    addr,
-                    child_mate,
-                    update_reason,
-                );
+                self.info_backward(pos, addr, child_mate, comment);
             }
         }
 
