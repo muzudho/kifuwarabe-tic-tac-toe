@@ -4,8 +4,8 @@ use crate::result::GameResult;
 /// 1スタートで9まで☆（＾～＾） 配列には0番地もあるから、要素数は10だぜ☆（＾～＾）
 pub const BOARD_LEN: usize = 10;
 
-/// ９マスしか置くとこないから最大９手なんだが、配列の 0 はややこしいんで使わないことにして、要素数は10だぜ☆（＾～＾）
-pub const MOVES_LEN: usize = 10;
+/// 盤上に置ける最大の駒数だぜ☆（＾～＾） ９マスしか置くとこないから９だぜ☆（＾～＾）
+pub const SQUARES_NUM: usize = 9;
 
 /// 最大９手☆（＾～＾） これを超える深さの探索はしないぜ☆（＾～＾）
 pub const MAX_MOVES: usize = 9;
@@ -25,10 +25,10 @@ pub struct Position {
     pub board: [Option<Piece>; BOARD_LEN],
 
     /// 棋譜だぜ☆（＾～＾）駒を置いた番地を並べてけだぜ☆（＾～＾）
-    pub moves: [u8; MOVES_LEN],
+    pub history: [u8; SQUARES_NUM],
 
-    /// 何手目かだぜ☆（＾～＾）初期局面では 1 ☆（＾～＾） 0 は使わないぜ☆（＾～＾）
-    pub moves_num: usize,
+    /// 盤の上に駒が何個置いてあるかだぜ☆（＾～＾）
+    pub pieces_num: usize,
 }
 impl Default for Position {
     fn default() -> Self {
@@ -36,20 +36,20 @@ impl Default for Position {
             friend: Piece::Nought,
             starting_board: [None; BOARD_LEN],
             board: [None; BOARD_LEN],
-            moves: [0; MOVES_LEN],
-            moves_num: 1,
+            history: [0; SQUARES_NUM],
+            pieces_num: 0,
         }
     }
 }
 impl Position {
     pub fn add_move(&mut self, addr: u8) {
-        self.moves[self.moves_num] = addr;
-        self.moves_num += 1;
+        self.history[self.pieces_num] = addr;
+        self.pieces_num += 1;
     }
     pub fn remove_move(&mut self) -> u8 {
         // 手数は次の要素を指しているんで、先に戻してから、配列の中身を取り出せだぜ☆（＾～＾）
-        self.moves_num -= 1;
-        self.moves[self.moves_num]
+        self.pieces_num -= 1;
+        self.history[self.pieces_num]
     }
     pub fn change_phase(&mut self) {
         use crate::piece::Piece::*;

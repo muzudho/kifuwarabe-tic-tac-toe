@@ -1,6 +1,7 @@
 use crate::log::Log;
 use crate::piece::Piece;
-use crate::position::{Position, BOARD_LEN, MAX_MOVES, MOVES_LEN};
+use crate::position::{Position, BOARD_LEN, MAX_MOVES, SQUARES_NUM};
+use std::time::Instant;
 
 /// 探索部☆（＾～＾）
 pub struct Search {
@@ -8,25 +9,49 @@ pub struct Search {
     pub root_friend: Piece,
     /// この探索を始めたのは何手目か☆（＾～＾）
     root_move_num: usize,
-    /// 現在局面からの、棋譜☆（＾～＾）ややこしいんで [0] は使わないぜ☆（＾～＾）
-    moves: [u8; 10],
+    /// 現在局面からの、棋譜☆（＾～＾）
+    history: [u8; SQUARES_NUM],
     /// 現在局面からの読みの深さ☆（＾～＾）1スタート☆（＾～＾）
     pub depth: usize,
+    /// 探索したノード数☆（＾～＾）
+    pub nodes: u32,
+    /// この構造体を生成した時点からストップ・ウォッチを開始するぜ☆（＾～＾）
+    stopwatch: Instant,
+    /*
+    /// 勝ち筋☆（＾～＾）
+    best_pv: BestPv,
+    */
 }
 impl Search {
     pub fn new(friend: Piece, move_num: usize) -> Self {
         Search {
             root_friend: friend,
             root_move_num: move_num,
-            moves: [0; MOVES_LEN],
+            history: [0; SQUARES_NUM],
             depth: 1,
+            nodes: 0,
+            stopwatch: Instant::now(),
+            // best_pv: BestPv::default(),
         }
     }
+    fn sec(&self) -> u64 {
+        self.stopwatch.elapsed().as_secs()
+    }
+
+    pub fn nps(&self) -> u64 {
+        let sec = self.sec();
+        if 0 < sec {
+            self.nodes as u64 / sec
+        } else {
+            0
+        }
+    }
+
     /// Principal variation. 今読んでる読み筋☆（＾～＾）
     pub fn pv(&self) -> String {
         let mut pv = String::new();
-        for d in 1..self.depth {
-            pv.push_str(&format!("{} ", self.moves[d]));
+        for d in 0..(self.depth - 1) {
+            pv.push_str(&format!("{} ", self.history[d]));
         }
         pv.trim_end().to_string()
     }
@@ -34,10 +59,12 @@ impl Search {
     pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, Option<i8>) {
         match pos.friend {
             Piece::Nought => {
-                Log::println("info pv O X O X O X O X O");
+                Log::println("info nps ...... nodes ...... pv O X O X O X O X O");
             }
             Piece::Cross => {
-                Log::println(&format!("info pv X O X O X O X O X"));
+                Log::println(&format!(
+                    "info nps ...... nodes ...... pv X O X O X O X O X"
+                ));
             }
         }
         self.node(pos)
@@ -53,8 +80,9 @@ impl Search {
             if let None = pos.board[addr] {
                 // とりあえず置いてみようぜ☆（＾～＾）
                 pos.board[addr] = Some(pos.friend);
+                self.nodes += 1;
                 // 棋譜にも付けようぜ☆（＾～＾）
-                self.moves[self.depth] = addr as u8;
+                self.history[self.depth - 1] = addr as u8;
                 self.depth += 1;
 
                 // 深い方に潜ってるときの読み筋☆（＾～＾）いわゆる前向き☆（＾～＾）
@@ -215,3 +243,18 @@ impl Search {
         (best_addr, cur_mate)
     }
 }
+/*
+/// 勝ち筋☆（＾～＾）
+pub struct BestPv {
+    pub best_moves: [u8; MOVES_LEN],
+    pub best_moves_len: usize,
+}
+impl Default for BestPv {
+    fn default() -> Self {
+        BestPv {
+            best_moves: [0; MOVES_LEN],
+            best_moves_len: 0,
+        }
+    }
+}
+*/

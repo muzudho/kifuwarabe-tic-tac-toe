@@ -52,10 +52,10 @@ impl Position {
         }
 
         // Moves
-        if 1 < self.moves_num {
+        if 0 < self.pieces_num {
             xfen.push_str(" moves");
-            for i in 1..self.moves_num {
-                xfen.push_str(&format!(" {}", self.moves[i].to_string()));
+            for i in 0..self.pieces_num {
+                xfen.push_str(&format!(" {}", self.history[i].to_string()));
             }
         }
 

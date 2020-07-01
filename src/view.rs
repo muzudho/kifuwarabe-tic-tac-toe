@@ -29,9 +29,10 @@ impl Position {
     pub fn pos(&self) {
         // Log::println(&format!("Debug   | position={:?}", self));
         Log::println(&format!(
-            "[{} move(s) | Go {}]
+            "[Next {} move(s) | Go {}]
 ",
-            self.moves_num, self.friend
+            self.pieces_num + 1,
+            self.friend
         ));
         // 書式を指定したりで、桁がずれるのは仕方ないぜ☆（＾～＾）
         Log::println(&format!(
