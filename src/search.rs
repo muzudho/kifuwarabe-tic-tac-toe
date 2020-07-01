@@ -69,11 +69,7 @@ impl Search {
                         } else {
                             "lose".to_string()
                         },
-                        if pos.friend == self.root_friend {
-                            Some("Hooray!".to_string())
-                        } else {
-                            Some("Damn!".to_string())
-                        },
+                        Some("Hooray!".to_string()),
                     );
 
                     // 置いたところを戻そうぜ☆（＾～＾）？
@@ -132,7 +128,7 @@ impl Search {
                             (true, Some("At first, mate is good.".to_string()))
                         } else {
                             // 負け☆（＾～＾）合法手だが、こんな手は採用してはいけないぜ☆（＾～＾）
-                            (false, Some("Damn!".to_string()))
+                            (false, Some("Damn! I don't choose the square!".to_string()))
                         }
                     } else {
                         (true, Some("At first, draw is good.".to_string()))
@@ -147,32 +143,45 @@ impl Search {
                                 if 0 < child_mate {
                                     // 今まで メートされる手ばかりだったが、メートできる手を見つけたぜ☆（＾～＾）
                                     // メート食らってたのを、メートかけるんだから、すごい良い手だぜ☆（＾～＾）！更新するぜ☆（＾～＾）
-                                    (true, Some("Cross-counter checkmate is better.".to_string()))
+                                    (
+                                        true,
+                                        Some(
+                                            "Alright! Cross-counter checkmate is great!"
+                                                .to_string(),
+                                        ),
+                                    )
                                 } else {
                                     if cur_mate.abs() < child_mate.abs() {
                                         // 今まで メートされる手ばかりだったが、手数を伸ばす手を見つけたぜ☆（＾～＾）
                                         (true, Some("Delayed the bad is better.".to_string()))
                                     } else {
-                                        (false, Some("Oh, No!".to_string()))
+                                        // 今もメートされていて、いいとこなし☆（＾～＾）
+                                        (false, Some("Oh. There was no good point.".to_string()))
                                     }
                                 }
                             } else {
                                 // 今まで メートされる手ばかりだったが、引き分けにできるぜ☆（＾～＾）！
-                                (true, Some("Draw is better.".to_string()))
+                                (true, Some("I was relieved. Draw is better.".to_string()))
                             }
                         } else {
                             // 今までの手は、メート掛ける手のとき☆（＾ｑ＾）
                             if let Some(cihld_mate) = child_mate {
                                 if 0 < cihld_mate && cihld_mate.abs() < cur_mate.abs() {
                                     // より短手数のメートをかける手を見つけてたら、更新するぜ☆（＾～＾）
-                                    (true, Some("Shorter checkmate is better.".to_string()))
+                                    (
+                                        true,
+                                        Some("It's good! Shorter checkmate is better.".to_string()),
+                                    )
                                 } else {
                                     // メートが長手数になるとか、メートが外れるとか☆（＾～＾）
-                                    (false, Some("No.".to_string()))
+                                    (
+                                        false,
+                                        Some("I was disappointed. It was good before.".to_string()),
+                                    )
                                 }
                             } else {
                                 // メートしてたのに引き分けになるなんて☆（＾～＾）
-                                (false, Some("No.".to_string()))
+                                (false, Some("What a hell! No more wins!".to_string()))
                             }
                         }
                     } else {
@@ -181,14 +190,14 @@ impl Search {
                             // メート0 は負数（負け）扱いで☆（＾～＾）
                             if 0 < child_mate {
                                 // こっちからメートする手を見つけたぜ☆（＾～＾）
-                                (true, Some("Checkmate is better.".to_string()))
+                                (true, Some("Thumbs up! I found a mate!".to_string()))
                             } else {
                                 // 引き分けだったのにメートになるなんて☆（＾～＾）
-                                (false, Some("No.".to_string()))
+                                (false, Some("I messed up! I lost the draw!".to_string()))
                             }
                         } else {
                             // 引き分けが変わってなければ☆（＾～＾）
-                            (false, Some("It's ok.".to_string()))
+                            (false, Some("Ok. It was a draw from before.".to_string()))
                         }
                     }
                 };

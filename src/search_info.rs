@@ -27,7 +27,15 @@ impl Search {
                 "         ".to_string()
             },
             if let Some(comment) = comment {
-                format!(" {}", comment)
+                format!(
+                    " {} \"{}\"",
+                    if pos.friend == self.root_friend {
+                        "+".to_string()
+                    } else {
+                        "-".to_string()
+                    },
+                    comment
+                )
             } else {
                 "".to_string()
             },
@@ -53,7 +61,15 @@ impl Search {
             self.depth - 1,
             result,
             if let Some(comment) = comment {
-                format!(" {}", comment)
+                format!(
+                    " {} \"{}\"",
+                    if pos.friend == self.root_friend {
+                        "+".to_string()
+                    } else {
+                        "-".to_string()
+                    },
+                    comment
+                )
             } else {
                 "".to_string()
             },
@@ -83,7 +99,15 @@ impl Search {
                 "         ".to_string()
             },
             if let Some(comment) = comment {
-                format!(" {}", comment)
+                format!(
+                    " {} \"{}\"",
+                    if pos.friend == self.root_friend {
+                        "+".to_string()
+                    } else {
+                        "-".to_string()
+                    },
+                    comment
+                )
             } else {
                 "".to_string()
             }
