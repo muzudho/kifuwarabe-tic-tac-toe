@@ -108,31 +108,20 @@ impl Search {
                 self.depth -= 1;
                 pos.board[addr] = None;
 
-                enum UpdateReadon {
-                    /// 置ける場所があれば、必ず置かなければならないから、最初の１個はとりあえず選ぶぜ☆（＾～＾）
-                    GettingFirst(String),
-                    /// 今までに見つけた手より良い手なら、更新だぜ☆（＾～＾）
-                    Better(String),
-                }
-                let update_reason = if best_addr == None {
+                let update_reason: Option<String> = if best_addr == None {
                     // 置ける場所があれば必ず選ばなければならないから、最初に見つけた置ける場所をひとまず調べるぜ☆（＾～＾）
                     if let Some(child_mate) = child_mate {
                         if (0 < child_mate && pos.friend == self.root_friend)
                             || (child_mate <= 0 && pos.friend != self.root_friend)
                         {
                             // （メートが正の数で、探索している方のターン）または、（メートが０または負数で、探索していない方のターン）なら、そいつの勝ちだぜ☆（＾～＾）
-                            Some(UpdateReadon::GettingFirst(
-                                "At first, mate is good.".to_string(),
-                            ))
+                            Some("At first, mate is good.".to_string())
                         } else {
                             // 負け☆（＾～＾）合法手だが、こんな手は採用してはいけないぜ☆（＾～＾）
-                            // Some(UpdateReadon::GettingFirst("Bad.".to_string()))
                             None
                         }
                     } else {
-                        Some(UpdateReadon::GettingFirst(
-                            "At first, draw is good.".to_string(),
-                        ))
+                        Some("At first, draw is good.".to_string())
                     }
                 } else {
                     if let Some(cur_mate) = cur_mate {
@@ -144,31 +133,25 @@ impl Search {
                                 if 0 < child_mate {
                                     // 今まで メートされる手ばかりだったが、メートできる手を見つけたぜ☆（＾～＾）
                                     // メート食らってたのを、メートかけるんだから、すごい良い手だぜ☆（＾～＾）！更新するぜ☆（＾～＾）
-                                    Some(UpdateReadon::Better(
-                                        "Cross-counter checkmate is better.".to_string(),
-                                    ))
+                                    Some("Cross-counter checkmate is better.".to_string())
                                 } else {
                                     if cur_mate.abs() < child_mate.abs() {
                                         // 今まで メートされる手ばかりだったが、手数を伸ばす手を見つけたぜ☆（＾～＾）
-                                        Some(UpdateReadon::Better(
-                                            "Delayed the bad is better.".to_string(),
-                                        ))
+                                        Some("Delayed the bad is better.".to_string())
                                     } else {
                                         None
                                     }
                                 }
                             } else {
                                 // 今まで メートされる手ばかりだったが、引き分けにできるぜ☆（＾～＾）！
-                                Some(UpdateReadon::Better("Draw is better.".to_string()))
+                                Some("Draw is better.".to_string())
                             }
                         } else {
                             // 今までの手は、メート掛ける手のとき☆（＾ｑ＾）
                             if let Some(cihld_mate) = child_mate {
                                 if 0 < cihld_mate && cihld_mate.abs() < cur_mate.abs() {
                                     // より短手数のメートをかける手を見つけてたら、更新するぜ☆（＾～＾）
-                                    Some(UpdateReadon::Better(
-                                        "Shorter checkmate is better.".to_string(),
-                                    ))
+                                    Some("Shorter checkmate is better.".to_string())
                                 } else {
                                     None
                                 }
@@ -182,7 +165,7 @@ impl Search {
                             // メート0 は負数（負け）扱いで☆（＾～＾）
                             if 0 < child_mate {
                                 // こっちからメートする手を見つけたぜ☆（＾～＾）
-                                Some(UpdateReadon::Better("Checkmate is better.".to_string()))
+                                Some("Checkmate is better.".to_string())
                             } else {
                                 None
                             }
@@ -193,46 +176,25 @@ impl Search {
                 };
 
                 // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                if let Some(u_reason) = update_reason {
+                if let Some(update_reason) = update_reason {
                     // 更新することは確定☆（＾～＾）
                     best_addr = Some(addr as u8);
                     cur_mate = child_mate;
 
-                    match u_reason {
-                        UpdateReadon::GettingFirst(comment) => {
-                            Log::println(&format!(
-                                "info {} {}",
-                                self.backward_str(
-                                    self.pv(),
-                                    if pos.friend == self.root_friend {
-                                        "+".to_string()
-                                    } else {
-                                        "-".to_string()
-                                    },
-                                    addr,
-                                    child_mate
-                                ),
-                                comment
-                            ));
-                        }
-                        UpdateReadon::Better(comment) => {
-                            // 短手数のメートを良い方へ更新したら、更新するぜ☆（＾～＾）
-                            Log::println(&format!(
-                                "info {} {}",
-                                self.backward_str(
-                                    self.pv(),
-                                    if pos.friend == self.root_friend {
-                                        "+".to_string()
-                                    } else {
-                                        "-".to_string()
-                                    },
-                                    addr,
-                                    child_mate,
-                                ),
-                                comment
-                            ));
-                        }
-                    }
+                    Log::println(&format!(
+                        "info {} {}",
+                        self.backward_str(
+                            self.pv(),
+                            if pos.friend == self.root_friend {
+                                "+".to_string()
+                            } else {
+                                "-".to_string()
+                            },
+                            addr,
+                            child_mate
+                        ),
+                        update_reason
+                    ));
                 } else {
                     // 更新がないとき☆（＾～＾）
                     Log::println(&format!(
