@@ -22,7 +22,8 @@ impl Search {
             }
         ))
     }
-    pub fn info_win_up(&self, pos: &mut Position, addr: usize) {
+    /// 葉だぜ☆（＾～＾）
+    pub fn info_leaf(&self, pos: &mut Position, addr: usize, result: String) {
         Log::println(&format!(
             "info pv {: <17} | {} [{}] | .       depth {} |       | {:4}    |",
             self.pv(),
@@ -33,36 +34,20 @@ impl Search {
             },
             addr,
             self.depth - 1,
-            if pos.friend == self.root_friend {
-                "win".to_string()
-            } else {
-                "lose".to_string()
-            },
+            result,
         ));
     }
-    pub fn info_draw_up(&self, pos: &mut Position, addr: usize) {
-        Log::println(&format!(
-            "info pv {: <17} | {} [{}] | .       depth {} |       | draw    |",
-            self.pv(),
-            if pos.friend == self.root_friend {
-                "+".to_string()
-            } else {
-                "-".to_string()
-            },
-            addr,
-            self.depth - 1,
-        ))
-    }
-    // 後ろ向き探索のときの表示だぜ☆（＾～＾）
-    pub fn backward_str(
+    /// 後ろ向き探索のときの表示だぜ☆（＾～＾）
+    pub fn info_backward(
         &self,
         pv: String,
         friend: String,
         addr: usize,
         child_mate: Option<i8>,
-    ) -> String {
-        format!(
-            "pv {: <17} |       | <- from depth {} | {} [{}] | {} |",
+        update_reason: Option<String>,
+    ) {
+        Log::println(&format!(
+            "info pv {: <17} |       | <- from depth {} | {} [{}] | {} | {}",
             pv,
             self.depth,
             friend,
@@ -72,11 +57,16 @@ impl Search {
             } else {
                 "       ".to_string()
             },
-        )
+            if let Some(comment) = update_reason {
+                comment
+            } else {
+                "".to_string()
+            }
+        ));
     }
-    pub fn info_win_down(&self, pos: &mut Position, addr: usize, mate: i8) {
+    pub fn info_down_from_leaf(&self, pos: &mut Position, addr: usize, mate: Option<i8>) {
         Log::println(&format!(
-            "info pv {: <17} |       | <- from depth {} | {} [{}] | mate {: >2} |",
+            "info pv {: <17} |       | <- from depth {} | {} [{}] |{}|",
             self.pv(),
             self.depth,
             if pos.friend == self.root_friend {
@@ -85,20 +75,11 @@ impl Search {
                 "-".to_string()
             },
             addr,
-            mate
-        ))
-    }
-    pub fn info_draw_down(&self, pos: &mut Position, addr: usize) {
-        Log::println(&format!(
-            "info pv {: <17} |       | <- from depth {} | {} [{}] |         |",
-            self.pv(),
-            self.depth,
-            if pos.friend == self.root_friend {
-                "+".to_string()
+            if let Some(mate) = mate {
+                format!(" mate {: >2} ", mate)
             } else {
-                "-".to_string()
-            },
-            addr
+                "         ".to_string()
+            }
         ))
     }
 }

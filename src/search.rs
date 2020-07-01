@@ -61,7 +61,15 @@ impl Search {
                 // 勝ったかどうか判定しようぜ☆（＾～＾）？
                 if pos.is_win() {
                     // 勝ったなら☆（＾～＾）
-                    self.info_win_up(pos, addr);
+                    self.info_leaf(
+                        pos,
+                        addr,
+                        if pos.friend == self.root_friend {
+                            "win".to_string()
+                        } else {
+                            "lose".to_string()
+                        },
+                    );
 
                     // 置いたところを戻そうぜ☆（＾～＾）？
                     self.depth -= 1;
@@ -76,18 +84,18 @@ impl Search {
                     };
 
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    self.info_win_down(pos, addr, mate);
+                    self.info_down_from_leaf(pos, addr, Some(mate));
 
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), Some(mate));
                 } else if MAX_MOVES - self.root_move_num + 1 < self.depth {
                     // 勝っていなくて、深さ上限に達したら、〇×ゲームでは 他に置く場所もないから引き分け確定だぜ☆（＾～＾）
-                    self.info_draw_up(pos, addr);
+                    self.info_leaf(pos, addr, "draw".to_string());
                     // 次の枝の探索へ☆（＾～＾）
                     self.depth -= 1;
                     pos.board[addr] = None;
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                    self.info_draw_down(pos, addr);
+                    self.info_down_from_leaf(pos, addr, None);
 
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), None);
@@ -108,6 +116,7 @@ impl Search {
                 self.depth -= 1;
                 pos.board[addr] = None;
 
+                // 子枝のメートを見て、採用するか棄却するか選ぶぜ☆（＾～＾）
                 let update_reason: Option<String> = if best_addr == None {
                     // 置ける場所があれば必ず選ばなければならないから、最初に見つけた置ける場所をひとまず調べるぜ☆（＾～＾）
                     if let Some(child_mate) = child_mate {
@@ -176,41 +185,22 @@ impl Search {
                 };
 
                 // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
-                if let Some(update_reason) = update_reason {
+                if let Some(_) = update_reason {
                     // 更新することは確定☆（＾～＾）
                     best_addr = Some(addr as u8);
                     cur_mate = child_mate;
-
-                    Log::println(&format!(
-                        "info {} {}",
-                        self.backward_str(
-                            self.pv(),
-                            if pos.friend == self.root_friend {
-                                "+".to_string()
-                            } else {
-                                "-".to_string()
-                            },
-                            addr,
-                            child_mate
-                        ),
-                        update_reason
-                    ));
-                } else {
-                    // 更新がないとき☆（＾～＾）
-                    Log::println(&format!(
-                        "info {}",
-                        self.backward_str(
-                            self.pv(),
-                            if pos.friend == self.root_friend {
-                                "+".to_string()
-                            } else {
-                                "-".to_string()
-                            },
-                            addr,
-                            child_mate
-                        ),
-                    ));
                 }
+                self.info_backward(
+                    self.pv(),
+                    if pos.friend == self.root_friend {
+                        "+".to_string()
+                    } else {
+                        "-".to_string()
+                    },
+                    addr,
+                    child_mate,
+                    update_reason,
+                );
             }
         }
 
