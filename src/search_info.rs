@@ -2,6 +2,7 @@ use crate::log::Log;
 use crate::piece::Piece;
 use crate::position::Position;
 use crate::position::SQUARES_NUM;
+use crate::search::GameResultState;
 use crate::search::Search;
 
 impl Search {
@@ -19,15 +20,9 @@ impl Search {
     }
 
     /// 前向き探索中だぜ☆（＾～＾）
-    pub fn info_forward(
-        &self,
-        pos: &mut Position,
-        addr: usize,
-        mate: Option<i8>,
-        comment: Option<String>,
-    ) {
+    pub fn info_forward(&self, pos: &mut Position, addr: usize, comment: Option<String>) {
         Log::println(&format!(
-            "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | ->   to {} |       |{}|{}",
+            "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | ->   to {} |       |         |{}",
             self.nps(),
             self.nodes,
             self.pv(),
@@ -41,11 +36,6 @@ impl Search {
                 "none    ".to_string()
             } else {
                 format!("height {}", self.pieces_num + 1)
-            },
-            if let Some(mate) = mate {
-                format!("     ({: >2})", mate)
-            } else {
-                "         ".to_string()
             },
             if let Some(comment) = comment {
                 format!(
@@ -67,11 +57,11 @@ impl Search {
         &self,
         pos: &mut Position,
         addr: usize,
-        result: String,
+        result: GameResultState,
         comment: Option<String>,
     ) {
         Log::println(&format!(
-            "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | .       {} |       | {:4}    |{}",
+            "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | .       {} |       |{}|{}",
             self.nps(),
             self.nodes,
             self.pv(),
@@ -86,7 +76,11 @@ impl Search {
             } else {
                 format!("height {}", self.pieces_num)
             },
-            result,
+            match result {
+                GameResultState::Win => " win     ".to_string(),
+                GameResultState::Draw => " draw    ".to_string(),
+                GameResultState::Lose => " lose    ".to_string(),
+            },
             if let Some(comment) = comment {
                 format!(
                     " {} \"{}\"",
@@ -107,7 +101,7 @@ impl Search {
         &self,
         pos: &mut Position,
         addr: usize,
-        mate: Option<i8>,
+        result: GameResultState,
         comment: Option<String>,
     ) {
         Log::println(&format!(
@@ -126,10 +120,10 @@ impl Search {
                 "-".to_string()
             },
             addr,
-            if let Some(mate) = mate {
-                format!(" mate {: >2} ", mate)
-            } else {
-                "         ".to_string()
+            match result {
+                GameResultState::Win => " win     ".to_string(),
+                GameResultState::Draw => " draw    ".to_string(),
+                GameResultState::Lose => " lose    ".to_string(),
             },
             if let Some(comment) = comment {
                 format!(
