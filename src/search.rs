@@ -1,6 +1,5 @@
-use crate::log::Log;
 use crate::piece::Piece;
-use crate::position::{Position, BOARD_LEN, MAX_MOVES, SQUARES_NUM};
+use crate::position::{Position, BOARD_LEN, SQUARES_NUM};
 use std::time::Instant;
 
 #[derive(Debug)]
@@ -59,12 +58,6 @@ impl Search {
     }
     /// 最善の番地を返すぜ☆（＾～＾）
     pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, GameResult) {
-        /*
-        print!(
-            "Go! MAX_MOVES={} self.root_pieces_num={} self.pieces_num={}",
-            MAX_MOVES, self.root_pieces_num, self.pieces_num
-        );
-        */
         self.info_header(pos);
         self.node(pos)
     }
@@ -114,13 +107,6 @@ impl Search {
                     self.info_forward(pos, addr, Some("Search.".to_string()));
                 }
 
-                /*
-                print!(
-                    "MAX_MOVES={} self.root_pieces_num={} self.pieces_num={}",
-                    MAX_MOVES, self.root_pieces_num, self.pieces_num
-                );
-                */
-
                 pos.add_move(addr as u8);
                 pos.change_phase();
 
@@ -164,7 +150,6 @@ impl Search {
             }
         }
 
-        // メートは絶対値が増えて、符号を反転しろだぜ☆（＾～＾）
         (grate_addr, grate_result)
     }
 }

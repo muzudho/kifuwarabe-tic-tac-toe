@@ -59,10 +59,19 @@ TODO cargo run
 
 ```plain
 # mate +3 の局面。 5 -> [6,9]どう打っても -> [9,6]。
+# x..
+# o..
+# o.x
 position xfen x2/o2/o1x o
 
+# mate +5 の局面？
+# ...
+# ...
+# o.x
+position xfen 3/3/o1x o
+
 # Draw の局面。 9。
-# xo
+# xo.
 # oxx
 # xoo
 position xfen xo1/oxx/xoo o

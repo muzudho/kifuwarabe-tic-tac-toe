@@ -25,33 +25,16 @@ fn main() {
 
 コマンド:
 `do 7` - 手番のプレイヤーが、 7 番地に印を付けます。
-`pos` - 局面表示。
+`go`   - コンピューターが次の1手を示します。
+`pos`  - 局面表示。
 `position xfen 3/3/3 o moves 5 1 2 8 4 6 3 7 9` - 初期局面と棋譜を入力。
+`undo` - 1手戻します。
 `xfen` - 現局面のxfen文字列表示。
 ",
     );
-    // let board = Board::default();
 
     // 初期局面
-    let xfen = "xfen 3/3/3 o";
-    // 一手詰め局面
-    // let xfen = "xfen oxo/xox/3 o";
-    // 二手詰め局面
-    // let xfen = "xfen oxo/xo1/3 x";
-    // ３手詰め局面
-    // let xfen = "xfen oxo/x2/3 o";
-    // 必死の２手局面
-    // let xfen = "xfen 2o/1o1/xxo x";
-    // 受けの１手局面
-    // let xfen = "xfen 3/1ox/1o1 x";
-    let mut pos = if let Some(board) = Position::from_xfen(xfen) {
-        board
-    } else {
-        panic!("xfen error. xfen={}", xfen);
-    };
-
-    // Log::println("xfen={}", xfen);
-    // board.debug_write();
+    let mut pos = Position::default();
 
     // [Ctrl]+[C] でループを終了
     loop {
@@ -69,15 +52,14 @@ fn main() {
         // よく使うコマンド順に並べた方が高速だが、先に見つけた方が選ばれるので後ろの方を漏らしやすいし、アルファベット順に並べた方が見やすいぜ☆（＾～＾）
         if p.starts_with("do") {
             p.go_next_to("do ");
-            // Log::println("Debug   | rest=|{}|", p.rest());
             if let Some(rest) = p.rest() {
                 pos.do_(rest);
             }
         } else if p.starts_with("go") {
             let mut search = Search::new(pos.friend, pos.pieces_num);
-            let (addr, game_result) = search.go(&mut pos);
+            let (addr, result) = search.go(&mut pos);
             if let Some(addr) = addr {
-                Log::println(&format!("info result={:?}", game_result));
+                Log::println(&format!("info result={:?}", result));
                 Log::println(&format!("bestmove {}", addr));
             } else {
                 Log::println("resign");

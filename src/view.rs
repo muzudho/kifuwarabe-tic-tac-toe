@@ -27,7 +27,6 @@ impl Position {
         }
     }
     pub fn pos(&self) {
-        // Log::println(&format!("Debug   | position={:?}", self));
         Log::println(&format!(
             "[Next {} move(s) | Go {}]
 ",

@@ -12,7 +12,6 @@ impl Position {
         // StartingBoard
         let mut spaces = 0;
         for addr in [7, 8, 9, 4, 5, 6, 1, 2, 3].iter() {
-            // Log::println(&format("addr={} spaces={} xfen={}", addr, spaces, xfen));
             if let Some(piece) = self.starting_board[*addr as usize] {
                 if 0 < spaces {
                     xfen.push_str(&spaces.to_string());
@@ -94,14 +93,6 @@ impl Position {
         // Rust言語では文字列に配列のインデックスを使ったアクセスはできないので、
         // 一手間かけるぜ☆（＾～＾）
         for (i, ch) in xfen.chars().enumerate() {
-            // 分け分からんバグが出たらデバッグ・ライトしろだぜ☆（＾～＾）
-            /*
-            Log::println(&format(
-                "Trace   | machine_state={:?}, addr={} count={} ch={}",
-                machine_state, addr, count, ch
-            ));
-            */
-
             match machine_state {
                 MachineState::Start => {
                     if i + 1 == "xfen ".len() {
@@ -186,8 +177,6 @@ impl Position {
                 return;
             }
         };
-
-        // Log::println(&format("Debug   | move_={} addr={}", move_, addr));
 
         // 合法手チェック☆（＾～＾）
         // 移動先のマスに駒があってはダメ☆（＾～＾）

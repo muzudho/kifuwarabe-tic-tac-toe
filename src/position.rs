@@ -6,9 +6,6 @@ pub const BOARD_LEN: usize = 10;
 /// 盤上に置ける最大の駒数だぜ☆（＾～＾） ９マスしか置くとこないから９だぜ☆（＾～＾）
 pub const SQUARES_NUM: usize = 9;
 
-/// 最大９手☆（＾～＾） これを超える深さの探索はしないぜ☆（＾～＾）
-pub const MAX_MOVES: usize = 9;
-
 #[derive(Debug)]
 pub struct Position {
     /// 次に盤に置く駒☆（＾～＾）
