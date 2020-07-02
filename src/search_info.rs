@@ -2,7 +2,7 @@ use crate::log::Log;
 use crate::piece::Piece;
 use crate::position::Position;
 use crate::position::SQUARES_NUM;
-use crate::search::GameResultState;
+use crate::search::GameResult;
 use crate::search::Search;
 
 impl Search {
@@ -57,7 +57,7 @@ impl Search {
         &self,
         pos: &mut Position,
         addr: usize,
-        result: GameResultState,
+        result: GameResult,
         comment: Option<String>,
     ) {
         Log::println(&format!(
@@ -77,9 +77,9 @@ impl Search {
                 format!("height {}", self.pieces_num)
             },
             match result {
-                GameResultState::Win => " win  ".to_string(),
-                GameResultState::Draw => " draw ".to_string(),
-                GameResultState::Lose => " lose ".to_string(),
+                GameResult::Win => " win  ".to_string(),
+                GameResult::Draw => " draw ".to_string(),
+                GameResult::Lose => " lose ".to_string(),
             },
             if let Some(comment) = comment {
                 format!(
@@ -101,7 +101,7 @@ impl Search {
         &self,
         pos: &mut Position,
         addr: usize,
-        result: GameResultState,
+        result: GameResult,
         comment: Option<String>,
     ) {
         Log::println(&format!(
@@ -121,9 +121,9 @@ impl Search {
             },
             addr,
             match result {
-                GameResultState::Win => " win  ".to_string(),
-                GameResultState::Draw => " draw ".to_string(),
-                GameResultState::Lose => " lose ".to_string(),
+                GameResult::Win => " win  ".to_string(),
+                GameResult::Draw => " draw ".to_string(),
+                GameResult::Lose => " lose ".to_string(),
             },
             if let Some(comment) = comment {
                 format!(
