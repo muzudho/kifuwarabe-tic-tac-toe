@@ -75,10 +75,10 @@ fn main() {
             }
         } else if p.starts_with("go") {
             let mut search = Search::new(pos.friend, pos.pieces_num);
-            let (address, game_result_state) = search.go(&mut pos);
-            if let Some(addr_val) = address {
-                Log::println(&format!("info game_result_state={:?}", game_result_state));
-                Log::println(&format!("bestmove {}", addr_val));
+            let (addr, game_result) = search.go(&mut pos);
+            if let Some(addr) = addr {
+                Log::println(&format!("info result={:?}", game_result));
+                Log::println(&format!("bestmove {}", addr));
             } else {
                 Log::println("resign");
             }

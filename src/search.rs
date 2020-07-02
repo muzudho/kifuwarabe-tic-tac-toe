@@ -14,8 +14,8 @@ pub enum GameResult {
 pub struct Search {
     /// この探索を始めたのはどっち側か☆（＾～＾）
     pub root_friend: Piece,
-    /// この探索を始めたのは何手目か☆（＾～＾）
-    root_move_num: usize,
+    /// この探索を始めたときに石はいくつ置いてあったか☆（＾～＾）
+    root_pieces_num: usize,
     /// 現在局面からの、棋譜☆（＾～＾）
     history: [u8; SQUARES_NUM],
     /// 現在局面から置いた石の数☆（＾～＾）
@@ -26,10 +26,10 @@ pub struct Search {
     stopwatch: Instant,
 }
 impl Search {
-    pub fn new(friend: Piece, move_num: usize) -> Self {
+    pub fn new(friend: Piece, root_pieces_num: usize) -> Self {
         Search {
             root_friend: friend,
-            root_move_num: move_num,
+            root_pieces_num: root_pieces_num,
             history: [0; SQUARES_NUM],
             pieces_num: 0,
             nodes: 0,
@@ -59,6 +59,12 @@ impl Search {
     }
     /// 最善の番地を返すぜ☆（＾～＾）
     pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, GameResult) {
+        /*
+        print!(
+            "Go! MAX_MOVES={} self.root_pieces_num={} self.pieces_num={}",
+            MAX_MOVES, self.root_pieces_num, self.pieces_num
+        );
+        */
         self.info_header(pos);
         self.node(pos)
     }
@@ -92,9 +98,9 @@ impl Search {
 
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), GameResult::Win);
-                } else if MAX_MOVES - self.root_move_num < self.pieces_num {
+                } else if SQUARES_NUM <= self.root_pieces_num + self.pieces_num {
                     // 勝っていなくて、深さ上限に達したら、〇×ゲームでは 他に置く場所もないから引き分け確定だぜ☆（＾～＾）
-                    self.info_leaf(pos, addr, GameResult::Draw, Some("Fmmm.".to_string()));
+                    self.info_leaf(pos, addr, GameResult::Draw, Some("It's ok.".to_string()));
                     // 次の枝の探索へ☆（＾～＾）
                     self.pieces_num -= 1;
                     pos.board[addr] = None;
@@ -108,37 +114,34 @@ impl Search {
                     self.info_forward(pos, addr, Some("Search.".to_string()));
                 }
 
+                /*
+                print!(
+                    "MAX_MOVES={} self.root_pieces_num={} self.pieces_num={}",
+                    MAX_MOVES, self.root_pieces_num, self.pieces_num
+                );
+                */
+
                 pos.add_move(addr as u8);
                 pos.change_phase();
 
                 // 相手の番だぜ☆（＾～＾）
-                let (_opponent_address, opponent_game_result_state) = self.node(pos);
+                let (_opponent_address, opponent_game_result) = self.node(pos);
 
-                // 相手が置いたところを戻そうぜ☆（＾～＾）？
+                // 自分が置いたところを戻そうぜ☆（＾～＾）？
                 pos.change_phase();
                 pos.remove_move();
                 self.pieces_num -= 1;
                 pos.board[addr] = None;
 
-                match opponent_game_result_state {
+                match opponent_game_result {
                     GameResult::Lose => {
-                        // 相手の負けなら、こっちの勝ちだぜ☆（＾～＾）
-                        self.info_backward(
-                            pos,
-                            addr,
-                            GameResult::Win,
-                            Some("Thumbs up! I found a mate!".to_string()),
-                        );
+                        // 相手の負けなら、この手で勝ちだぜ☆（＾～＾）
+                        self.info_backward(pos, addr, GameResult::Win, Some("Ok.".to_string()));
                         return (Some(addr as u8), GameResult::Win);
                     }
                     GameResult::Draw => {
                         // 勝ち負けがずっと見えてないなら☆（＾～＾）
-                        self.info_backward(
-                            pos,
-                            addr,
-                            GameResult::Draw,
-                            Some("It's ok. Even.".to_string()),
-                        );
+                        self.info_backward(pos, addr, GameResult::Draw, Some("Fmmm.".to_string()));
                         match grate_result {
                             GameResult::Lose => {
                                 // 更新
@@ -149,12 +152,13 @@ impl Search {
                         }
                     }
                     GameResult::Win => {
-                        // 負けてるなんて☆（＾～＾）
-                        self.info_backward(pos, addr, GameResult::Lose, Some("Damn!".to_string()));
-                        if let None = grate_addr {
-                            // 更新
-                            grate_addr = Some(addr as u8);
-                        }
+                        // 相手が勝つ手を選んではダメだぜ☆（＾～＾）
+                        self.info_backward(
+                            pos,
+                            addr,
+                            GameResult::Lose,
+                            Some("Resign.".to_string()),
+                        );
                     }
                 }
             }

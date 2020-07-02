@@ -54,3 +54,16 @@ TODO cargo run
 * [x] `position.add_move()`、`position.remove_move()`を作成し、`position.moves` に、指し手を並べます。
 * [x] `undo` コマンドを作って、駒を取り除く
 * [x] `go` コマンドを作って コンピューターが思考開始、何か手を１つ返す
+
+# Test case
+
+```plain
+# mate +3 の局面。 5 -> [6,9]どう打っても -> [9,6]。
+position xfen x2/o2/o1x o
+
+# Draw の局面。 9。
+# xo
+# oxx
+# xoo
+position xfen xo1/oxx/xoo o
+```

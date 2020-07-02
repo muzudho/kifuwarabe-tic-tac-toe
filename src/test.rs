@@ -39,7 +39,11 @@ pub fn test() {
     debug_assert!(!Position::from_xfen("xfen o2/1x1/2x x").unwrap().is_win());
     debug_assert!(!Position::from_xfen("xfen 2o/1x1/x2 x").unwrap().is_win());
     // 引き分けチェック☆（＾～＾）
-    debug_assert!(Position::from_xfen("xfen xoo/xox/oxo o").unwrap().is_draw());
+    {
+        debug_assert!(Position::from_xfen("xfen xox/xox/oxo x").unwrap().is_draw());
+        debug_assert!(!Position::from_xfen("xfen xox/xox/oxo x").unwrap().is_win());
+    }
+
     // TODO 次の１手チェック
     // xfen 3/3/3 o moves 5 1 2 8 3 7
     // 受け手なし

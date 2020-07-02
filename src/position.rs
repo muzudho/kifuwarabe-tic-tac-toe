@@ -112,8 +112,11 @@ impl Position {
             && Some(self.friend) == self.board[1])
     }
 
-    /// 全てのマスが埋まってたら引き分けだぜ☆（＾～＾）
+    /// 勝ちがなく、かつ、全てのマスが埋まってたら引き分けだぜ☆（＾～＾）
     pub fn is_draw(&self) -> bool {
+        if self.is_win() {
+            return false;
+        }
         for addr in 1..BOARD_LEN {
             if let None = self.board[addr] {
                 return false;

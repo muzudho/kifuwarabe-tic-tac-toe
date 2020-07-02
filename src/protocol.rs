@@ -112,10 +112,12 @@ impl Position {
                 MachineState::StartingBoard => match ch {
                     'x' => {
                         pos.starting_board[addr] = Some(Piece::Cross);
+                        pos.pieces_num += 1;
                         addr += 1;
                     }
                     'o' => {
                         pos.starting_board[addr] = Some(Piece::Nought);
+                        pos.pieces_num += 1;
                         addr += 1;
                     }
                     '1' => addr += 1,
