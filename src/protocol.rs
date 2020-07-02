@@ -191,7 +191,13 @@ impl Position {
 
         // 合法手チェック☆（＾～＾）
         // 移動先のマスに駒があってはダメ☆（＾～＾）
-        if let Some(_piece_val) = self.board[addr as usize] {
+        if addr < 1 || 9 < addr {
+            Log::println(&format!(
+                "Error   | 1～9 で指定してくれだぜ☆（＾～＾） 番地={}",
+                addr
+            ));
+            return;
+        } else if let Some(_piece_val) = self.board[addr as usize] {
             Log::println(&format!(
                 "Error   | 移動先のマスに駒があってはダメだぜ☆（＾～＾） 番地={}",
                 addr
