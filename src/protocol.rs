@@ -1,7 +1,6 @@
 //! 局面データを文字列にしたり、文字列を局面データに復元するのに使うぜ☆（＾～＾）
 use crate::log::Log;
-use crate::piece::Piece;
-use crate::position::Position;
+use crate::position::{Piece, Position};
 
 impl Position {
     /// 現局面を xfen に変換するぜ☆（＾～＾）
@@ -164,7 +163,7 @@ impl Position {
     ///
     /// # Arguments
     ///
-    /// * `move_` - 指し手。ここでは駒を置く場所。 `1` とか `7` など。
+    /// * `line` - コマンドラインの残り。ここでは駒を置く場所。 `1` とか `7` など。
     pub fn do_(&mut self, line: &str) {
         // Log::println(&format("Trace   | do_ line={}", line));
         let addr: usize = match line.parse() {
@@ -211,7 +210,6 @@ impl Position {
     pub fn undo(&mut self) {
         self.change_phase();
         let addr = self.remove_move();
-        Log::println(&format!("Trace   | undo addr={}", addr));
         self.board[addr as usize] = None;
     }
 }

@@ -1,25 +1,27 @@
+//! このファイルがプログラムの入り口とか、スタート地点みたいなもんだぜ☆（＾～＾）プログラムのエントリー・ポイントと言う☆（＾～＾）
 #[macro_use]
 extern crate lazy_static;
 
-mod command_line;
+mod command_line_parser;
 mod log;
-mod piece;
 mod position;
 mod protocol;
 mod search;
-mod search_info;
 mod test;
 mod view;
 
-use crate::command_line::CommandLine;
-use crate::log::Log;
+use command_line_parser::CommandLineParser;
+use log::Log;
 use position::Position;
 use search::Search;
 use std;
 use test::test;
 
 fn main() {
+    // しょっぱなにプログラムが壊れてないかテストしているぜ☆（＾～＾）
+    // こんなとこに書かない方がいいが、テストを毎回するのが めんどくさいんで 実行するたびにテストさせているぜ☆（＾～＾）
     test();
+    // 説明を出そうぜ☆（＾～＾）
     Log::println(
         "きふわらべの〇×ゲーム
 
@@ -47,9 +49,10 @@ fn main() {
         };
 
         // コマンドライン☆（＾～＾） p は parser の意味で使ってるぜ☆（＾～＾）
-        let mut p = CommandLine::new(&line);
+        let mut p = CommandLineParser::new(&line);
 
-        // よく使うコマンド順に並べた方が高速だが、先に見つけた方が選ばれるので後ろの方を漏らしやすいし、アルファベット順に並べた方が見やすいぜ☆（＾～＾）
+        // 本当は よく使うコマンド順に並べた方が高速だが、先に見つけた方が選ばれるので後ろの方を漏らしやすくて むずかしいし、
+        // だから、アルファベット順に並べた方が見やすいぜ☆（＾～＾）
         if p.starts_with("do") {
             p.go_next_to("do ");
             if let Some(rest) = p.rest() {

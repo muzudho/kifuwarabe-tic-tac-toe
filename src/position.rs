@@ -1,11 +1,19 @@
-use crate::piece::Piece;
-
 /// 1スタートで9まで☆（＾～＾） 配列には0番地もあるから、要素数は10だぜ☆（＾～＾）
 pub const BOARD_LEN: usize = 10;
 
 /// 盤上に置ける最大の駒数だぜ☆（＾～＾） ９マスしか置くとこないから９だぜ☆（＾～＾）
 pub const SQUARES_NUM: usize = 9;
 
+/// 駒とか、石とかのことだが、〇×は 何なんだろうな、マーク☆（＾～＾）？
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Piece {
+    /// 〇
+    Nought,
+    /// ×
+    Cross,
+}
+
+/// 局面☆（＾～＾）ゲームデータをセーブしたり、ロードしたりするときの保存されてる現状だぜ☆（＾～＾）
 #[derive(Debug)]
 pub struct Position {
     /// 次に盤に置く駒☆（＾～＾）
@@ -48,7 +56,7 @@ impl Position {
         self.history[self.pieces_num]
     }
     pub fn change_phase(&mut self) {
-        use crate::piece::Piece::*;
+        use crate::position::Piece::*;
         self.friend = match self.friend {
             Nought => Cross,
             Cross => Nought,

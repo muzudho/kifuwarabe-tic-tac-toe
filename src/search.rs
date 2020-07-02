@@ -1,5 +1,4 @@
-use crate::piece::Piece;
-use crate::position::{Position, BOARD_LEN, SQUARES_NUM};
+use crate::position::{Piece, Position, BOARD_LEN, SQUARES_NUM};
 use std::time::Instant;
 
 #[derive(Debug)]
@@ -25,6 +24,14 @@ pub struct Search {
     stopwatch: Instant,
 }
 impl Search {
+    pub fn add_move(&mut self, addr: u8) {
+        self.history[self.pieces_num] = addr;
+        self.pieces_num += 1;
+    }
+    pub fn remove_move(&mut self, pos: &mut Position, addr: usize) {
+        self.pieces_num -= 1;
+        pos.board[addr] = None;
+    }
     pub fn new(friend: Piece, root_pieces_num: usize) -> Self {
         Search {
             root_friend: friend,
@@ -73,8 +80,7 @@ impl Search {
                 pos.board[addr] = Some(pos.friend);
                 self.nodes += 1;
                 // 棋譜にも付けようぜ☆（＾～＾）
-                self.history[self.pieces_num] = addr as u8;
-                self.pieces_num += 1;
+                self.add_move(addr as u8);
 
                 // 深い方に潜ってるときの読み筋☆（＾～＾）いわゆる前向き☆（＾～＾）
                 // 勝ったかどうか判定しようぜ☆（＾～＾）？
@@ -95,8 +101,7 @@ impl Search {
                     // 勝っていなくて、深さ上限に達したら、〇×ゲームでは 他に置く場所もないから引き分け確定だぜ☆（＾～＾）
                     self.info_leaf(pos, addr, GameResult::Draw, Some("It's ok.".to_string()));
                     // 次の枝の探索へ☆（＾～＾）
-                    self.pieces_num -= 1;
-                    pos.board[addr] = None;
+                    self.remove_move(pos, addr);
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
                     self.info_backward(pos, addr, GameResult::Draw, None);
 
@@ -116,8 +121,7 @@ impl Search {
                 // 自分が置いたところを戻そうぜ☆（＾～＾）？
                 pos.change_phase();
                 pos.remove_move();
-                self.pieces_num -= 1;
-                pos.board[addr] = None;
+                self.remove_move(pos, addr);
 
                 match opponent_game_result {
                     GameResult::Lose => {

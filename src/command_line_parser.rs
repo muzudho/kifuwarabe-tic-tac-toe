@@ -1,11 +1,12 @@
+//! 入力されたコマンドを、読み取る手伝いをするぜ☆（＾～＾）
 use std::fmt;
 
-pub struct CommandLine {
+pub struct CommandLineParser {
     line: String,
     len: usize,
     starts: usize,
 }
-impl CommandLine {
+impl CommandLineParser {
     pub fn new(line: &str) -> Self {
         // 末尾の改行を除こうぜ☆（＾～＾）
         // trim すると空白も消えるぜ☆（＾～＾）
@@ -16,7 +17,7 @@ impl CommandLine {
         // 文字数を調べようぜ☆（＾～＾）
         let len = line.chars().count();
         let starts = 0;
-        CommandLine {
+        CommandLineParser {
             line: line,
             len: len,
             starts: starts,
@@ -40,7 +41,7 @@ impl CommandLine {
         }
     }
 }
-impl fmt::Debug for CommandLine {
+impl fmt::Debug for CommandLineParser {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
