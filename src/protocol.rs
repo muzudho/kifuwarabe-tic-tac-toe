@@ -193,7 +193,7 @@ impl Position {
             return;
         }
 
-        self.add_move(addr);
+        self.do_move(addr);
 
         // 勝ち負け判定☆（*＾～＾*）
         if self.is_opponent_win() {
@@ -205,6 +205,6 @@ impl Position {
 
     /// 未来の駒を１つ戻す
     pub fn undo(&mut self) {
-        self.remove_move();
+        self.undo_move();
     }
 }

@@ -108,7 +108,7 @@ impl Search {
         ))
     }
     /// 葉だぜ☆（＾～＾）
-    pub fn info_leaf(
+    pub fn info_forward_leaf(
         &self,
         pos: &mut Position,
         addr: usize,
