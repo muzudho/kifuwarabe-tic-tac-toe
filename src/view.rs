@@ -55,7 +55,7 @@ impl Search {
     /// Principal variation. 今読んでる読み筋☆（＾～＾）
     pub fn pv(&self, pos: &mut Position) -> String {
         let mut pv = String::new();
-        for t in self.root_pieces_num..pos.pieces_num {
+        for t in self.start_pieces_num..pos.pieces_num {
             pv.push_str(&format!("{} ", pos.history[t]));
         }
         pv.trim_end().to_string()
@@ -81,7 +81,7 @@ impl Search {
             self.nps(),
             self.nodes,
             self.pv(pos),
-            if pos.friend == self.root_friend {
+            if pos.friend == self.start_friend {
                 "+".to_string()
             } else {
                 "-".to_string()
@@ -95,7 +95,7 @@ impl Search {
             if let Some(comment) = comment {
                 format!(
                     " {} \"{}\"",
-                    if pos.friend == self.root_friend {
+                    if pos.friend == self.start_friend {
                         "+".to_string()
                     } else {
                         "-".to_string()
@@ -120,7 +120,7 @@ impl Search {
             self.nps(),
             self.nodes,
             self.pv(pos),
-            if pos.friend == self.root_friend {
+            if pos.friend == self.start_friend {
                 "+".to_string()
             } else {
                 "-".to_string()
@@ -139,7 +139,7 @@ impl Search {
             if let Some(comment) = comment {
                 format!(
                     " {} \"{}\"",
-                    if pos.friend == self.root_friend {
+                    if pos.friend == self.start_friend {
                         "+".to_string()
                     } else {
                         "-".to_string()
@@ -169,7 +169,7 @@ impl Search {
             } else {
                 format!("height {}", pos.pieces_num + 1)
             },
-            if pos.friend == self.root_friend {
+            if pos.friend == self.start_friend {
                 "+".to_string()
             } else {
                 "-".to_string()
@@ -183,7 +183,7 @@ impl Search {
             if let Some(comment) = comment {
                 format!(
                     " {} \"{}\"",
-                    if pos.friend == self.root_friend {
+                    if pos.friend == self.start_friend {
                         "+".to_string()
                     } else {
                         "-".to_string()

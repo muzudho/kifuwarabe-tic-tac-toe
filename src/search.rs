@@ -1,4 +1,4 @@
-//! サーチ☆（＾～＾）またの名を「これから」☆（＾～＾）ポジションと補完関係にあるぜ☆（＾～＾）
+//! サーチ☆（＾～＾）探索部とか言われてるやつだぜ☆（＾～＾）
 
 use crate::position::{Piece, Position, BOARD_LEN, SQUARES_NUM};
 use std::time::Instant;
@@ -13,19 +13,19 @@ pub enum GameResult {
 /// 探索部☆（＾～＾）
 pub struct Search {
     /// この探索を始めたのはどっち側か☆（＾～＾）
-    pub root_friend: Piece,
+    pub start_friend: Piece,
     /// この探索を始めたときに石はいくつ置いてあったか☆（＾～＾）
-    pub root_pieces_num: usize,
+    pub start_pieces_num: usize,
     /// 探索したノード数☆（＾～＾）
     pub nodes: u32,
     /// この構造体を生成した時点からストップ・ウォッチを開始するぜ☆（＾～＾）
     stopwatch: Instant,
 }
 impl Search {
-    pub fn new(friend: Piece, root_pieces_num: usize) -> Self {
+    pub fn new(friend: Piece, start_pieces_num: usize) -> Self {
         Search {
-            root_friend: friend,
-            root_pieces_num: root_pieces_num,
+            start_friend: friend,
+            start_pieces_num: start_pieces_num,
             nodes: 0,
             stopwatch: Instant::now(),
         }
@@ -71,7 +71,7 @@ impl Search {
                     self.info_backward(pos, addr, GameResult::Win, None);
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), GameResult::Win);
-                } else if SQUARES_NUM < pos.pieces_num {
+                } else if SQUARES_NUM <= pos.pieces_num {
                     // 勝っていなくて、深さ上限に達したら、〇×ゲームでは 他に置く場所もないから引き分け確定だぜ☆（＾～＾）
                     self.info_leaf(pos, addr, GameResult::Draw, Some("It's ok.".to_string()));
                     // 置いたところを戻そうぜ☆（＾～＾）？
