@@ -1,9 +1,23 @@
 use crate::log::Log;
+use crate::piece::Piece;
 use crate::position::Position;
 use crate::position::SQUARES_NUM;
 use crate::search::Search;
 
 impl Search {
+    pub fn info_header(&self, pos: &mut Position) {
+        match pos.friend {
+            Piece::Nought => {
+                Log::println("info nps ...... nodes ...... pv O X O X O X O X O");
+            }
+            Piece::Cross => {
+                Log::println(&format!(
+                    "info nps ...... nodes ...... pv X O X O X O X O X"
+                ));
+            }
+        }
+    }
+
     /// 前向き探索中だぜ☆（＾～＾）
     pub fn info_forward(
         &self,
@@ -23,13 +37,13 @@ impl Search {
                 "-".to_string()
             },
             addr,
-            if SQUARES_NUM < self.depth {
-                "none   ".to_string()
+            if SQUARES_NUM < self.pieces_num + 1 {
+                "none    ".to_string()
             } else {
-                format!("depth {}", self.depth)
+                format!("height {}", self.pieces_num + 1)
             },
-            if let Some(cur_mate) = mate {
-                format!("     ({: >2})", cur_mate)
+            if let Some(mate) = mate {
+                format!("     ({: >2})", mate)
             } else {
                 "         ".to_string()
             },
@@ -67,10 +81,10 @@ impl Search {
                 "-".to_string()
             },
             addr,
-            if SQUARES_NUM < self.depth - 1 {
-                "none   ".to_string()
+            if SQUARES_NUM < self.pieces_num {
+                "none    ".to_string()
             } else {
-                format!("depth {}", self.depth - 1)
+                format!("height {}", self.pieces_num)
             },
             result,
             if let Some(comment) = comment {
@@ -101,10 +115,10 @@ impl Search {
             self.nps(),
             self.nodes,
             self.pv(),
-            if SQUARES_NUM < self.depth {
-                "none   ".to_string()
+            if SQUARES_NUM < self.pieces_num + 1 {
+                "none    ".to_string()
             } else {
-                format!("depth {}", self.depth)
+                format!("height {}", self.pieces_num + 1)
             },
             if pos.friend == self.root_friend {
                 "+".to_string()

@@ -11,8 +11,8 @@ pub struct Search {
     root_move_num: usize,
     /// 現在局面からの、棋譜☆（＾～＾）
     history: [u8; SQUARES_NUM],
-    /// 現在局面からの読みの深さ☆（＾～＾）1スタート☆（＾～＾）
-    pub depth: usize,
+    /// 現在局面から置いた石の数☆（＾～＾）
+    pub pieces_num: usize,
     /// 探索したノード数☆（＾～＾）
     pub nodes: u32,
     /// この構造体を生成した時点からストップ・ウォッチを開始するぜ☆（＾～＾）
@@ -28,7 +28,7 @@ impl Search {
             root_friend: friend,
             root_move_num: move_num,
             history: [0; SQUARES_NUM],
-            depth: 1,
+            pieces_num: 0,
             nodes: 0,
             stopwatch: Instant::now(),
             // best_pv: BestPv::default(),
@@ -50,23 +50,14 @@ impl Search {
     /// Principal variation. 今読んでる読み筋☆（＾～＾）
     pub fn pv(&self) -> String {
         let mut pv = String::new();
-        for d in 0..(self.depth - 1) {
+        for d in 0..self.pieces_num {
             pv.push_str(&format!("{} ", self.history[d]));
         }
         pv.trim_end().to_string()
     }
     /// 最善の番地を返すぜ☆（＾～＾）
     pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, Option<i8>) {
-        match pos.friend {
-            Piece::Nought => {
-                Log::println("info nps ...... nodes ...... pv O X O X O X O X O");
-            }
-            Piece::Cross => {
-                Log::println(&format!(
-                    "info nps ...... nodes ...... pv X O X O X O X O X"
-                ));
-            }
-        }
+        self.info_header(pos);
         self.node(pos)
     }
 
@@ -82,8 +73,8 @@ impl Search {
                 pos.board[addr] = Some(pos.friend);
                 self.nodes += 1;
                 // 棋譜にも付けようぜ☆（＾～＾）
-                self.history[self.depth - 1] = addr as u8;
-                self.depth += 1;
+                self.history[self.pieces_num] = addr as u8;
+                self.pieces_num += 1;
 
                 // 深い方に潜ってるときの読み筋☆（＾～＾）いわゆる前向き☆（＾～＾）
                 // 勝ったかどうか判定しようぜ☆（＾～＾）？
@@ -101,15 +92,16 @@ impl Search {
                     );
 
                     // 置いたところを戻そうぜ☆（＾～＾）？
-                    self.depth -= 1;
+                    self.pieces_num -= 1;
                     pos.board[addr] = None;
 
+                    // TODO 要見直し☆（＾～＾）
                     // メートが出るぜ☆（＾～＾）
                     // 偶数手番は相手の勝ちなんで負数に、奇数手番は自分の勝ちなんで正の数にしろだぜ☆（＾～＾）
-                    let mate = if self.depth % 2 == 0 {
-                        -(self.depth as i8)
+                    let mate = if self.pieces_num % 2 == 1 {
+                        -(self.pieces_num as i8)
                     } else {
-                        self.depth as i8
+                        self.pieces_num as i8
                     };
 
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
@@ -117,11 +109,11 @@ impl Search {
 
                     // 探索終了だぜ☆（＾～＾）
                     return (Some(addr as u8), Some(mate));
-                } else if MAX_MOVES - self.root_move_num + 1 < self.depth {
+                } else if MAX_MOVES - self.root_move_num < self.pieces_num {
                     // 勝っていなくて、深さ上限に達したら、〇×ゲームでは 他に置く場所もないから引き分け確定だぜ☆（＾～＾）
                     self.info_leaf(pos, addr, "draw".to_string(), Some("Fmmm.".to_string()));
                     // 次の枝の探索へ☆（＾～＾）
-                    self.depth -= 1;
+                    self.pieces_num -= 1;
                     pos.board[addr] = None;
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
                     self.info_backward(pos, addr, None, None);
@@ -142,7 +134,7 @@ impl Search {
                 // 相手が置いたところを戻そうぜ☆（＾～＾）？
                 pos.change_phase();
                 pos.remove_move();
-                self.depth -= 1;
+                self.pieces_num -= 1;
                 pos.board[addr] = None;
 
                 // 子枝のメートを見て、採用するか棄却するか選ぶぜ☆（＾～＾）
