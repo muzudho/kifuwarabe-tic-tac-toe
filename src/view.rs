@@ -52,6 +52,15 @@ impl Position {
     }
 }
 impl Search {
+    /// Principal variation. 今読んでる読み筋☆（＾～＾）
+    pub fn pv(&self, pos: &mut Position) -> String {
+        let mut pv = String::new();
+        for d in self.root_pieces_num..pos.pieces_num {
+            pv.push_str(&format!("{} ", self.history[d]));
+        }
+        pv.trim_end().to_string()
+    }
+
     pub fn info_header(&self, pos: &mut Position) {
         match pos.friend {
             Piece::Nought => {
@@ -71,17 +80,17 @@ impl Search {
             "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | ->   to {} |       |      |{}",
             self.nps(),
             self.nodes,
-            self.pv(),
+            self.pv(pos),
             if pos.friend == self.root_friend {
                 "+".to_string()
             } else {
                 "-".to_string()
             },
             addr,
-            if SQUARES_NUM < self.pieces_num + 1 {
+            if SQUARES_NUM < pos.pieces_num + 1 {
                 "none    ".to_string()
             } else {
-                format!("height {}", self.pieces_num + 1)
+                format!("height {}", pos.pieces_num + 1)
             },
             if let Some(comment) = comment {
                 format!(
@@ -110,17 +119,17 @@ impl Search {
             "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | .       {} |       |{}|{}",
             self.nps(),
             self.nodes,
-            self.pv(),
+            self.pv(pos),
             if pos.friend == self.root_friend {
                 "+".to_string()
             } else {
                 "-".to_string()
             },
             addr,
-            if SQUARES_NUM < self.pieces_num {
+            if SQUARES_NUM < pos.pieces_num {
                 "none    ".to_string()
             } else {
-                format!("height {}", self.pieces_num)
+                format!("height {}", pos.pieces_num)
             },
             match result {
                 GameResult::Win => " win  ".to_string(),
@@ -154,11 +163,11 @@ impl Search {
             "info nps {: >6} nodes {: >6} pv {: <17} |       | <- from {} | {} [{}] |{}|{}",
             self.nps(),
             self.nodes,
-            self.pv(),
-            if SQUARES_NUM < self.pieces_num + 1 {
+            self.pv(pos),
+            if SQUARES_NUM < pos.pieces_num + 1 {
                 "none    ".to_string()
             } else {
-                format!("height {}", self.pieces_num + 1)
+                format!("height {}", pos.pieces_num + 1)
             },
             if pos.friend == self.root_friend {
                 "+".to_string()

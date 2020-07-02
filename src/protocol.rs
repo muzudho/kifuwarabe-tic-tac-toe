@@ -158,7 +158,7 @@ impl Position {
         Some(pos)
     }
 
-    /// 駒を置く
+    /// 未来へ駒を置く
     /// 最初は、合法か判定せずに　とりあえず動かせだぜ☆（＾～＾）
     ///
     /// # Arguments
@@ -193,23 +193,18 @@ impl Position {
             return;
         }
 
-        self.board[addr] = Some(self.friend);
+        self.add_move(addr);
 
         // 勝ち負け判定☆（*＾～＾*）
-        if self.is_win() {
+        if self.is_opponent_win() {
             Log::println(&format!("win {}", self.friend));
         } else if self.is_draw() {
             Log::println(&format!("draw"));
         }
-
-        self.add_move(addr as u8);
-        self.change_phase();
     }
 
-    /// 駒を戻す
+    /// 未来の駒を１つ戻す
     pub fn undo(&mut self) {
-        self.change_phase();
-        let addr = self.remove_move();
-        self.board[addr as usize] = None;
+        self.remove_move();
     }
 }
