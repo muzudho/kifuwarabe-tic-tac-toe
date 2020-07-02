@@ -26,17 +26,20 @@ fn main() {
         "きふわらべの〇×ゲーム
 
 コマンド:
-`do 7` - 手番のプレイヤーが、 7 番地に印を付けます。
-`go`   - コンピューターが次の1手を示します。
-`pos`  - 局面表示。
+`do 7`     - 手番のプレイヤーが、 7 番地に印を付けます。
+`go`       - コンピューターが次の1手を示します。
+`info-off` - info出力なし。
+`info-on`  - info出力あり(既定)。
+`pos`      - 局面表示。
 `position xfen 3/3/3 o moves 5 1 2 8 4 6 3 7 9` - 初期局面と棋譜を入力。
-`undo` - 1手戻します。
-`xfen` - 現局面のxfen文字列表示。
+`undo`     - 1手戻します。
+`xfen`     - 現局面のxfen文字列表示。
 ",
     );
 
     // 初期局面
     let mut pos = Position::default();
+    let mut info_enable = true;
 
     // [Ctrl]+[C] でループを終了
     loop {
@@ -59,7 +62,7 @@ fn main() {
                 pos.do_(rest);
             }
         } else if p.starts_with("go") {
-            let mut search = Search::new(pos.friend, pos.pieces_num);
+            let mut search = Search::new(pos.friend, pos.pieces_num, info_enable);
             let (addr, result) = search.go(&mut pos);
             if let Some(addr) = addr {
                 Log::println(&format!("info result={:?}", result));
@@ -67,6 +70,10 @@ fn main() {
             } else {
                 Log::println("resign");
             }
+        } else if p.starts_with("info-off") {
+            info_enable = false;
+        } else if p.starts_with("info-on") {
+            info_enable = true;
         } else if p.starts_with("position") {
             p.go_next_to("position ");
             if let Some(rest) = p.rest() {
