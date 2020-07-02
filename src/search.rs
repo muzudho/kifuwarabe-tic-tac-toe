@@ -16,8 +16,6 @@ pub struct Search {
     pub root_friend: Piece,
     /// この探索を始めたときに石はいくつ置いてあったか☆（＾～＾）
     pub root_pieces_num: usize,
-    /// 現在局面からの、棋譜☆（＾～＾）
-    pub history: [u8; SQUARES_NUM],
     /// 探索したノード数☆（＾～＾）
     pub nodes: u32,
     /// この構造体を生成した時点からストップ・ウォッチを開始するぜ☆（＾～＾）
@@ -28,7 +26,6 @@ impl Search {
         Search {
             root_friend: friend,
             root_pieces_num: root_pieces_num,
-            history: [0; SQUARES_NUM],
             nodes: 0,
             stopwatch: Instant::now(),
         }

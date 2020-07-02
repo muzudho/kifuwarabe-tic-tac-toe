@@ -55,8 +55,8 @@ impl Search {
     /// Principal variation. 今読んでる読み筋☆（＾～＾）
     pub fn pv(&self, pos: &mut Position) -> String {
         let mut pv = String::new();
-        for d in self.root_pieces_num..pos.pieces_num {
-            pv.push_str(&format!("{} ", self.history[d]));
+        for t in self.root_pieces_num..pos.pieces_num {
+            pv.push_str(&format!("{} ", pos.history[t]));
         }
         pv.trim_end().to_string()
     }
