@@ -11,6 +11,15 @@ pub fn test() {
     debug_assert!(Position::from_xfen("xfen 2o/2o/2o o").unwrap().is_win());
     debug_assert!(Position::from_xfen("xfen o2/1o1/2o o").unwrap().is_win());
     debug_assert!(Position::from_xfen("xfen 2o/1o1/o2 o").unwrap().is_win());
+    // O 勝ってないチェック☆（＾～＾）
+    debug_assert!(!Position::from_xfen("xfen xoo/3/3 o").unwrap().is_win());
+    debug_assert!(!Position::from_xfen("xfen 3/xoo/3 o").unwrap().is_win());
+    debug_assert!(!Position::from_xfen("xfen 3/3/xoo o").unwrap().is_win());
+    debug_assert!(!Position::from_xfen("xfen x2/o2/o2 o").unwrap().is_win());
+    debug_assert!(!Position::from_xfen("xfen 1x1/1o1/1o1 o").unwrap().is_win());
+    debug_assert!(!Position::from_xfen("xfen 2x/2o/2o o").unwrap().is_win());
+    debug_assert!(!Position::from_xfen("xfen x2/1o1/2o o").unwrap().is_win());
+    debug_assert!(!Position::from_xfen("xfen 2x/1o1/o2 o").unwrap().is_win());
     // X 勝ちチェック☆（＾～＾）
     debug_assert!(Position::from_xfen("xfen xxx/3/3 x").unwrap().is_win());
     debug_assert!(Position::from_xfen("xfen 3/xxx/3 x").unwrap().is_win());
@@ -29,6 +38,8 @@ pub fn test() {
     debug_assert!(!Position::from_xfen("xfen 2o/2x/2x x").unwrap().is_win());
     debug_assert!(!Position::from_xfen("xfen o2/1x1/2x x").unwrap().is_win());
     debug_assert!(!Position::from_xfen("xfen 2o/1x1/x2 x").unwrap().is_win());
+    // 引き分けチェック☆（＾～＾）
+    debug_assert!(Position::from_xfen("xfen xoo/xox/oxo o").unwrap().is_draw());
     // TODO 次の１手チェック
     // xfen 3/3/3 o moves 5 1 2 8 3 7
     // 受け手なし

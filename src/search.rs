@@ -95,14 +95,8 @@ impl Search {
                     self.pieces_num -= 1;
                     pos.board[addr] = None;
 
-                    // TODO 要見直し☆（＾～＾）
-                    // メートが出るぜ☆（＾～＾）
-                    // 偶数手番は相手の勝ちなんで負数に、奇数手番は自分の勝ちなんで正の数にしろだぜ☆（＾～＾）
-                    let mate = if self.pieces_num % 2 == 1 {
-                        -(self.pieces_num as i8)
-                    } else {
-                        self.pieces_num as i8
-                    };
+                    // 投了図では メートは -0 ☆（＾～＾）
+                    let mate = -0;
 
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
                     self.info_backward(pos, addr, Some(mate), None);
@@ -129,8 +123,18 @@ impl Search {
                 pos.change_phase();
 
                 // 相手の番だぜ☆（＾～＾）
-                let (_opponent_address, child_mate) = self.node(pos);
-
+                let (_opponent_address, opponent_mate) = self.node(pos);
+                // メートは絶対値が増えて、符号を反転しろだぜ☆（＾～＾）
+                let friend_mate = if let Some(opponent_mate) = opponent_mate {
+                    if opponent_mate == 0 {
+                        // 次が 1 の都合上、 0 は負数としてくれだぜ☆（＾～＾）
+                        Some(1)
+                    } else {
+                        Some((-opponent_mate / opponent_mate) * (opponent_mate.abs() + 1))
+                    }
+                } else {
+                    None
+                };
                 // 相手が置いたところを戻そうぜ☆（＾～＾）？
                 pos.change_phase();
                 pos.remove_move();
@@ -140,27 +144,28 @@ impl Search {
                 // 子枝のメートを見て、採用するか棄却するか選ぶぜ☆（＾～＾）
                 let (update, comment) = if best_addr == None {
                     // 置ける場所があれば必ず選ばなければならないから、最初に見つけた置ける場所をひとまず調べるぜ☆（＾～＾）
-                    if let Some(child_mate) = child_mate {
-                        if (0 < child_mate && pos.friend == self.root_friend)
-                            || (child_mate <= 0 && pos.friend != self.root_friend)
-                        {
-                            // （メートが正の数で、探索している方のターン）または、（メートが０または負数で、探索していない方のターン）なら、そいつの勝ちだぜ☆（＾～＾）
+                    if let Some(friend_mate) = friend_mate {
+                        if friend_mate.abs() % 2 == 1 {
+                            // メートが奇数なら手番の勝ちだぜ☆（＾～＾）
                             (true, Some("At first, mate is good.".to_string()))
                         } else {
                             // 負け☆（＾～＾）合法手だが、こんな手は採用してはいけないぜ☆（＾～＾）
-                            (false, Some("Damn! I don't choose the square!".to_string()))
+                            (
+                                false,
+                                Some("At first, Damn! I don't choose the square!".to_string()),
+                            )
                         }
                     } else {
-                        (true, Some("At first, draw is good.".to_string()))
+                        (true, Some("At first, draw is better.".to_string()))
                     }
                 } else {
                     if let Some(cur_mate) = cur_mate {
                         // メート0 は負数（負け）扱いで☆（＾～＾）
                         if cur_mate < 0 {
                             // 今までの手は、メート食らう手のとき☆（／＿＼）
-                            if let Some(child_mate) = child_mate {
-                                // メート0 は負数（負け）扱いで☆（＾～＾）
-                                if 0 < child_mate {
+                            if let Some(friend_mate) = friend_mate {
+                                if friend_mate.abs() % 2 == 1 {
+                                    // メートが奇数なら手番の勝ちだぜ☆（＾～＾）
                                     // 今まで メートされる手ばかりだったが、メートできる手を見つけたぜ☆（＾～＾）
                                     // メート食らってたのを、メートかけるんだから、すごい良い手だぜ☆（＾～＾）！更新するぜ☆（＾～＾）
                                     (
@@ -171,7 +176,7 @@ impl Search {
                                         ),
                                     )
                                 } else {
-                                    if cur_mate.abs() < child_mate.abs() {
+                                    if cur_mate.abs() < friend_mate.abs() {
                                         // 今まで メートされる手ばかりだったが、手数を伸ばす手を見つけたぜ☆（＾～＾）
                                         (true, Some("Delayed the bad is better.".to_string()))
                                     } else {
@@ -185,13 +190,21 @@ impl Search {
                             }
                         } else {
                             // 今までの手は、メート掛ける手のとき☆（＾ｑ＾）
-                            if let Some(cihld_mate) = child_mate {
-                                if 0 < cihld_mate && cihld_mate.abs() < cur_mate.abs() {
-                                    // より短手数のメートをかける手を見つけてたら、更新するぜ☆（＾～＾）
-                                    (
-                                        true,
-                                        Some("It's good! Shorter checkmate is better.".to_string()),
-                                    )
+                            if let Some(friend_mate) = friend_mate {
+                                if friend_mate.abs() % 2 == 1 {
+                                    // メートが奇数なら手番の勝ちだぜ☆（＾～＾）
+                                    if friend_mate.abs() < cur_mate.abs() {
+                                        // より短手数のメートをかける手を見つけてたら、更新するぜ☆（＾～＾）
+                                        (
+                                            true,
+                                            Some(
+                                                "It's good! Shorter checkmate is better."
+                                                    .to_string(),
+                                            ),
+                                        )
+                                    } else {
+                                        (false, Some("No, good.".to_string()))
+                                    }
                                 } else {
                                     // メートが長手数になるとか、メートが外れるとか☆（＾～＾）
                                     (
@@ -205,19 +218,18 @@ impl Search {
                             }
                         }
                     } else {
-                        // 今まで、引き分けの手だけ見つけているケースで。
-                        if let Some(child_mate) = child_mate {
-                            // メート0 は負数（負け）扱いで☆（＾～＾）
-                            if 0 < child_mate {
-                                // こっちからメートする手を見つけたぜ☆（＾～＾）
+                        // 初回か、または 今まで引き分けで。
+                        if let Some(friend_mate) = friend_mate {
+                            if friend_mate.abs() % 2 == 1 {
+                                // メートが奇数なら手番が勝ってるぜ☆（＾～＾）
                                 (true, Some("Thumbs up! I found a mate!".to_string()))
                             } else {
-                                // 引き分けだったのにメートになるなんて☆（＾～＾）
-                                (false, Some("I messed up! I lost the draw!".to_string()))
+                                // 負けてるなんて☆（＾～＾）
+                                (false, Some("Damn!".to_string()))
                             }
                         } else {
-                            // 引き分けが変わってなければ☆（＾～＾）
-                            (false, Some("Ok. It was a draw from before.".to_string()))
+                            // 勝ち負けがずっと見えてないなら☆（＾～＾）
+                            (false, Some("It's ok. Even.".to_string()))
                         }
                     }
                 };
@@ -226,12 +238,13 @@ impl Search {
                 if update {
                     // 更新することは確定☆（＾～＾）
                     best_addr = Some(addr as u8);
-                    cur_mate = child_mate;
+                    cur_mate = friend_mate;
                 }
-                self.info_backward(pos, addr, child_mate, comment);
+                self.info_backward(pos, addr, cur_mate /*friend_mate*/, comment);
             }
         }
 
+        // メートは絶対値が増えて、符号を反転しろだぜ☆（＾～＾）
         (best_addr, cur_mate)
     }
 }

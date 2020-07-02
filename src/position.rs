@@ -124,7 +124,7 @@ impl Position {
     }
 
     /// 全てのマスが埋まってたら引き分けだぜ☆（＾～＾）
-    fn is_draw(&self) -> bool {
+    pub fn is_draw(&self) -> bool {
         for addr in 1..BOARD_LEN {
             if let None = self.board[addr] {
                 return false;
