@@ -2,7 +2,6 @@
 use crate::log::Log;
 use crate::piece::Piece;
 use crate::position::Position;
-use crate::result::GameResult;
 
 impl Position {
     /// 現局面を xfen に変換するぜ☆（＾～＾）
@@ -201,15 +200,10 @@ impl Position {
         self.board[addr] = Some(self.friend);
 
         // 勝ち負け判定☆（*＾～＾*）
-        if let Some(result) = self.get_result() {
-            match result {
-                GameResult::FriendWin => {
-                    Log::println(&format!("win {}", self.friend));
-                }
-                GameResult::Draw => {
-                    Log::println(&format!("draw"));
-                }
-            }
+        if self.is_win() {
+            Log::println(&format!("win {}", self.friend));
+        } else if self.is_draw() {
+            Log::println(&format!("draw"));
         }
 
         self.add_move(addr as u8);

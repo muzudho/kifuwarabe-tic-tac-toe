@@ -6,7 +6,6 @@ mod log;
 mod piece;
 mod position;
 mod protocol;
-mod result;
 mod search;
 mod search_info;
 mod test;

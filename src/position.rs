@@ -1,5 +1,4 @@
 use crate::piece::Piece;
-use crate::result::GameResult;
 
 /// 1スタートで9まで☆（＾～＾） 配列には0番地もあるから、要素数は10だぜ☆（＾～＾）
 pub const BOARD_LEN: usize = 10;
@@ -59,16 +58,6 @@ impl Position {
         };
     }
 
-    /// 勝敗結果を返すぜ☆（＾～＾）
-    pub fn get_result(&self) -> Option<GameResult> {
-        if self.is_win() {
-            Some(GameResult::FriendWin)
-        } else if self.is_draw() {
-            Some(GameResult::Draw)
-        } else {
-            None
-        }
-    }
     /// 手番を持ってる方が３つ並べてたら真だぜ☆（＾～＾）
     pub fn is_win(&self) -> bool {
         // 8パターンしかないので、全部チェックしてしまおうぜ☆（＾～＾）

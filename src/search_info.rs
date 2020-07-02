@@ -22,7 +22,7 @@ impl Search {
     /// 前向き探索中だぜ☆（＾～＾）
     pub fn info_forward(&self, pos: &mut Position, addr: usize, comment: Option<String>) {
         Log::println(&format!(
-            "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | ->   to {} |       |         |{}",
+            "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | ->   to {} |       |      |{}",
             self.nps(),
             self.nodes,
             self.pv(),
@@ -77,9 +77,9 @@ impl Search {
                 format!("height {}", self.pieces_num)
             },
             match result {
-                GameResultState::Win => " win     ".to_string(),
-                GameResultState::Draw => " draw    ".to_string(),
-                GameResultState::Lose => " lose    ".to_string(),
+                GameResultState::Win => " win  ".to_string(),
+                GameResultState::Draw => " draw ".to_string(),
+                GameResultState::Lose => " lose ".to_string(),
             },
             if let Some(comment) = comment {
                 format!(
@@ -121,9 +121,9 @@ impl Search {
             },
             addr,
             match result {
-                GameResultState::Win => " win     ".to_string(),
-                GameResultState::Draw => " draw    ".to_string(),
-                GameResultState::Lose => " lose    ".to_string(),
+                GameResultState::Win => " win  ".to_string(),
+                GameResultState::Draw => " draw ".to_string(),
+                GameResultState::Lose => " lose ".to_string(),
             },
             if let Some(comment) = comment {
                 format!(

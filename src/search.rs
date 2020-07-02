@@ -87,10 +87,6 @@ impl Search {
                     self.pieces_num -= 1;
                     pos.board[addr] = None;
 
-                    // 投了図では メートは -0 ☆（＾～＾）
-                    // -0,1,-2,3,-4... のように、0を除くと、 正の奇数（勝ち）と、負の偶数（負け）が交互に出てくるぜ☆（＾～＾）
-                    let mate = -0;
-
                     // 浅い方に浮かんでるときの読み筋☆（＾～＾）いわゆる後ろ向き☆（＾～＾）
                     self.info_backward(pos, addr, GameResultState::Win, None);
 
