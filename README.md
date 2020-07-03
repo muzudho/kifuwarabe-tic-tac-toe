@@ -1,6 +1,6 @@
 # Kifuwarabe's tic-tac-toe
 
-〇×ゲームだぜ☆（＾～＾）
+〇×ゲームだぜ☆（＾～＾）  
 
 ## Test run
 
@@ -38,22 +38,69 @@ docker run --name tic-tac-toe -it --rm tic-tac-toe:0.1
 TODO カレント・ディレクトリの移動
 TODO cargo run
 
-# How to make
+## How to make tic tac toe?
 
-* [ ] 簡易的にログを取ります
-* [x] 空っぽの盤を、デバッグ・ウィンドウへ表示
-* [x] XFENを作成して、駒の配置の入力
-* [x] 駒を置いての盤を、デバッグ・ウィンドウへ表示
-* [x] UXIプロトコルを作成し、`pos` コマンド打鍵で盤を、ターミナルへ表示
-* [x] `position` コマンドを作って、局面作成
-* [x] `xfen` コマンドを作って、xfen文字列を返す
-* [x] `do` コマンドを作って、駒を置く
-* [x] ポジション構造体に 手番(friend) 変数を追加。`do` コマンドで置かれる駒を交互にします
-* [x] `is_win` 関数を作成し、３つ並んでいれば `win` と表示します
-* [x] `is_draw` 関数を作成し、置き場所が無ければ `draw` と表示します
-* [x] `position.add_move()`、`position.remove_move()`を作成し、`position.moves` に、指し手を並べます。
-* [x] `undo` コマンドを作って、駒を取り除く
-* [x] `go` コマンドを作って コンピューターが思考開始、何か手を１つ返す
+During development, you may need to reproduce the behavior of your computer.  
+It is difficult to compare the behavior. Instead, it is useful to get the logs and compare the logs.  
+
+* [x] Log.
+  * [x] Write - Write to a file.
+  * [x] Print - Write and display.
+
+The first thing you have to create is your motive.  
+It is important to start with the appearance.  
+
+* [x] Look and Model.
+  * [x] Piece - "O", "X".
+  * [x] Game result - Win/Draw/Lose.
+  * [x] Position - It's the board.
+  * [x] Search - Computer player search info.
+
+Let's enter commands into the computer. Create a command line parser.  
+
+* [x] Command line parser.
+  * [x] Input.
+  * [x] Starts with.
+  * [x] Go next to.
+  * [x] Rest.
+
+People who are looking for something 10 minutes a day are looking for something for a week in a year.  
+Before creating the game itself, let's first create the replay function. Let's get it for a week.  
+
+* [x] UXI protocol.
+  * [x] Starting board.
+  * [x] Player phase.
+  * [x] Moves.
+  * [x] To xfen.
+  * [x] From xfen.
+
+Let's make a principal command.
+
+* [x] Main.
+  * [x] position.
+  * [x] pos.
+  * [x] do.
+  * [x] undo.
+  * [x] xfen.
+
+Before you make a computer player, let's judge the outcome. And let's test.  
+
+* [x] Win/lose judgment.
+  * [x] Win.
+  * [x] Draw - Not win, not lose, can not play.
+  * [-] Lose. - Not win is lose.
+
+Before creating a computer player, let's create a mechanism to measure performance.  
+
+* [x] Performance measurement.
+  * [x] Node per second.
+
+Finally, let's make a computer player.
+
+* [x] Computer player.
+  * [x] Search.
+  * [-] Evaluation - None.
+  * [x] Create "go" command.
 
 # Test case
 

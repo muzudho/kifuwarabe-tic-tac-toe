@@ -1,7 +1,7 @@
-use crate::position::Position;
+use crate::look_and_model::Position;
 
 /// 動作テストだぜ☆（＾～＾）
-pub fn test() {
+pub fn test_win_lose_judgement() {
     // O 勝ち局面チェック☆（＾～＾）
     debug_assert!(Position::from_xfen("xfen ooo/3/3 x")
         .unwrap()

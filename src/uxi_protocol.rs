@@ -1,6 +1,6 @@
 //! 局面データを文字列にしたり、文字列を局面データに復元するのに使うぜ☆（＾～＾）
 use crate::log::Log;
-use crate::position::{Piece, Position};
+use crate::look_and_model::{Piece, Position};
 
 impl Position {
     /// 現局面を xfen に変換するぜ☆（＾～＾）

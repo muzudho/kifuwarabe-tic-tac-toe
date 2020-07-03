@@ -1,29 +1,8 @@
 //! サーチ☆（＾～＾）探索部とか言われてるやつだぜ☆（＾～＾）
 
-use crate::position::{Piece, Position, BOARD_LEN, SQUARES_NUM};
+use crate::look_and_model::{GameResult, Piece, Position, Search, BOARD_LEN, SQUARES_NUM};
 use std::time::Instant;
 
-/// 〇×ゲームは完全解析できるから、評価ではなくて、ゲームの結果が分かるんだよな☆（＾～＾）
-#[derive(Debug)]
-pub enum GameResult {
-    Win,
-    Draw,
-    Lose,
-}
-
-/// 探索部☆（＾～＾）
-pub struct Search {
-    /// この探索を始めたのはどっち側か☆（＾～＾）
-    pub start_friend: Piece,
-    /// この探索を始めたときに石はいくつ置いてあったか☆（＾～＾）
-    pub start_pieces_num: usize,
-    /// 探索した状態ノード数☆（＾～＾）
-    pub nodes: u32,
-    /// この構造体を生成した時点からストップ・ウォッチを開始するぜ☆（＾～＾）
-    stopwatch: Instant,
-    /// info の出力の有無。
-    info_enable: bool,
-}
 impl Search {
     pub fn new(friend: Piece, start_pieces_num: usize, info_enable: bool) -> Self {
         Search {
@@ -32,19 +11,6 @@ impl Search {
             nodes: 0,
             stopwatch: Instant::now(),
             info_enable: info_enable,
-        }
-    }
-    fn sec(&self) -> u64 {
-        self.stopwatch.elapsed().as_secs()
-    }
-
-    /// Node per second.
-    pub fn nps(&self) -> u64 {
-        let sec = self.sec();
-        if 0 < sec {
-            self.nodes as u64 / sec
-        } else {
-            0
         }
     }
 
@@ -56,7 +22,7 @@ impl Search {
         self.node(pos)
     }
 
-    /// 手番が来たぜ☆（＾～＾）
+    /// 手番が来たぜ☆（＾～＾）いわゆる search だぜ☆（＾～＾）
     fn node(&mut self, pos: &mut Position) -> (Option<u8>, GameResult) {
         let mut best_addr = None;
         let mut best_result = GameResult::Lose;

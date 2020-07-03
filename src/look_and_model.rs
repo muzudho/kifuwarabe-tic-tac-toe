@@ -1,11 +1,18 @@
 use crate::log::Log;
-use crate::position::{Piece, Position, SQUARES_NUM};
-use crate::search::{GameResult, Search};
 use std::fmt;
+use std::time::Instant;
 
+/// 駒とか、石とかのことだが、〇×は 何なんだろうな、マーク☆（＾～＾）？
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Piece {
+    /// 〇
+    Nought,
+    /// ×
+    Cross,
+}
 impl fmt::Display for Piece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use crate::position::Piece::*;
+        use crate::look_and_model::Piece::*;
         match self {
             Nought => write!(f, "O"),
             Cross => write!(f, "X"),
@@ -13,6 +20,41 @@ impl fmt::Display for Piece {
     }
 }
 
+/// 〇×ゲームは完全解析できるから、評価ではなくて、ゲームの結果が分かるんだよな☆（＾～＾）
+#[derive(Debug)]
+pub enum GameResult {
+    Win,
+    Draw,
+    Lose,
+}
+
+/// 1スタートで9まで☆（＾～＾） 配列には0番地もあるから、要素数は10だぜ☆（＾～＾）
+pub const BOARD_LEN: usize = 10;
+
+/// 盤上に置ける最大の駒数だぜ☆（＾～＾） ９マスしか置くとこないから９だぜ☆（＾～＾）
+pub const SQUARES_NUM: usize = 9;
+
+/// 局面☆（＾～＾）ゲームデータをセーブしたり、ロードしたりするときの保存されてる現状だぜ☆（＾～＾）
+#[derive(Debug)]
+pub struct Position {
+    /// 次に盤に置く駒☆（＾～＾）
+    /// 英語では 手番は your turn, 相手版は your opponent's turn なんで 手番という英語は無い☆（＾～＾）
+    /// 自分という意味の単語はプログラム用語と被りまくるんで、
+    /// あまり被らない 味方(friend) を手番の意味で たまたま使ってるだけだぜ☆（＾～＾）
+    pub friend: Piece,
+
+    /// 開始局面の盤の各マス☆（＾～＾） [0] は未使用☆（＾～＾）
+    pub starting_board: [Option<Piece>; BOARD_LEN],
+
+    /// 現状の盤の各マス☆（＾～＾） [0] は未使用☆（＾～＾）
+    pub board: [Option<Piece>; BOARD_LEN],
+
+    /// 棋譜だぜ☆（＾～＾）駒を置いた番地を並べてけだぜ☆（＾～＾）
+    pub history: [u8; SQUARES_NUM],
+
+    /// 盤の上に駒が何個置いてあるかだぜ☆（＾～＾）
+    pub pieces_num: usize,
+}
 impl Position {
     fn cell(&self, index: usize) -> String {
         if let Some(piece) = self.board[index] {
@@ -50,6 +92,20 @@ impl Position {
             self.cell(3)
         ));
     }
+}
+
+/// 探索部☆（＾～＾）
+pub struct Search {
+    /// この探索を始めたのはどっち側か☆（＾～＾）
+    pub start_friend: Piece,
+    /// この探索を始めたときに石はいくつ置いてあったか☆（＾～＾）
+    pub start_pieces_num: usize,
+    /// 探索した状態ノード数☆（＾～＾）
+    pub nodes: u32,
+    /// この構造体を生成した時点からストップ・ウォッチを開始するぜ☆（＾～＾）
+    pub stopwatch: Instant,
+    /// info の出力の有無。
+    pub info_enable: bool,
 }
 impl Search {
     /// Principal variation. 今読んでる読み筋☆（＾～＾）

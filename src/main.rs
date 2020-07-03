@@ -3,24 +3,26 @@
 extern crate lazy_static;
 
 mod command_line_parser;
+mod computer_player;
 mod log;
+mod look_and_model;
+mod performance_measurement;
 mod position;
-mod protocol;
-mod search;
 mod test;
-mod view;
+mod uxi_protocol;
+mod win_lose_judgment;
 
 use command_line_parser::CommandLineParser;
 use log::Log;
-use position::Position;
-use search::Search;
+use look_and_model::Position;
+use look_and_model::Search;
 use std;
-use test::test;
+use test::test_win_lose_judgement;
 
 fn main() {
     // しょっぱなにプログラムが壊れてないかテストしているぜ☆（＾～＾）
     // こんなとこに書かない方がいいが、テストを毎回するのが めんどくさいんで 実行するたびにテストさせているぜ☆（＾～＾）
-    test();
+    test_win_lose_judgement();
     // 説明を出そうぜ☆（＾～＾）
     Log::println(
         "きふわらべの〇×ゲーム
@@ -77,7 +79,7 @@ fn main() {
         } else if p.starts_with("position") {
             p.go_next_to("position ");
             if let Some(rest) = p.rest() {
-                if let Some(pos_val) = position::Position::from_xfen(rest) {
+                if let Some(pos_val) = look_and_model::Position::from_xfen(rest) {
                     pos = pos_val;
                 }
             }
