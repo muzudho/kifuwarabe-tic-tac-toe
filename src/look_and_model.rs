@@ -119,6 +119,17 @@ pub struct Search {
     pub info_enable: bool,
 }
 impl Search {
+    /// 初期値だぜ☆（＾～＾）
+    pub fn new(friend: Piece, start_pieces_num: usize, info_enable: bool) -> Self {
+        Search {
+            start_friend: friend,
+            start_pieces_num: start_pieces_num,
+            nodes: 0,
+            stopwatch: Instant::now(),
+            info_enable: info_enable,
+        }
+    }
+
     /// Principal variation. 今読んでる読み筋☆（＾～＾）
     pub fn pv(&self, pos: &mut Position) -> String {
         let mut pv = String::new();
@@ -128,7 +139,7 @@ impl Search {
         pv.trim_end().to_string()
     }
 
-    pub fn info_header(&self, pos: &mut Position) {
+    pub fn info_header(pos: &mut Position) {
         match pos.friend {
             Piece::Nought => {
                 Log::println("info nps ...... nodes ...... pv O X O X O X O X O");
@@ -143,16 +154,17 @@ impl Search {
 
     /// 前向き探索中だぜ☆（＾～＾）
     pub fn info_forward(&self, pos: &mut Position, addr: usize, comment: Option<String>) {
+        let friend_str = if pos.friend == self.start_friend {
+            "+".to_string()
+        } else {
+            "-".to_string()
+        };
         Log::println(&format!(
             "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | ->   to {} |       |      |{}",
             self.nps(),
             self.nodes,
             self.pv(pos),
-            if pos.friend == self.start_friend {
-                "+".to_string()
-            } else {
-                "-".to_string()
-            },
+            friend_str,
             addr,
             if SQUARES_NUM < pos.pieces_num + 1 {
                 "none    ".to_string()
@@ -160,15 +172,7 @@ impl Search {
                 format!("height {}", pos.pieces_num + 1)
             },
             if let Some(comment) = comment {
-                format!(
-                    " {} \"{}\"",
-                    if pos.friend == self.start_friend {
-                        "+".to_string()
-                    } else {
-                        "-".to_string()
-                    },
-                    comment
-                )
+                format!(" {} \"{}\"", friend_str, comment)
             } else {
                 "".to_string()
             },
@@ -182,16 +186,17 @@ impl Search {
         result: GameResult,
         comment: Option<String>,
     ) {
+        let friend_str = if pos.friend == self.start_friend {
+            "+".to_string()
+        } else {
+            "-".to_string()
+        };
         Log::println(&format!(
             "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | .       {} |       |{}|{}",
             self.nps(),
             self.nodes,
             self.pv(pos),
-            if pos.friend == self.start_friend {
-                "+".to_string()
-            } else {
-                "-".to_string()
-            },
+            friend_str,
             addr,
             if SQUARES_NUM < pos.pieces_num {
                 "none    ".to_string()
@@ -204,15 +209,7 @@ impl Search {
                 GameResult::Lose => " lose ".to_string(),
             },
             if let Some(comment) = comment {
-                format!(
-                    " {} \"{}\"",
-                    if pos.friend == self.start_friend {
-                        "+".to_string()
-                    } else {
-                        "-".to_string()
-                    },
-                    comment
-                )
+                format!(" {} \"{}\"", friend_str, comment)
             } else {
                 "".to_string()
             },
@@ -226,6 +223,11 @@ impl Search {
         result: GameResult,
         comment: Option<String>,
     ) {
+        let friend_str = if pos.friend == self.start_friend {
+            "+".to_string()
+        } else {
+            "-".to_string()
+        };
         Log::println(&format!(
             "info nps {: >6} nodes {: >6} pv {: <17} |       | <- from {} | {} [{}] |{}|{}",
             self.nps(),
@@ -236,11 +238,7 @@ impl Search {
             } else {
                 format!("height {}", pos.pieces_num + 1)
             },
-            if pos.friend == self.start_friend {
-                "+".to_string()
-            } else {
-                "-".to_string()
-            },
+            friend_str,
             addr,
             match result {
                 GameResult::Win => " win  ".to_string(),
@@ -248,15 +246,7 @@ impl Search {
                 GameResult::Lose => " lose ".to_string(),
             },
             if let Some(comment) = comment {
-                format!(
-                    " {} \"{}\"",
-                    if pos.friend == self.start_friend {
-                        "+".to_string()
-                    } else {
-                        "-".to_string()
-                    },
-                    comment
-                )
+                format!(" {} \"{}\"", friend_str, comment)
             } else {
                 "".to_string()
             }

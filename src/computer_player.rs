@@ -1,23 +1,12 @@
 //! サーチ☆（＾～＾）探索部とか言われてるやつだぜ☆（＾～＾）
 
-use crate::look_and_model::{GameResult, Piece, Position, Search, BOARD_LEN, SQUARES_NUM};
-use std::time::Instant;
+use crate::look_and_model::{GameResult, Position, Search, BOARD_LEN, SQUARES_NUM};
 
 impl Search {
-    pub fn new(friend: Piece, start_pieces_num: usize, info_enable: bool) -> Self {
-        Search {
-            start_friend: friend,
-            start_pieces_num: start_pieces_num,
-            nodes: 0,
-            stopwatch: Instant::now(),
-            info_enable: info_enable,
-        }
-    }
-
     /// 最善の番地を返すぜ☆（＾～＾）
     pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, GameResult) {
         if self.info_enable {
-            self.info_header(pos);
+            Search::info_header(pos);
         }
         self.node(pos)
     }
