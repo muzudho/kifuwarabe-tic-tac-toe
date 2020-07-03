@@ -178,7 +178,7 @@ impl Search {
             },
         ))
     }
-    /// 葉だぜ☆（＾～＾）
+    /// 前向き探索で葉に着いたぜ☆（＾～＾）
     pub fn info_forward_leaf(
         &self,
         pos: &mut Position,

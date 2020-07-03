@@ -57,6 +57,14 @@ It is important to start with the appearance.
   * [x] Position - It's the board.
   * [x] Search - Computer player search info.
 
+If you want to play immediately, you have the talent of a game creator.
+Being able to control your position means being able to play.
+
+* [x] Position
+  * [x] do_move
+  * [x] undo_move
+  * [x] opponent
+
 Let's enter commands into the computer. Create a command line parser.  
 
 * [x] Command line parser.
@@ -69,11 +77,10 @@ People who are looking for something 10 minutes a day are looking for something 
 Before creating the game itself, let's first create the replay function. Let's get it for a week.  
 
 * [x] UXI protocol.
-  * [x] Starting board.
-  * [x] Player phase.
-  * [x] Moves.
-  * [x] To xfen.
-  * [x] From xfen.
+  * [x] To XFEN.
+  * [x] Do. (Before 'From XFEN')
+  * [x] From XFEN.
+  * [x] Undo.
 
 Let's make a principal command.
 
