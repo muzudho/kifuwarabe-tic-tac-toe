@@ -163,15 +163,15 @@ impl Position {
     ///
     /// # Arguments
     ///
-    /// * `line` - コマンドラインの残り。ここでは駒を置く場所。 `1` とか `7` など。
-    pub fn do_(&mut self, line: &str) {
+    /// * `arg_str` - コマンドラインの残り。ここでは駒を置く場所。 `1` とか `7` など。
+    pub fn do_(&mut self, arg_str: &str) {
         // Log::println(&format("Trace   | do_ line={}", line));
-        let addr: usize = match line.parse() {
+        let addr: usize = match arg_str.parse() {
             Ok(x) => x,
             Err(_x) => {
                 Log::println(&format!(
-                    "Error   | `do 数字` で入力してくれだぜ☆（＾～＾） 入力=|{}|",
-                    line
+                    "Error   | `do 数字` で入力してくれだぜ☆（＾～＾） 引数=|{}|",
+                    arg_str
                 ));
                 return;
             }

@@ -90,7 +90,7 @@ fn main() {
         } else if p.starts_with("xfen") {
             Log::println(&format!("{}", pos.to_xfen()));
         } else {
-            Log::println(&format!("Debug   | Command not found. {:?}", p));
+            Log::println(&format!("Debug   | Invalid command=|{:?}|", p));
         }
     }
 }

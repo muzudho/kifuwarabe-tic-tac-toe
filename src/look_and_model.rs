@@ -69,7 +69,7 @@ impl Default for Position {
 impl Position {
     fn cell(&self, index: usize) -> String {
         if let Some(piece) = self.board[index] {
-            format!("{: ^3}", piece)
+            format!(" {} ", piece)
         } else {
             "   ".to_string()
         }

@@ -78,7 +78,7 @@ Before creating the game itself, let's first create the replay function. Let's g
 
 * [x] 'uxi_protocol.rs'
   * [x] To XFEN.
-  * [x] Do. (Before 'From XFEN')
+  * [x] Do. (Before 'From XFEN') Excludes legal moves and winning/losing decisions.
   * [x] From XFEN.
   * [x] Undo.
 
@@ -108,6 +108,7 @@ Finally, let's make a computer player.
 * [x] 'computer_player.rs'
   * [x] Search.
   * [-] Evaluation - None.
+* [ ] 'main.py'
   * [x] Create "go" command.
 
 # Test case
