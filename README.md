@@ -51,7 +51,7 @@ It is difficult to compare the behavior. Instead, it is useful to get the logs a
 The first thing you have to create is your motive.  
 It is important to start with the appearance.  
 
-* [x] Look and Model.
+* [x] 'look_and_model.rs'
   * [x] Piece - "O", "X".
   * [x] Game result - Win/Draw/Lose.
   * [x] Position - It's the board.
@@ -60,14 +60,14 @@ It is important to start with the appearance.
 If you want to play immediately, you have the talent of a game creator.
 Being able to control your position means being able to play.
 
-* [x] Position
+* [x] 'position.rs'
   * [x] do_move
   * [x] undo_move
   * [x] opponent
 
 Let's enter commands into the computer. Create a command line parser.  
 
-* [x] Command line parser.
+* [x] 'command_line_parser.rs'
   * [x] Input.
   * [x] Starts with.
   * [x] Go next to.
@@ -76,7 +76,7 @@ Let's enter commands into the computer. Create a command line parser.
 People who are looking for something 10 minutes a day are looking for something for a week in a year.  
 Before creating the game itself, let's first create the replay function. Let's get it for a week.  
 
-* [x] UXI protocol.
+* [x] 'uxi_protocol.rs'
   * [x] To XFEN.
   * [x] Do. (Before 'From XFEN')
   * [x] From XFEN.
@@ -84,7 +84,7 @@ Before creating the game itself, let's first create the replay function. Let's g
 
 Let's make a principal command.
 
-* [x] Main.
+* [x] 'main.rs'
   * [x] position.
   * [x] pos.
   * [x] do.
@@ -93,19 +93,19 @@ Let's make a principal command.
 
 Before you make a computer player, let's judge the outcome. And let's test.  
 
-* [x] Win/lose judgment.
+* [x] 'win_lose_judgment.rs'
   * [x] Win.
   * [x] Draw - Not win, not lose, can not play.
   * [-] Lose. - Not win is lose.
 
 Before creating a computer player, let's create a mechanism to measure performance.  
 
-* [x] Performance measurement.
+* [x] 'performance_measurement.rs'
   * [x] Node per second.
 
 Finally, let's make a computer player.
 
-* [x] Computer player.
+* [x] 'computer_player.rs'
   * [x] Search.
   * [-] Evaluation - None.
   * [x] Create "go" command.
