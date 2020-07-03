@@ -49,9 +49,9 @@ impl Position {
         }
 
         // Moves
-        if 0 < self.pieces_num {
+        if 0 < self.pieces_num - self.starting_pieces_num {
             xfen.push_str(" moves");
-            for i in 0..self.pieces_num {
+            for i in self.starting_pieces_num..self.pieces_num {
                 xfen.push_str(&format!(" {}", self.history[i].to_string()));
             }
         }
@@ -101,6 +101,7 @@ impl Position {
                 }
                 MachineState::StartingBoard => match ch {
                     'x' => {
+                        // 手番の順ではないので、手番は分からないぜ☆（＾～＾）
                         pos.starting_board[addr] = Some(Piece::Cross);
                         pos.pieces_num += 1;
                         addr += 1;
@@ -117,6 +118,7 @@ impl Position {
                     ' ' => {
                         // 明示的にクローン☆（＾～＾）
                         pos.board = pos.starting_board.clone();
+                        pos.starting_pieces_num = pos.pieces_num;
                         machine_state = MachineState::Phase;
                     }
                     _ => {

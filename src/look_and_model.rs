@@ -45,6 +45,8 @@ pub struct Position {
 
     /// 開始局面の盤の各マス☆（＾～＾） [0] は未使用☆（＾～＾）
     pub starting_board: [Option<Piece>; BOARD_LEN],
+    /// 盤の上に最初から駒が何個置いてあったかだぜ☆（＾～＾）
+    pub starting_pieces_num: usize,
 
     /// 現状の盤の各マス☆（＾～＾） [0] は未使用☆（＾～＾）
     pub board: [Option<Piece>; BOARD_LEN],
@@ -60,6 +62,7 @@ impl Default for Position {
         Position {
             friend: Piece::Nought,
             starting_board: [None; BOARD_LEN],
+            starting_pieces_num: 0,
             board: [None; BOARD_LEN],
             history: [0; SQUARES_NUM],
             pieces_num: 0,
