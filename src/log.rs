@@ -27,6 +27,7 @@ lazy_static! {
     /// ログ・ファイルのミューテックス（排他制御）
     pub static ref LOGFILE: Mutex<File> = {
         // File::createの返り値は`io::Result<File>` なので .unwrap() で中身を取り出す
+        // 毎回新規作成するので、空っぽから始まります。
         Mutex::new(File::create(Path::new(LOG_FILE)).unwrap())
     };
 }

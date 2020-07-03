@@ -1,17 +1,6 @@
 //! ポジション☆（＾～＾）局面とか言われるやつだぜ☆（＾～＾）
-use crate::look_and_model::{Piece, Position, BOARD_LEN, SQUARES_NUM};
+use crate::look_and_model::{Piece, Position};
 
-impl Default for Position {
-    fn default() -> Self {
-        Position {
-            friend: Piece::Nought,
-            starting_board: [None; BOARD_LEN],
-            board: [None; BOARD_LEN],
-            history: [0; SQUARES_NUM],
-            pieces_num: 0,
-        }
-    }
-}
 impl Position {
     /// 過去を追加☆（＾～＾）
     pub fn do_move(&mut self, addr: usize) {

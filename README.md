@@ -43,7 +43,8 @@ TODO cargo run
 During development, you may need to reproduce the behavior of your computer.  
 It is difficult to compare the behavior. Instead, it is useful to get the logs and compare the logs.  
 
-* [x] Log.
+* [x] 'log.rs' (You can code in 15 minutes)
+  * [x] Clear - Log to empty.
   * [x] Write - Write to a file.
   * [x] Print - Write and display.
 
