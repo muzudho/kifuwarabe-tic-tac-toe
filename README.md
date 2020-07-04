@@ -89,6 +89,7 @@ Let's make a principal command.
   * [x] pos.
   * [x] do.
   * [x] undo.
+  * [ ] uxi.
   * [x] xfen.
 
 Before you make a computer player, let's judge the outcome. And let's test.  

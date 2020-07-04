@@ -35,6 +35,7 @@ fn main() {
 `pos`      - 局面表示。
 `position xfen 3/3/3 o moves 5 1 2 8 4 6 3 7 9` - 初期局面と棋譜を入力。
 `undo`     - 1手戻します。
+`uxi`      - 'uxiok tic-tac-toe {protocol-version}' を返します。
 `xfen`     - 現局面のxfen文字列表示。
 ",
     );
@@ -87,6 +88,8 @@ fn main() {
             pos.pos();
         } else if p.starts_with("undo") {
             pos.undo();
+        } else if p.starts_with("uxi") {
+            Log::println("uxiok tic-tac-toe v20200704.0.0");
         } else if p.starts_with("xfen") {
             Log::println(&format!("{}", pos.to_xfen()));
         } else {
