@@ -2,6 +2,8 @@
 
 〇×ゲームだぜ☆（＾～＾）  
 
+* [Python ver](https://github.com/muzudho/tic-tac-toe-on-python)
+
 ## Test run
 
 あなたのローカルPCでテストする方法です。  
