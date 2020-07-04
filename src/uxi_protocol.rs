@@ -1,6 +1,6 @@
 //! 局面データを文字列にしたり、文字列を局面データに復元するのに使うぜ☆（＾～＾）
 use crate::log::Log;
-use crate::look_and_model::{Piece, Position};
+use crate::look_and_model::{GameResult, Piece, Position};
 
 impl Position {
     /// 現局面を xfen に変換するぜ☆（＾～＾）
@@ -198,11 +198,8 @@ impl Position {
         self.do_move(addr);
 
         // 勝ち負け判定☆（*＾～＾*）
-        if self.is_opponent_win() {
-            Log::println(&format!("win {}", self.friend));
-        } else if self.is_draw() {
-            Log::println(&format!("draw"));
-        }
+        // これは PositionHelper, WinLoseJudgment を作ってから実装しろだぜ☆（＾～＾）
+        self.print_result();
     }
 
     /// 未来の駒を１つ戻す

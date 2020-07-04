@@ -101,6 +101,7 @@ Before you make a computer player, let's judge the outcome. And let's test.
 Before creating a computer player, let's create a mechanism to measure performance.  
 
 * [x] 'performance_measurement.rs'
+  * [x] Seconds. - Stopwatch.
   * [x] Node per second.
 
 Finally, let's make a computer player.
@@ -108,7 +109,7 @@ Finally, let's make a computer player.
 * [x] 'computer_player.rs'
   * [x] Search.
   * [-] Evaluation - None.
-* [ ] 'main.py'
+* [x] 'main.py'
   * [x] Create "go" command.
 
 # Test case

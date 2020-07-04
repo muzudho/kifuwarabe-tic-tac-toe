@@ -106,6 +106,14 @@ impl Position {
             self.cell(3)
         ));
     }
+
+    pub fn print_result(&self) {
+        if self.is_opponent_win() {
+            Log::println(&format!("win {}", self.opponent()));
+        } else if self.is_draw() {
+            Log::println(&format!("draw"));
+        }
+    }
 }
 
 /// 探索部☆（＾～＾）
