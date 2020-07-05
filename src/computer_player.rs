@@ -1,12 +1,13 @@
 //! サーチ☆（＾～＾）探索部とか言われてるやつだぜ☆（＾～＾）
 
+use crate::log::Log;
 use crate::look_and_model::{GameResult, Position, Search, BOARD_LEN, SQUARES_NUM};
 
 impl Search {
     /// 最善の番地を返すぜ☆（＾～＾）
     pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, GameResult) {
         if self.info_enable {
-            Search::info_header(pos);
+            Log::println(&Search::info_header(pos));
         }
         self.node(pos)
     }
@@ -31,38 +32,52 @@ impl Search {
                     // 勝ったなら☆（＾～＾）
                     // 前向き探索情報を出して、置いた石は戻して、後ろ向き探索情報を出して、探索終了だぜ☆（＾～＾）
                     if self.info_enable {
-                        self.info_forward_leaf(
+                        Log::println(&self.info_forward_leaf(
+                            self.nps(),
                             pos,
                             addr,
                             GameResult::Win,
-                            Some("Hooray!".to_string()),
-                        );
+                            Some("Hooray!"),
+                        ));
                     }
                     pos.undo_move();
                     if self.info_enable {
-                        self.info_backward(pos, addr, GameResult::Win, None);
+                        Log::println(&self.info_backward(
+                            self.nps(),
+                            pos,
+                            addr,
+                            GameResult::Win,
+                            None,
+                        ));
                     }
                     return (Some(addr as u8), GameResult::Win);
                 } else if SQUARES_NUM <= pos.pieces_num {
                     // 勝っていなくて、深さ上限に達したら、〇×ゲームでは 他に置く場所もないから引き分け確定だぜ☆（＾～＾）
                     // 前向き探索情報を出して、置いた石は戻して、後ろ向き探索情報を出して、探索終了だぜ☆（＾～＾）
                     if self.info_enable {
-                        self.info_forward_leaf(
+                        Log::println(&self.info_forward_leaf(
+                            self.nps(),
                             pos,
                             addr,
                             GameResult::Draw,
-                            Some("It's ok.".to_string()),
-                        );
+                            Some("It's ok."),
+                        ));
                     }
                     pos.undo_move();
                     if self.info_enable {
-                        self.info_backward(pos, addr, GameResult::Draw, None);
+                        Log::println(&self.info_backward(
+                            self.nps(),
+                            pos,
+                            addr,
+                            GameResult::Draw,
+                            None,
+                        ));
                     }
                     return (Some(addr as u8), GameResult::Draw);
                 } else {
                     // まだ続きがあるぜ☆（＾～＾）
                     if self.info_enable {
-                        self.info_forward(pos, addr, Some("Search.".to_string()));
+                        Log::println(&self.info_forward(self.nps(), pos, addr, Some("Search.")));
                     }
                 }
 
@@ -76,19 +91,26 @@ impl Search {
                     // 相手の負けなら、この手で勝ちだぜ☆（＾～＾）後ろ向き探索情報を出して、探索終わり☆（＾～＾）
                     GameResult::Lose => {
                         if self.info_enable {
-                            self.info_backward(pos, addr, GameResult::Win, Some("Ok.".to_string()));
+                            Log::println(&self.info_backward(
+                                self.nps(),
+                                pos,
+                                addr,
+                                GameResult::Win,
+                                Some("Ok."),
+                            ));
                         }
                         return (Some(addr as u8), GameResult::Win);
                     }
                     // 勝ち負けがずっと見えてないなら☆（＾～＾）後ろ向き探索情報を出して、探索を続けるぜ☆（＾～＾）
                     GameResult::Draw => {
                         if self.info_enable {
-                            self.info_backward(
+                            Log::println(&self.info_backward(
+                                self.nps(),
                                 pos,
                                 addr,
                                 GameResult::Draw,
-                                Some("Fmmm.".to_string()),
-                            );
+                                Some("Fmmm."),
+                            ));
                         }
                         match best_result {
                             GameResult::Lose => {
@@ -102,12 +124,13 @@ impl Search {
                     // 相手が勝つ手を選んではダメだぜ☆（＾～＾）後ろ向き探索情報を出して、探索を続けるぜ☆（＾～＾）
                     GameResult::Win => {
                         if self.info_enable {
-                            self.info_backward(
+                            Log::println(&self.info_backward(
+                                self.nps(),
                                 pos,
                                 addr,
                                 GameResult::Lose,
-                                Some("Resign.".to_string()),
-                            );
+                                Some("Resign."),
+                            ));
                         }
                     }
                 }

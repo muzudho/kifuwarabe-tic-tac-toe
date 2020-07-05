@@ -1,4 +1,3 @@
-use crate::log::Log;
 use std::fmt;
 use std::time::Instant;
 
@@ -166,7 +165,7 @@ impl Search {
     }
 
     /// Principal variation. 今読んでる読み筋☆（＾～＾）
-    pub fn pv(&self, pos: &mut Position) -> String {
+    pub fn pv(&self, pos: &Position) -> String {
         let mut pv = String::new();
         for t in self.start_pieces_num..pos.pieces_num {
             pv.push_str(&format!("{} ", pos.history[t]));
@@ -174,29 +173,31 @@ impl Search {
         pv.trim_end().to_string()
     }
 
-    pub fn info_header(pos: &mut Position) {
+    pub fn info_header(pos: &Position) -> String {
         match pos.friend {
-            Piece::Nought => {
-                Log::println("info nps ...... nodes ...... pv O X O X O X O X O");
-            }
+            Piece::Nought => "info nps ...... nodes ...... pv O X O X O X O X O".to_string(),
             Piece::Cross => {
-                Log::println(&format!(
-                    "info nps ...... nodes ...... pv X O X O X O X O X"
-                ));
+                format!("info nps ...... nodes ...... pv X O X O X O X O X").to_string()
             }
         }
     }
 
     /// 前向き探索中だぜ☆（＾～＾）
-    pub fn info_forward(&self, pos: &mut Position, addr: usize, comment: Option<String>) {
+    pub fn info_forward(
+        &self,
+        nps: u64,
+        pos: &Position,
+        addr: usize,
+        comment: Option<&str>,
+    ) -> String {
         let friend_str = if pos.friend == self.start_friend {
             "+".to_string()
         } else {
             "-".to_string()
         };
-        Log::println(&format!(
+        format!(
             "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | ->   to {} |       |      |{}",
-            self.nps(),
+            nps,
             self.nodes,
             self.pv(pos),
             friend_str,
@@ -211,24 +212,26 @@ impl Search {
             } else {
                 "".to_string()
             },
-        ))
+        )
+        .to_string()
     }
     /// 前向き探索で葉に着いたぜ☆（＾～＾）
     pub fn info_forward_leaf(
         &self,
-        pos: &mut Position,
+        nps: u64,
+        pos: &Position,
         addr: usize,
         result: GameResult,
-        comment: Option<String>,
-    ) {
+        comment: Option<&str>,
+    ) -> String {
         let friend_str = if pos.friend == self.start_friend {
             "+".to_string()
         } else {
             "-".to_string()
         };
-        Log::println(&format!(
+        format!(
             "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | .       {} |       | {:4} |{}",
-            self.nps(),
+            nps,
             self.nodes,
             self.pv(pos),
             friend_str,
@@ -244,24 +247,26 @@ impl Search {
             } else {
                 "".to_string()
             },
-        ));
+        )
+        .to_string()
     }
     /// 後ろ向き探索のときの表示だぜ☆（＾～＾）
     pub fn info_backward(
         &self,
-        pos: &mut Position,
+        nps: u64,
+        pos: &Position,
         addr: usize,
         result: GameResult,
-        comment: Option<String>,
-    ) {
+        comment: Option<&str>,
+    ) -> String {
         let friend_str = if pos.friend == self.start_friend {
             "+".to_string()
         } else {
             "-".to_string()
         };
-        Log::println(&format!(
+        return format!(
             "info nps {: >6} nodes {: >6} pv {: <17} |       | <- from {} | {} [{}] | {:4} |{}",
-            self.nps(),
+            nps,
             self.nodes,
             self.pv(pos),
             if SQUARES_NUM < pos.pieces_num + 1 {
@@ -277,6 +282,7 @@ impl Search {
             } else {
                 "".to_string()
             }
-        ));
+        )
+        .to_string();
     }
 }
