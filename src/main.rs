@@ -85,7 +85,7 @@ fn main() {
                 }
             }
         } else if p.starts_with("pos") {
-            pos.pos();
+            Log::println(&pos.pos());
         } else if p.starts_with("undo") {
             pos.undo();
         } else if p.starts_with("uxi") {

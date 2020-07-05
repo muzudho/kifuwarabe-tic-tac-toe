@@ -77,15 +77,15 @@ impl Position {
             "   ".to_string()
         }
     }
-    pub fn pos(&self) {
-        Log::println(&format!(
+    pub fn pos(&self) -> String {
+        let s = &mut format!(
             "[Next {} move(s) | Go {}]
 ",
             self.pieces_num + 1,
             self.friend
-        ));
+        );
         // 書式指定子は cell関数の方に任せるぜ☆（＾～＾）
-        Log::println(&format!(
+        s.push_str(&format!(
             "\
 +---+---+---+
 |{0}|{1}|{2}| マスを選んでください。例 `do 7`
@@ -105,6 +105,7 @@ impl Position {
             self.cell(2),
             self.cell(3)
         ));
+        s.to_string()
     }
 
     pub fn print_result(&self) {
