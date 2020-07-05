@@ -118,13 +118,24 @@ impl Position {
         s.to_string()
     }
 
-    pub fn result(&self) -> Option<String> {
-        if self.is_opponent_win() {
-            Some(format!("win {}", self.opponent()).to_string())
-        } else if self.is_draw() {
-            Some(format!("draw").to_string())
-        } else {
-            None
+    /// 本当は 以下のように書けばいいんだが、"ステップ・バイ・ステップ" という趣旨なんで 回りくどい作り方をしておくぜ☆（＾～＾）
+    ///
+    /// pub fn result(&self) -> Option<String> {
+    ///     if self.is_opponent_win() {
+    ///         Some(format!("win {}", self.opponent()).to_string())
+    ///     } else if self.is_draw() {
+    ///         Some(format!("draw").to_string())
+    ///     } else {
+    ///         None
+    ///     }
+    /// }
+    ///
+    pub fn result(result: GameResult, winner: Option<Piece>) -> Option<String> {
+        match result {
+            // ぜったい None が返ってこない仕様のときは .unwrap() でヌル・チェックを飛ばせだぜ☆（＾～＾）
+            GameResult::Win => Some(format!("win {}", winner.unwrap()).to_string()),
+            GameResult::Draw => Some(format!("draw").to_string()),
+            GameResult::Lose => None,
         }
     }
 }

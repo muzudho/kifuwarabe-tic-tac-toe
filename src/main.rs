@@ -30,6 +30,12 @@ fn main() {
     Log::println(&format!("Win   =|{}|", GameResult::Win));
     Log::println(&format!("Draw  =|{}|", GameResult::Draw));
     Log::println(&format!("Lose  =|{}|", GameResult::Lose));
+
+    let pos = Position::default();
+    Log::println(&pos.pos());
+    // ぜったい None が返ってこない仕様のときは .unwrap() でヌル・チェックを飛ばせだぜ☆（＾～＾）
+    Log::println(&Position::result(GameResult::Win, Some(Piece::Nought)).unwrap());
+
     test_win_lose_judgement();
 
     // 説明を出そうぜ☆（＾～＾）
