@@ -27,6 +27,16 @@ pub enum GameResult {
     Draw,
     Lose,
 }
+impl fmt::Display for GameResult {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use crate::look_and_model::GameResult::*;
+        match self {
+            Win => write!(f, "win"),
+            Draw => write!(f, "draw"),
+            Lose => write!(f, "lose"),
+        }
+    }
+}
 
 /// 1スタートで9まで☆（＾～＾） 配列には0番地もあるから、要素数は10だぜ☆（＾～＾）
 pub const BOARD_LEN: usize = 10;
@@ -108,11 +118,13 @@ impl Position {
         s.to_string()
     }
 
-    pub fn print_result(&self) {
+    pub fn result(&self) -> Option<String> {
         if self.is_opponent_win() {
-            Log::println(&format!("win {}", self.opponent()));
+            Some(format!("win {}", self.opponent()).to_string())
         } else if self.is_draw() {
-            Log::println(&format!("draw"));
+            Some(format!("draw").to_string())
+        } else {
+            None
         }
     }
 }
@@ -204,7 +216,7 @@ impl Search {
             "-".to_string()
         };
         Log::println(&format!(
-            "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | .       {} |       |{}|{}",
+            "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | .       {} |       | {:4} |{}",
             self.nps(),
             self.nodes,
             self.pv(pos),
@@ -215,11 +227,7 @@ impl Search {
             } else {
                 format!("height {}", pos.pieces_num)
             },
-            match result {
-                GameResult::Win => " win  ".to_string(),
-                GameResult::Draw => " draw ".to_string(),
-                GameResult::Lose => " lose ".to_string(),
-            },
+            result.to_string(),
             if let Some(comment) = comment {
                 format!(" {} \"{}\"", friend_str, comment)
             } else {
@@ -241,7 +249,7 @@ impl Search {
             "-".to_string()
         };
         Log::println(&format!(
-            "info nps {: >6} nodes {: >6} pv {: <17} |       | <- from {} | {} [{}] |{}|{}",
+            "info nps {: >6} nodes {: >6} pv {: <17} |       | <- from {} | {} [{}] | {:4} |{}",
             self.nps(),
             self.nodes,
             self.pv(pos),
@@ -252,11 +260,7 @@ impl Search {
             },
             friend_str,
             addr,
-            match result {
-                GameResult::Win => " win  ".to_string(),
-                GameResult::Draw => " draw ".to_string(),
-                GameResult::Lose => " lose ".to_string(),
-            },
+            result.to_string(),
             if let Some(comment) = comment {
                 format!(" {} \"{}\"", friend_str, comment)
             } else {

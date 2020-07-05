@@ -1,4 +1,5 @@
 //! このファイルがプログラムの入り口とか、スタート地点みたいなもんだぜ☆（＾～＾）プログラムのエントリー・ポイントと言う☆（＾～＾）
+
 #[macro_use]
 extern crate lazy_static;
 
@@ -14,15 +15,23 @@ mod win_lose_judgment;
 
 use command_line_parser::CommandLineParser;
 use log::Log;
-use look_and_model::Position;
-use look_and_model::Search;
+use look_and_model::{GameResult, Piece, Position, Search};
 use std;
 use test::test_win_lose_judgement;
 
 fn main() {
     // しょっぱなにプログラムが壊れてないかテストしているぜ☆（＾～＾）
     // こんなとこに書かない方がいいが、テストを毎回するのが めんどくさいんで 実行するたびにテストさせているぜ☆（＾～＾）
+    Log::writeln("狂った街、東京！！");
+    Log::println("おはようさん、世界！！");
+
+    Log::println(&format!("Nought=|{}|", Piece::Nought));
+    Log::println(&format!("Cross =|{}|", Piece::Cross));
+    Log::println(&format!("Win   =|{}|", GameResult::Win));
+    Log::println(&format!("Draw  =|{}|", GameResult::Draw));
+    Log::println(&format!("Lose  =|{}|", GameResult::Lose));
     test_win_lose_judgement();
+
     // 説明を出そうぜ☆（＾～＾）
     Log::println(
         "きふわらべの〇×ゲーム

@@ -199,7 +199,9 @@ impl Position {
 
         // 勝ち負け判定☆（*＾～＾*）
         // これは PositionHelper, WinLoseJudgment を作ってから実装しろだぜ☆（＾～＾）
-        self.print_result();
+        if let Some(result) = self.result() {
+            Log::println(&result);
+        }
     }
 
     /// 未来の駒を１つ戻す

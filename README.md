@@ -48,8 +48,8 @@ During development, you may need to reproduce the behavior of your computer.
 It is difficult to compare the behavior. Instead, it is useful to get the logs and compare the logs.  
 
 * [x] 'log.rs' (You can code in 15 minutes)
-  * [x] Clear - Log to empty.
   * [x] Write - Write to a file.
+  * [x] Clear - Log to empty.
   * [x] Print - Write and display.
 
 The first thing you have to create is your motive.  
