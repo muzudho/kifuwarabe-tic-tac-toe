@@ -39,9 +39,10 @@ fn main() {
     let search = Search::new(pos.friend, pos.pieces_num, true);
     Log::println(&format!("pv=|{}|", search.pv(&pos)));
     Log::println(&Search::info_header(&pos));
-    Log::println(&search.info_forward(search.nps(), &pos, 1, Some("Hello!")));
-    Log::println(&search.info_forward_leaf(search.nps(), &pos, 1, GameResult::Win, Some("Hello!")));
-    Log::println(&search.info_backward(search.nps(), &pos, 1, GameResult::Win, Some("Hello!")));
+    // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしろだぜ☆（＾～＾）
+    Log::println(&search.info_forward(123, &pos, 1, Some("Hello!")));
+    Log::println(&search.info_forward_leaf(456, &pos, 1, GameResult::Win, Some("Hello!")));
+    Log::println(&search.info_backward(789, &pos, 1, GameResult::Win, Some("Hello!")));
 
     test_win_lose_judgement();
 
