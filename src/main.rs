@@ -77,7 +77,7 @@ fn main() {
             let mut search = Search::new(pos.friend, pos.pieces_num, info_enable);
             let (addr, result) = search.go(&mut pos);
             if let Some(addr) = addr {
-                Log::println(&format!("info result={:?}", result));
+                Log::println(&format!("info result={:?} nps={}", result, search.nps()));
                 Log::println(&format!("bestmove {}", addr));
             } else {
                 Log::println("resign");

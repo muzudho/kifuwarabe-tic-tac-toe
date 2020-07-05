@@ -11,7 +11,8 @@ impl Search {
         if 0 < sec {
             self.nodes as u64 / sec
         } else {
-            0
+            // 1秒未満で全部探索してしまった☆（＾～＾） 本当は もっと多いと思うんだが☆（＾～＾）
+            self.nodes as u64
         }
     }
 }
