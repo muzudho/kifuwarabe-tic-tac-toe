@@ -22,28 +22,52 @@ use test::test_win_lose_judgement;
 fn main() {
     // しょっぱなにプログラムが壊れてないかテストしているぜ☆（＾～＾）
     // こんなとこに書かない方がいいが、テストを毎回するのが めんどくさいんで 実行するたびにテストさせているぜ☆（＾～＾）
-    Log::writeln("狂った街、東京！！");
-    Log::println("おはようさん、世界！！");
+    // Step 1.
+    Log::writeln("Hello, world!!");
+    Log::println("こんにちわ、世界！！");
+    // こんにちわ、世界！！
 
+    // Step 2.
     Log::println(&format!("Nought=|{}|", Piece::Nought));
+    // Nought=|O|
     Log::println(&format!("Cross =|{}|", Piece::Cross));
+    // Cross =|X|
     Log::println(&format!("Win   =|{}|", GameResult::Win));
+    // Win   =|win|
     Log::println(&format!("Draw  =|{}|", GameResult::Draw));
+    // Draw  =|draw|
     Log::println(&format!("Lose  =|{}|", GameResult::Lose));
+    // Lose  =|lose|
 
     let mut pos = Position::default();
     Log::println(&pos.pos());
+    // [Next 1 move(s) | Go O]
+    //
+    // +---+---+---+
+    // |   |   |   | マスを選んでください。例 `do 7`
+    // +---+---+---+
+    // |   |   |   |    7 8 9
+    // +---+---+---+    4 5 6
+    // |   |   |   |    1 2 3
+    // +---+---+---+
     // ぜったい None が返ってこない仕様のときは .unwrap() でヌル・チェックを飛ばせだぜ☆（＾～＾）
     Log::println(&Position::result(GameResult::Win, Some(Piece::Nought)).unwrap());
+    // win O
 
     let search = Search::new(pos.friend, pos.pieces_num, true);
     Log::println(&format!("pv=|{}|", search.pv(&pos)));
+    // pv=||
     Log::println(&Search::info_header(&pos));
+    // info nps ...... nodes ...... pv O X O X O X O X O
     // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしろだぜ☆（＾～＾）
     Log::println(&search.info_forward(123, &pos, 1, Some("Hello!")));
+    // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
     Log::println(&search.info_forward_leaf(456, &pos, 1, GameResult::Win, Some("Hello!")));
+    // info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
     Log::println(&search.info_backward(789, &pos, 1, GameResult::Win, Some("Hello!")));
+    // info nps    789 nodes      0 pv                   |       | <- from height 1 | + [1] | win  | + "Hello!"
 
+    // Step 3.
     pos.do_move(1);
     Log::println(&pos.pos());
     // [Next 2 move(s) | Go x]
@@ -68,6 +92,7 @@ fn main() {
     //         +---+---+---+
     Log::println(&format!("opponent={}", pos.opponent()));
 
+    // Step 4.
     let mut p = CommandLineParser::new("Go to the Moon!");
     Log::println(&format!("Go to   =|{}|", p.starts_with("Go to")));
     // Go to   =|True|
@@ -89,6 +114,7 @@ fn main() {
     ));
     // p.rest  =| the Moon!|
 
+    // Step 5.
     test_win_lose_judgement();
 
     // 説明を出そうぜ☆（＾～＾）

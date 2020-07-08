@@ -47,7 +47,7 @@ TODO cargo run
 During development, you may need to reproduce the behavior of your computer.  
 It is difficult to compare the behavior. Instead, it is useful to get the logs and compare the logs.  
 
-* [x] 'log.rs' (You can code in 15 minutes)
+* [x] Step 1. 'log.rs' (You can code in 15 minutes)
   * [x] Write - Write to a file.
   * [x] Clear - Log to empty.
   * [x] Print - Write and display.
@@ -55,23 +55,23 @@ It is difficult to compare the behavior. Instead, it is useful to get the logs a
 The first thing you have to create is your motive.  
 It is important to start with the appearance.  
 
-* [x] 'look_and_model.rs'
+* [x] Step 2. 'look_and_model.rs'
   * [x] Piece - "O", "X".
   * [x] Game result - Win/Draw/Lose.
   * [x] Position - It's the board.
   * [x] Search - Computer player search info.
 
-If you want to play immediately, you have the talent of a game creator.
-Being able to control your position means being able to play.
+If you want to play immediately, you have the talent of a game creator.  
+Being able to control your position means being able to play.  
 
-* [x] 'position.rs'
+* [x] Step 3. 'position.rs'
   * [x] do_move
   * [x] undo_move
   * [x] opponent
 
 Let's enter commands into the computer. Create a command line parser.  
 
-* [x] 'command_line_parser.rs'
+* [x] Step 4. 'command_line_parser.rs'
   * [x] Input.
   * [x] Starts with.
   * [x] Go next to.
@@ -80,15 +80,15 @@ Let's enter commands into the computer. Create a command line parser.
 People who are looking for something 10 minutes a day are looking for something for a week in a year.  
 Before creating the game itself, let's first create the replay function. Let's get it for a week.  
 
-* [x] 'uxi_protocol.rs'
+* [x] Step 5. 'uxi_protocol.rs'
   * [x] To XFEN.
   * [x] Do. (Before 'From XFEN') Excludes legal moves and winning/losing decisions.
   * [x] From XFEN.
   * [x] Undo.
 
-Let's make a principal command.
+Let's make a principal command.  
 
-* [x] 'main.rs'
+* [x] Step 6. 'main.rs'
   * [x] position.
   * [x] pos.
   * [x] do.
@@ -98,20 +98,20 @@ Let's make a principal command.
 
 Before you make a computer player, let's judge the outcome. And let's test.  
 
-* [x] 'win_lose_judgment.rs'
+* [x] Step 7. 'win_lose_judgment.rs'
   * [x] Win.
   * [x] Draw - Not win, not lose, can not play.
   * [-] Lose. - Not win is lose.
 
 Before creating a computer player, let's create a mechanism to measure performance.  
 
-* [x] 'performance_measurement.rs'
+* [x] Step 8. 'performance_measurement.rs'
   * [x] Seconds. - Stopwatch.
   * [x] Node per second.
 
-Finally, let's make a computer player.
+Finally, let's make a computer player.  
 
-* [x] 'computer_player.rs'
+* [x] Step 9. 'computer_player.rs'
   * [x] Search.
   * [-] Evaluation - None.
 * [x] 'main.py'

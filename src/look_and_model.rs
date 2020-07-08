@@ -89,6 +89,7 @@ impl Position {
     pub fn pos(&self) -> String {
         let s = &mut format!(
             "[Next {} move(s) | Go {}]
+
 ",
             self.pieces_num + 1,
             self.friend
@@ -102,8 +103,7 @@ impl Position {
 |{3}|{4}|{5}|    7 8 9
 +---+---+---+    4 5 6
 |{6}|{7}|{8}|    1 2 3
-+---+---+---+
-",
++---+---+---+",
             self.cell(7),
             self.cell(8),
             self.cell(9),
