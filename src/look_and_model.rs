@@ -173,6 +173,7 @@ impl Search {
         pv.trim_end().to_string()
     }
 
+    /// 見出しだぜ☆（＾～＾）
     pub fn info_header(pos: &Position) -> String {
         match pos.friend {
             Piece::Nought => "info nps ...... nodes ...... pv O X O X O X O X O".to_string(),

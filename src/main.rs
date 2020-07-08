@@ -31,7 +31,7 @@ fn main() {
     Log::println(&format!("Draw  =|{}|", GameResult::Draw));
     Log::println(&format!("Lose  =|{}|", GameResult::Lose));
 
-    let pos = Position::default();
+    let mut pos = Position::default();
     Log::println(&pos.pos());
     // ぜったい None が返ってこない仕様のときは .unwrap() でヌル・チェックを飛ばせだぜ☆（＾～＾）
     Log::println(&Position::result(GameResult::Win, Some(Piece::Nought)).unwrap());
@@ -43,6 +43,51 @@ fn main() {
     Log::println(&search.info_forward(123, &pos, 1, Some("Hello!")));
     Log::println(&search.info_forward_leaf(456, &pos, 1, GameResult::Win, Some("Hello!")));
     Log::println(&search.info_backward(789, &pos, 1, GameResult::Win, Some("Hello!")));
+
+    pos.do_move(1);
+    Log::println(&pos.pos());
+    // [Next 2 move(s) | Go x]
+    //
+    //         +---+---+---+
+    //         |   |   |   | マスを選んでください。例 `do 7`
+    //         +---+---+---+
+    //         |   |   |   |    7 8 9
+    //         +---+---+---+    4 5 6
+    //         | o |   |   |    1 2 3
+    //         +---+---+---+
+    pos.undo_move();
+    Log::println(&pos.pos());
+    // [Next 1 move(s) | Go o]
+    //
+    //         +---+---+---+
+    //         |   |   |   | マスを選んでください。例 `do 7`
+    //         +---+---+---+
+    //         |   |   |   |    7 8 9
+    //         +---+---+---+    4 5 6
+    //         |   |   |   |    1 2 3
+    //         +---+---+---+
+    Log::println(&format!("opponent={}", pos.opponent()));
+
+    let mut p = CommandLineParser::new("Go to the Moon!");
+    Log::println(&format!("Go to   =|{}|", p.starts_with("Go to")));
+    // Go to   =|True|
+    Log::println(&format!("Goto    =|{}|", p.starts_with("Goto")));
+    // Goto    =|False|
+    Log::println(&format!("p.starts=|{}|", p.starts));
+    // p.starts=|0|
+    Log::println(&format!(
+        "p.rest  =|{}|",
+        if let Some(rest) = p.rest() { rest } else { "" }
+    ));
+    // p.rest  =|Go to the Moon!|
+    p.go_next_to("Go to");
+    Log::println(&format!("p.starts=|{}|", p.starts));
+    // p.starts=|5|
+    Log::println(&format!(
+        "p.rest  =|{}|",
+        if let Some(rest) = p.rest() { rest } else { "" }
+    ));
+    // p.rest  =| the Moon!|
 
     test_win_lose_judgement();
 

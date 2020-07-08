@@ -1,0 +1,60 @@
+狂った街、東京！！
+おはようさん、世界！！
+Nought=|O|
+Cross =|X|
+Win   =|win|
+Draw  =|draw|
+Lose  =|lose|
+[Next 1 move(s) | Go O]
++---+---+---+
+|   |   |   | マスを選んでください。例 `do 7`
++---+---+---+
+|   |   |   |    7 8 9
++---+---+---+    4 5 6
+|   |   |   |    1 2 3
++---+---+---+
+
+win O
+pv=||
+info nps ...... nodes ...... pv O X O X O X O X O
+info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
+info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
+info nps    789 nodes      0 pv                   |       | <- from height 1 | + [1] | win  | + "Hello!"
+[Next 2 move(s) | Go X]
++---+---+---+
+|   |   |   | マスを選んでください。例 `do 7`
++---+---+---+
+|   |   |   |    7 8 9
++---+---+---+    4 5 6
+| O |   |   |    1 2 3
++---+---+---+
+
+[Next 1 move(s) | Go O]
++---+---+---+
+|   |   |   | マスを選んでください。例 `do 7`
++---+---+---+
+|   |   |   |    7 8 9
++---+---+---+    4 5 6
+|   |   |   |    1 2 3
++---+---+---+
+
+opponent=X
+Go to   =|true|
+Goto    =|false|
+p.starts=|0|
+p.rest  =|Go to the Moon!|
+p.starts=|5|
+p.rest  =| the Moon!|
+きふわらべの〇×ゲーム
+
+コマンド:
+`do 7`     - 手番のプレイヤーが、 7 番地に印を付けます。
+`go`       - コンピューターが次の1手を示します。
+`info-off` - info出力なし。
+`info-on`  - info出力あり(既定)。
+`pos`      - 局面表示。
+`position xfen 3/3/3 o moves 5 1 2 8 4 6 3 7 9` - 初期局面と棋譜を入力。
+`undo`     - 1手戻します。
+`uxi`      - 'uxiok tic-tac-toe {protocol-version}' を返します。
+`xfen`     - 現局面のxfen文字列表示。
+

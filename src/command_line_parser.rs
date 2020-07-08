@@ -4,7 +4,7 @@ use std::fmt;
 pub struct CommandLineParser {
     line: String,
     len: usize,
-    starts: usize,
+    pub starts: usize,
 }
 impl CommandLineParser {
     pub fn new(line: &str) -> Self {
@@ -16,11 +16,10 @@ impl CommandLineParser {
         };
         // 文字数を調べようぜ☆（＾～＾）
         let len = line.chars().count();
-        let starts = 0;
         CommandLineParser {
             line: line,
             len: len,
-            starts: starts,
+            starts: 0,
         }
     }
 
