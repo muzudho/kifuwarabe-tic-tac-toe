@@ -17,8 +17,8 @@ use command_line_parser::CommandLineParser;
 use log::Log;
 use look_and_model::{GameResult, Piece, Position, Search};
 use std;
+use std::{thread, time};
 use test::test_win_lose_judgement;
-
 fn main() {
     // しょっぱなにプログラムが壊れてないかテストしているぜ☆（＾～＾）
     // こんなとこに書かない方がいいが、テストを毎回するのが めんどくさいんで 実行するたびにテストさせているぜ☆（＾～＾）
@@ -115,6 +115,131 @@ fn main() {
     // p.rest  =| the Moon!|
 
     // Step 5.
+    Log::println(&format!("xfen=|{}|", pos.to_xfen()));
+    // xfen=|xfen 3/3/3 o|
+    pos.do_("2");
+    Log::println(&pos.pos());
+    // [Next 2 move(s) | Go x]
+    //
+    // +---+---+---+
+    // |   |   |   | マスを選んでください。例 `do 7`
+    // +---+---+---+
+    // |   |   |   |    7 8 9
+    // +---+---+---+    4 5 6
+    // |   | o |   |    1 2 3
+    // +---+---+---+
+    let xfen = "xfen xo1/xox/oxo o";
+    pos = if let Some(pos) = Position::from_xfen(xfen) {
+        pos
+    } else {
+        panic!("Invalid xfen=|{}|", xfen)
+    };
+    Log::println(&pos.pos());
+    // [Next 9 move(s) | Go o]
+    //
+    // +---+---+---+
+    // | x | o |   | マスを選んでください。例 `do 7`
+    // +---+---+---+
+    // | x | o | x |    7 8 9
+    // +---+---+---+    4 5 6
+    // | o | x | o |    1 2 3
+    // +---+---+---+
+    let xfen = "xfen 3/3/3 x moves 1 7 4 8 9 3 6 2 5";
+    pos = if let Some(pos) = Position::from_xfen(xfen) {
+        pos
+    } else {
+        panic!("Invalid xfen=|{}|", xfen)
+    };
+    Log::println(&pos.pos());
+    // win x
+    // [Next 10 move(s) | Go o]
+    //
+    // +---+---+---+
+    // | o | o | x | マスを選んでください。例 `do 7`
+    // +---+---+---+
+    // | x | x | x |    7 8 9
+    // +---+---+---+    4 5 6
+    // | x | o | o |    1 2 3
+    // +---+---+---+
+    pos.undo();
+    Log::println(&pos.pos());
+    // [Next 9 move(s) | Go x]
+    //
+    // +---+---+---+
+    // | o | o | x | マスを選んでください。例 `do 7`
+    // +---+---+---+
+    // | x |   | x |    7 8 9
+    // +---+---+---+    4 5 6
+    // | x | o | o |    1 2 3
+    // +---+---+---+
+
+    // Step 6.
+    // Step 7.
+    let xfen = "xfen o2/xox/oxo x";
+    pos = if let Some(pos) = Position::from_xfen(xfen) {
+        pos
+    } else {
+        panic!("Invalid xfen=|{}|", xfen)
+    };
+    Log::println(&format!("win=|{}|", pos.is_opponent_win()));
+    // win=|True|
+    let xfen = "xfen xox/oxo/oxo x";
+    pos = if let Some(pos) = Position::from_xfen(xfen) {
+        pos
+    } else {
+        panic!("Invalid xfen=|{}|", xfen)
+    };
+    Log::println(&format!("draw=|{}|", pos.is_draw()));
+    // draw=|True|
+
+    // Step 8.
+    thread::sleep(time::Duration::from_secs(1));
+    Log::println(&format!("sec={}", search.sec()));
+    // sec=1.0
+    Log::println(&format!("nps={}", search.nps()));
+    // nps=0.0
+
+    // Step 9.
+    let xfen = "xfen 3/3/3 o moves 1 5 2 3 7 4";
+    pos = if let Some(pos) = Position::from_xfen(xfen) {
+        pos
+    } else {
+        panic!("Invalid xfen=|{}|", xfen)
+    };
+    let mut search = Search::new(pos.friend, pos.pieces_num, true);
+    let (addr, result) = search.go(&mut pos);
+    // info nps ...... nodes ...... pv O X O X O X O X O
+    // info nps      1 nodes      1 pv 6                 | - [6] | ->   to height 8 |       |      | - "Search."
+    // info nps      2 nodes      2 pv 6 8               | + [8] | ->   to height 9 |       |      | + "Search."
+    // info nps      3 nodes      3 pv 6 8 9             | - [9] | .       height 9 |       | draw | - "It's ok."
+    // info nps      3 nodes      3 pv 6 8               |       | <- from height 8 | + [9] | draw |
+    // info nps      3 nodes      3 pv 6                 |       | <- from height 7 | - [8] | draw | - "Fmmm."
+    // info nps      4 nodes      4 pv 6 9               | + [9] | ->   to height 9 |       |      | + "Search."
+    // info nps      5 nodes      5 pv 6 9 8             | - [8] | .       height 9 |       | draw | - "It's ok."
+    // info nps      5 nodes      5 pv 6 9               |       | <- from height 8 | + [8] | draw |
+    // info nps      5 nodes      5 pv 6                 |       | <- from height 7 | - [9] | draw | - "Fmmm."
+    // info nps      5 nodes      5 pv                   |       | <- from height 6 | + [6] | draw | + "Fmmm."
+    // info nps      6 nodes      6 pv 8                 | - [8] | ->   to height 8 |       |      | - "Search."
+    // info nps      7 nodes      7 pv 8 6               | + [6] | .       height 8 |       | win  | + "Hooray!"
+    // info nps      7 nodes      7 pv 8                 |       | <- from height 7 | - [6] | win  |
+    // info nps      7 nodes      7 pv                   |       | <- from height 6 | + [8] | lose | + "Resign."
+    // info nps      8 nodes      8 pv 9                 | - [9] | ->   to height 8 |       |      | - "Search."
+    // info nps      9 nodes      9 pv 9 6               | + [6] | .       height 8 |       | win  | + "Hooray!"
+    // info nps      9 nodes      9 pv 9                 |       | <- from height 7 | - [6] | win  |
+    // info nps      9 nodes      9 pv                   |       | <- from height 6 | + [9] | lose | + "Resign."
+    Log::println(&format!("result=|{}|", result));
+    // result=|draw|
+    Log::println(&format!(
+        "bestmove=|{}|",
+        if let Some(addr) = addr {
+            format!("{}", addr).to_string()
+        } else {
+            "resign".to_string()
+        }
+    ));
+    // bestmove=|6|
+
+    // End.
     test_win_lose_judgement();
 
     // 説明を出そうぜ☆（＾～＾）

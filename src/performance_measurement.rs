@@ -1,7 +1,7 @@
 use crate::look_and_model::Search;
 
 impl Search {
-    fn sec(&self) -> u64 {
+    pub fn sec(&self) -> u64 {
         self.stopwatch.elapsed().as_secs()
     }
 
