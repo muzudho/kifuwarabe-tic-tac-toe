@@ -116,6 +116,7 @@ Finally, let's make a computer player.
   * [-] Evaluation - None.
 * [x] 'main.py'
   * [x] Create "go" command.
+* [ ] Remeve all 'TODO' tasks. Examples: '// TODO Write a code here.'
 
 # Test case
 

@@ -110,7 +110,7 @@ pub fn test_win_lose_judgement() {
             .is_opponent_win());
     }
 
-    // TODO 次の１手チェック
+    // 次の１手チェック
     // xfen 3/3/3 o moves 5 1 2 8 3 7
     // 受け手なし
     // xfen 3/3/3 o moves 5 1 2 8

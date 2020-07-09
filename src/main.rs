@@ -193,11 +193,14 @@ fn main() {
     // draw=|True|
 
     // Step 8.
+    // 探索してないんだから、 nodes も nps も 0 になるはずだよな☆（＾～＾）
     thread::sleep(time::Duration::from_secs(1));
-    Log::println(&format!("sec={}", search.sec()));
-    // sec=1.0
-    Log::println(&format!("nps={}", search.nps()));
-    // nps=0.0
+    Log::println(&format!("nodes={}", search.nodes));
+    // nodes=0
+    Log::println(&format!("sec  ={}", search.sec()));
+    // sec  =1
+    Log::println(&format!("nps  ={}", search.nps()));
+    // nps  =0
 
     // Step 9.
     let xfen = "xfen 3/3/3 o moves 1 5 2 3 7 4";
@@ -305,6 +308,8 @@ fn main() {
             }
         } else if p.starts_with("pos") {
             Log::println(&pos.pos());
+        } else if p.starts_with("quit") {
+            return;
         } else if p.starts_with("undo") {
             pos.undo();
         } else if p.starts_with("uxi") {
