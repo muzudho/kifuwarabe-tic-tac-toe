@@ -4,6 +4,7 @@
 
 * 他のプログラム言語
   * [プログラミング入門動画](https://www.youtube.com/playlist?list=PLllMJuAE0iK6kSsi96OBXBgNZHFg7KB9f) - 小学生は変女に Scratch でも教えられてろだぜ☆（＾～＾）
+  * [Go ver](https://github.com/muzudho/tic-tac-toe-golang)
   * [Python ver](https://github.com/muzudho/tic-tac-toe-on-python)
 
 ## Test run
