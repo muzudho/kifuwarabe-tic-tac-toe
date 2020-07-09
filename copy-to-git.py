@@ -23,7 +23,7 @@ def go():
 
     print('Trace   | Copy.')
     copy_dir('/doc')
-    copy_dir('/src')
+    copy_dir('/src', ignore=shutil.ignore_patterns('*.log'))
     copy_file('/.gitignore')
     copy_file('/Cargo.toml')
     copy_file('/copy-to-git.py')
