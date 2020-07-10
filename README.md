@@ -7,6 +7,15 @@
   * [Go ver](https://github.com/muzudho/tic-tac-toe-on-golang)
   * [Python ver](https://github.com/muzudho/tic-tac-toe-on-python)
 
+## Visual Studio Code を使っている人へ
+
+* やれ。
+  * メインメニューから `[File] - [Preferences] - [Settings]` を開く。
+  * Search settings 欄へ `files.autoGuessEncoding` と入力。
+  * `Files: Auto Guess Encoding` チェックボックスをチェック。
+  * まだ Settings を閉じるなだぜ。視認性の悪い画面を良く見ろ、 `User`, `Workspace`, `tic-tac-toe` と３つタブが並んでるだろ☆ それぞれある☆
+  * 保存。
+
 ## Test run
 
 あなたのローカルPCでテストする方法です。  

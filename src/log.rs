@@ -1,10 +1,11 @@
+use chrono::Utc;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 use std::sync::Mutex;
 
 /// ログ
-pub const LOG_FILE: &str = "tic-tac-toe.log";
+pub const LOG_FILE_STEM: &str = "tic-tac-toe";
 pub const LOG_ENABLE: bool = true;
 
 // グローバル定数
@@ -26,9 +27,11 @@ pub const LOG_ENABLE: bool = true;
 lazy_static! {
     /// ログ・ファイルのミューテックス（排他制御）
     pub static ref LOGFILE: Mutex<File> = {
+        // ファイル名を作るぜ☆（＾～＾）
+        let name = format!("{}-{}.log",LOG_FILE_STEM,Utc::today().format("%Y-%m-%d").to_string());
         // File::createの返り値は`io::Result<File>` なので .unwrap() で中身を取り出す
         // 毎回新規作成するので、空っぽから始まります。
-        Mutex::new(File::create(Path::new(LOG_FILE)).unwrap())
+        Mutex::new(File::create(Path::new(&name)).unwrap())
     };
 }
 

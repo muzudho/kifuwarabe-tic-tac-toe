@@ -2,6 +2,7 @@
 
 #[macro_use]
 extern crate lazy_static;
+extern crate chrono;
 
 mod command_line_parser;
 mod computer_player;
