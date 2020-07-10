@@ -42,9 +42,9 @@ pub const LOG_ENABLE: bool = true;
 // 「How can I use mutable lazy_static?」
 // https://users.rust-lang.org/t/how-can-i-use-mutable-lazy-static/3751/3
 lazy_static! {
-    /// ログ・ファイルのミューテックス（排他制御）
-    pub static ref LOGFILE: Mutex<LogFile> = {
-        Mutex::new(LogFile::new())
+    /// ロガーのミューテックス（排他制御）
+    pub static ref LOGGER: Mutex<Logger> = {
+        Mutex::new(Logger::default())
     };
 }
 // スレッド・ローカル
@@ -52,66 +52,41 @@ lazy_static! {
 // * 参考
 //      * [ミュータブルなスレッドローカルデータを thread_local!() マクロと RefCell で実現する](https://qiita.com/tatsuya6502/items/bed3702517b36afbdbca)
 //
-// ログ・ディレクトリーの設定だぜ☆（＾～＾）
-thread_local!(pub static LOG_DIRECTORY: RefCell<LogDirectory> = {
-    RefCell::new(LogDirectory::default())
-});
 // ログの連番だぜ☆（＾～＾）
 thread_local!(pub static SEQ: RefCell<u128> = {
     RefCell::new(1)
 });
 
-pub struct LogFile {
-    date_file_opened: Date<Utc>,
+pub struct Logger {
+    pub retention_days: i64,
+    // 現在使用対象のログファイルの年月日だぜ☆（＾～＾）
+    start_date: Date<Utc>,
     file: File,
 }
-impl LogFile {
-    pub fn new() -> Self {
+impl Default for Logger {
+    fn default() -> Self {
+        let (start_date, file) = Logger::new_today_file();
+        Logger {
+            retention_days: 7,
+            start_date: start_date,
+            file: file,
+        }
+    }
+}
+impl Logger {
+    pub fn new_today_file() -> (Date<Utc>, File) {
         // ファイル名を作るぜ☆（＾～＾）
-        let date_file_opened = Utc::today();
-        // File::createの返り値は`io::Result<File>` なので .unwrap() で中身を取り出す
-        // 毎回新規作成するので、空っぽから始まります。
+        let start_date = Utc::today();
         let file = OpenOptions::new()
             .append(true)
             .open(Path::new(&format!(
                 "{}-{}.log.toml",
                 LOG_FILE_STEM,
-                date_file_opened.format("%Y-%m-%d")
+                start_date.format("%Y-%m-%d")
             )))
             .unwrap();
-
-        LogFile {
-            date_file_opened: date_file_opened,
-            file: file,
-        }
+        (start_date, file)
     }
-    /// 日付を跨いだら新しいファイルに乗り換える仕組みだけど、テストできてない☆（＾～＾）知らね☆（＾～＾）
-    fn current_file(&mut self) -> &File {
-        if self.date_file_opened < Utc::today() {
-            // 日付が変わってたら☆（＾～＾）
-
-            // 古いログ・ファイルを削除しようぜ☆（＾～＾）？
-            LOG_DIRECTORY.with(|log_directory| {
-                log_directory.borrow().remove_old_logs();
-            });
-
-            // 新しいファイルに乗り換えようぜ☆（＾～＾）
-            let new_file = LogFile::new();
-            self.date_file_opened = new_file.date_file_opened;
-            self.file = new_file.file;
-        }
-        &self.file
-    }
-}
-pub struct LogDirectory {
-    pub retention_days: i64,
-}
-impl Default for LogDirectory {
-    fn default() -> Self {
-        LogDirectory { retention_days: 7 }
-    }
-}
-impl LogDirectory {
     /// TODO 古いログを削除しようぜ☆（＾～＾）？
     /// なんだこのクソむずかしい日付処理は☆（＾～＾）！？
     pub fn remove_old_logs(&self) {
@@ -171,6 +146,23 @@ impl LogDirectory {
                 }
             }
         }
+    }
+
+    /// 日付を跨いだら新しいファイルに乗り換える仕組みだけど、テストできてない☆（＾～＾）知らね☆（＾～＾）
+    fn current_file(&mut self) -> &File {
+        if self.start_date < Utc::today() {
+            // 日付が変わってたら☆（＾～＾）
+
+            // 古いログ・ファイルを削除しようぜ☆（＾～＾）？
+            if let Ok(logger) = LOGGER.lock() {
+                logger.remove_old_logs();
+            }
+            // 新しいファイルに乗り換えようぜ☆（＾～＾）
+            let (start_date, file) = Logger::new_today_file();
+            self.start_date = start_date;
+            self.file = file;
+        }
+        &self.file
     }
 }
 
@@ -293,14 +285,11 @@ impl Log {
                 );
                 *seq.borrow_mut() += 1;
                 // write_allメソッドを使うには use std::io::Write; が必要
-                if let Err(_why) = LOGFILE
-                    .lock()
-                    .unwrap()
-                    .current_file()
-                    .write_all(toml.as_bytes())
-                {
-                    // 大会向けに、ログ書き込み失敗は出力しないことにする
-                    // panic!("(Err.148) couldn't write log. : {}",Error::description(&why)),
+                if let Ok(mut logger) = LOGGER.lock() {
+                    if let Err(_why) = logger.current_file().write_all(toml.as_bytes()) {
+                        // 大会向けに、ログ書き込み失敗は出力しないことにする
+                        // panic!("(Err.148) couldn't write log. : {}",Error::description(&why)),
+                    }
                 }
             });
         }

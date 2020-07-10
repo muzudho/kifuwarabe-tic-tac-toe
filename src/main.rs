@@ -16,7 +16,7 @@ mod uxi_protocol;
 mod win_lose_judgment;
 
 use command_line_parser::CommandLineParser;
-use log::{Log, LOG_DIRECTORY};
+use log::{Log, LOGGER};
 use look_and_model::{GameResult, Piece, Position, Search};
 use std;
 use std::{thread, time};
@@ -24,9 +24,10 @@ use test::test_win_lose_judgement;
 
 fn main() {
     // TODO テスト中☆（＾～＾） 古いログ・ファイルを削除しようぜ☆（＾～＾）？
-    LOG_DIRECTORY.with(|log_directory| {
-        log_directory.borrow().remove_old_logs();
-    });
+    // 古いログ・ファイルを削除しようぜ☆（＾～＾）？
+    if let Ok(logger) = LOGGER.lock() {
+        logger.remove_old_logs();
+    }
 
     // しょっぱなにプログラムが壊れてないかテストしているぜ☆（＾～＾）
     // こんなとこに書かない方がいいが、テストを毎回するのが めんどくさいんで 実行するたびにテストさせているぜ☆（＾～＾）
