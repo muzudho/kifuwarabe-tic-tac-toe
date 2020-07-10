@@ -71,10 +71,15 @@ impl LogFile {
 }
 
 pub struct Logger {
+    /// 何のログか分かるように名前を付けてやれだぜ☆（＾～＾）
     file_prefix: String,
+    /// このファイルは消してもいい、という符号としてファイル名の一部に '.log' と付けるのに使うことを想定しているぜ☆（＾～＾）
     file_suffix: String,
+    /// 拡張子だぜ☆（＾～＾） '.toml' と付けるのを想定しているが、「TOML？何それ！」みたいに煙たがられたら、 suffix を空文字にして拡張子を '.log' にでもしとけだぜ☆（＾～＾）
     file_extention: String,
+    /// ファイルを保持する日数だぜ☆（＾～＾）これを超えたら消す☆（＾～＾）
     pub retention_days: i64,
+    /// ファイルをつかむのに使うぜ☆（＾～＾）
     log_file: Option<LogFile>,
 }
 impl Default for Logger {
@@ -104,11 +109,13 @@ impl Logger {
     pub fn get_file_extention(&self) -> &str {
         &self.file_extention
     }
+    /// ログ・ファイル名の日付以外のところを決めろだぜ☆（＾～＾）
     pub fn set_file_name(&mut self, prefix: &str, suffix: &str, extention: &str) {
         self.file_prefix = prefix.to_string();
         self.file_suffix = suffix.to_string();
         self.file_extention = extention.to_string();
     }
+    /// 今日の日付が付いたログ・ファイルをつかむぜ☆（＾～＾）
     fn new_today_file(
         file_prefix: &str,
         file_suffix: &str,
@@ -129,11 +136,17 @@ impl Logger {
             .unwrap();
         (start_date, file)
     }
-    /// TODO 古いログを削除しようぜ☆（＾～＾）？
+    /// 古いログを削除しようぜ☆（＾～＾）？
     /// なんだこのクソむずかしい日付処理は☆（＾～＾）！？
     pub fn remove_old_logs(&self) -> usize {
         // 削除したファイル数だぜ☆（＾～＾）
         let mut count = 0;
+        // Example:
+        //      all = './tic-tac-toe-2020-07-11.log.toml'
+        //      prefix = "tic-tac-toe"
+        //      now = "-2020-07-11"
+        //      suffix = ".log"
+        //      extention = ".toml"
         let re = if let Ok(x) = Regex::new(&format!(
             "./{}-{}{}{}",
             self.file_prefix, r"(\d{4})-(\d{2})-(\d{2})", self.file_suffix, self.file_extention
@@ -142,6 +155,7 @@ impl Logger {
         } else {
             return 0;
         };
+        // file, directory paths:
         let paths = if let Ok(x) = fs::read_dir("./") {
             x
         } else {
@@ -153,9 +167,11 @@ impl Logger {
             } else {
                 continue;
             };
-            println!("Name: {}", name);
+            // println!("Name: {}", name);
+            // File name pattern match:
             if let Some(caps) = re.captures(&name) {
-                println!("CapsLen: {}", caps.len());
+                // println!("CapsLen: {}", caps.len());
+                // 年月日を抽出するぜ☆（＾～＾）
                 let year: i32 = if let Some(cap) = caps.get(1) {
                     if let Ok(n) = cap.as_str().parse() {
                         n
@@ -183,15 +199,16 @@ impl Logger {
                 } else {
                     0
                 };
-                println!("Ymd=|{}|{}|{}|", year, month, day);
+                // println!("Ymd=|{}|{}|{}|", year, month, day);
                 if month != 0 && day != 0 {
                     let file_date = Local.ymd(year, month, day);
 
+                    // ファイルの保存期間を超えていれば
                     if file_date.add(Duration::days(self.retention_days)) < Local::today() {
-                        // ファイルを削除するぜ☆（＾～＾）
-                        println!("TODO Delete: {}", name);
+                        // そのファイルを削除するぜ☆（＾～＾）
+                        // println!("Delete: {}", name);
                         if let Ok(_why) = fs::remove_file(name) {
-                            // 失敗したときの理由が、大会で送信されても嫌だしな☆（＾～＾）
+                            // ファイルの削除に失敗したときの理由が、大会で送信されても嫌だしな☆（＾～＾）表示しないぜ☆（＾～＾）
                             // println!("! {:?}", why.kind());
                         } else {
                             count += 1;
@@ -282,6 +299,7 @@ impl Log {
     /// panic! の第一引数に渡せだぜ☆（＾～＾） 強制終了する前に、ヤケクソで読み筋欄に表示できないかトライするぜ☆（＾～＾）
     #[allow(dead_code)]
     pub fn panic(s: &str) -> String {
+        // コンピューター将棋の USIプロトコル で 'info string' というのがあって真似ている☆（＾～＾）嫌なら変えろだぜ☆（＾～＾）
         let t = format!("info string panic! {}", s).to_string();
         Log::writeln(&t, "Fatal");
         println!("{}", t);
@@ -308,12 +326,14 @@ impl Log {
             };
             // ダブル・クォーテーションはエスケープするぜ☆（＾～＾）
             body = body.replace("\"", "\\\"");
+            /*
             println!(
                 "Body    =|{}| Len=|{}| LinesCount=|{}|",
                 body,
                 body.len(),
                 s.lines().count()
             );
+            */
             SEQ.with(move |seq| {
                 // TOMLの書式を真似る。
                 let toml = format!(
