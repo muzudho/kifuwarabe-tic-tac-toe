@@ -89,16 +89,18 @@ impl Logger {
     }
     /// TODO 古いログを削除しようぜ☆（＾～＾）？
     /// なんだこのクソむずかしい日付処理は☆（＾～＾）！？
-    pub fn remove_old_logs(&self) {
+    pub fn remove_old_logs(&self) -> usize {
+        // 削除したファイル数だぜ☆（＾～＾）
+        let mut count = 0;
         let re = if let Ok(x) = Regex::new(r"./tic-tac-toe-(\d{4})-(\d{2})-(\d{2}).log.toml") {
             x
         } else {
-            return;
+            return 0;
         };
         let paths = if let Ok(x) = fs::read_dir("./") {
             x
         } else {
-            return;
+            return 0;
         };
         for path in paths {
             let name = if let Ok(x) = path {
@@ -141,11 +143,19 @@ impl Logger {
                     let file_date = Local.ymd(year, month, day);
 
                     if file_date.add(Duration::days(self.retention_days)) < Local::today() {
+                        // ファイルを削除するぜ☆（＾～＾）
                         println!("TODO Delete: {}", name);
+                        if let Ok(_why) = fs::remove_file(name) {
+                            // 失敗したときの理由が、大会で送信されても嫌だしな☆（＾～＾）
+                            // println!("! {:?}", why.kind());
+                        } else {
+                            count += 1;
+                        }
                     }
                 }
             }
         }
+        count
     }
 
     /// 日付を跨いだら新しいファイルに乗り換える仕組みだけど、テストできてない☆（＾～＾）知らね☆（＾～＾）
@@ -156,6 +166,7 @@ impl Logger {
             // 古いログ・ファイルを削除しようぜ☆（＾～＾）？
             if let Ok(logger) = LOGGER.lock() {
                 logger.remove_old_logs();
+                // 削除したファイルとか、ロガーで書き込みとかしたいが、無限ループしても嫌だしな☆（＾～＾）
             }
             // 新しいファイルに乗り換えようぜ☆（＾～＾）
             let (start_date, file) = Logger::new_today_file();
