@@ -1,8 +1,10 @@
-use chrono::Utc;
+use chrono::{Local, Utc};
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
+use std::process;
 use std::sync::Mutex;
+use std::thread;
 
 // TODO Windows と Linuxディストリビューションの改行の違いどうにかならんのか☆（＾～＾）？
 #[cfg(windows)]
@@ -45,7 +47,14 @@ lazy_static! {
     };
 }
 
-pub struct Log {}
+pub struct Log {
+    seq: u128,
+}
+impl Default for Log {
+    fn default() -> Self {
+        Log { seq: 1 }
+    }
+}
 impl Log {
     /// コンソール表示とともに、ファイルへ書き込みます。末尾に改行は付けません。
     #[allow(dead_code)]
@@ -93,11 +102,14 @@ impl Log {
             // 複数行か、単一行かを区別するぜ☆（＾～＾）
             // TOMLの書式を真似る。
             let toml = format!(
-                "[\"{}\"]
+                "[\"Now={}&Pid={}&Thr={:?}\"]
 Info = {}
 
 ",
-                Utc::today(),
+                Local::now().format("%Y-%m-%dT%H:%M:%S%z"),
+                process::id(),
+                // Rust でスレッドID 取れね☆（＾～＾）
+                thread::current().id(),
                 // TODO 末尾以外で改行コードがまだあるかどうか☆（＾～＾）これが判定できない☆（＾～＾）？
                 if 1 < s.lines().count() {
                     // 複数行で出力しようぜ☆（＾～＾）？
