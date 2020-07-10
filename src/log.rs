@@ -1,4 +1,4 @@
-use chrono::{Local, Utc};
+use chrono::{Date, Local, Utc};
 use std::cell::RefCell;
 use std::fs::File;
 use std::fs::OpenOptions;
@@ -40,18 +40,48 @@ pub const LOG_ENABLE: bool = true;
 // https://users.rust-lang.org/t/how-can-i-use-mutable-lazy-static/3751/3
 lazy_static! {
     /// ログ・ファイルのミューテックス（排他制御）
-    pub static ref LOGFILE: Mutex<File> = {
+    pub static ref LOGFILE: Mutex<LogFile> = {
+        Mutex::new(LogFile::new())
+    };
+}
+pub struct LogFile {
+    date_file_opened: Date<Utc>,
+    file: File,
+}
+impl LogFile {
+    pub fn new() -> Self {
         // ファイル名を作るぜ☆（＾～＾）
-        // TODO でも、これだと日付を跨いでも ファイル名が切り替わらないよな☆（＾～＾）？
-        let name = format!("{}-{}.log.toml",LOG_FILE_STEM,Utc::today().format("%Y-%m-%d").to_string());
+        let date_file_opened = Utc::today();
         // File::createの返り値は`io::Result<File>` なので .unwrap() で中身を取り出す
         // 毎回新規作成するので、空っぽから始まります。
         let file = OpenOptions::new()
             .append(true)
-            .open(Path::new(&name))
+            .open(Path::new(&format!(
+                "{}-{}.log.toml",
+                LOG_FILE_STEM,
+                date_file_opened.format("%Y-%m-%d")
+            )))
             .unwrap();
-        Mutex::new(file)
-    };
+
+        LogFile {
+            date_file_opened: date_file_opened,
+            file: file,
+        }
+    }
+    /// 日付を跨いだら新しいファイルに乗り換える仕組みだけど、テストできてない☆（＾～＾）知らね☆（＾～＾）
+    fn current_file(&mut self) -> &File {
+        if self.date_file_opened < Utc::today() {
+            // 日付が変わってたら☆（＾～＾）
+
+            // TODO 古いログ・ファイルを削除しようぜ☆（＾～＾）？
+
+            // 新しいファイルに乗り換えようぜ☆（＾～＾）
+            let new_file = LogFile::new();
+            self.date_file_opened = new_file.date_file_opened;
+            self.file = new_file.file;
+        }
+        &self.file
+    }
 }
 
 // スレッド・ローカル
@@ -183,7 +213,12 @@ impl Log {
                 );
                 *seq.borrow_mut() += 1;
                 // write_allメソッドを使うには use std::io::Write; が必要
-                if let Err(_why) = LOGFILE.lock().unwrap().write_all(toml.as_bytes()) {
+                if let Err(_why) = LOGFILE
+                    .lock()
+                    .unwrap()
+                    .current_file()
+                    .write_all(toml.as_bytes())
+                {
                     // 大会向けに、ログ書き込み失敗は出力しないことにする
                     // panic!("(Err.148) couldn't write log. : {}",Error::description(&why)),
                 }
