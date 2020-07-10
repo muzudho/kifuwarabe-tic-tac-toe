@@ -1,4 +1,4 @@
-use chrono::{Date, Duration, Local, TimeZone, Utc};
+use chrono::{Date, Duration, Local, TimeZone};
 use regex::Regex;
 use std::cell::RefCell;
 use std::fs;
@@ -22,7 +22,6 @@ const NEW_LINE: &'static str = "\n";
 const NEW_LINE_SEQUENCE: &'static str = "\\n";
 
 /// ログ
-pub const LOG_FILE_STEM: &str = "tic-tac-toe";
 pub const LOG_ENABLE: bool = true;
 
 // グローバル定数
@@ -58,15 +57,24 @@ thread_local!(pub static SEQ: RefCell<u128> = {
 });
 
 pub struct Logger {
+    file_prefix: String,
+    file_suffix: String,
+    file_extention: String,
     pub retention_days: i64,
     // 現在使用対象のログファイルの年月日だぜ☆（＾～＾）
-    start_date: Date<Utc>,
+    start_date: Date<Local>,
     file: File,
 }
 impl Default for Logger {
     fn default() -> Self {
-        let (start_date, file) = Logger::new_today_file();
+        let prefix = "default";
+        let suffix = ".log";
+        let extention = ".toml";
+        let (start_date, file) = Logger::new_today_file(prefix, suffix, extention);
         Logger {
+            file_prefix: prefix.to_string(),
+            file_suffix: suffix.to_string(),
+            file_extention: extention.to_string(),
             retention_days: 7,
             start_date: start_date,
             file: file,
@@ -74,15 +82,39 @@ impl Default for Logger {
     }
 }
 impl Logger {
-    pub fn new_today_file() -> (Date<Utc>, File) {
-        // ファイル名を作るぜ☆（＾～＾）
-        let start_date = Utc::today();
+    #[allow(dead_code)]
+    pub fn get_file_prefix(&self) -> &str {
+        &self.file_prefix
+    }
+    #[allow(dead_code)]
+    pub fn get_file_suffix(&self) -> &str {
+        &self.file_suffix
+    }
+    #[allow(dead_code)]
+    pub fn get_file_extention(&self) -> &str {
+        &self.file_extention
+    }
+    pub fn set_file_name(&mut self, prefix: &str, suffix: &str, extention: &str) {
+        let (start_date, file) = Logger::new_today_file(prefix, suffix, extention);
+        self.start_date = start_date;
+        self.file = file;
+    }
+    fn new_today_file(
+        file_prefix: &str,
+        file_suffix: &str,
+        file_extention: &str,
+    ) -> (Date<Local>, File) {
+        // 'default-2020-07-11.log.toml' みたいな感じのファイル名を作るぜ☆（＾～＾）
+        let start_date = Local::today();
         let file = OpenOptions::new()
+            .create(true)
             .append(true)
             .open(Path::new(&format!(
-                "{}-{}.log.toml",
-                LOG_FILE_STEM,
-                start_date.format("%Y-%m-%d")
+                "{}-{}{}{}",
+                file_prefix,
+                start_date.format("%Y-%m-%d"),
+                file_suffix,
+                file_extention
             )))
             .unwrap();
         (start_date, file)
@@ -92,7 +124,10 @@ impl Logger {
     pub fn remove_old_logs(&self) -> usize {
         // 削除したファイル数だぜ☆（＾～＾）
         let mut count = 0;
-        let re = if let Ok(x) = Regex::new(r"./tic-tac-toe-(\d{4})-(\d{2})-(\d{2}).log.toml") {
+        let re = if let Ok(x) = Regex::new(&format!(
+            "./{}-{}{}{}",
+            self.file_prefix, r"(\d{4})-(\d{2})-(\d{2})", self.file_suffix, self.file_extention
+        )) {
             x
         } else {
             return 0;
@@ -160,7 +195,7 @@ impl Logger {
 
     /// 日付を跨いだら新しいファイルに乗り換える仕組みだけど、テストできてない☆（＾～＾）知らね☆（＾～＾）
     fn current_file(&mut self) -> &File {
-        if self.start_date < Utc::today() {
+        if self.start_date < Local::today() {
             // 日付が変わってたら☆（＾～＾）
 
             // 古いログ・ファイルを削除しようぜ☆（＾～＾）？
@@ -169,7 +204,8 @@ impl Logger {
                 // 削除したファイルとか、ロガーで書き込みとかしたいが、無限ループしても嫌だしな☆（＾～＾）
             }
             // 新しいファイルに乗り換えようぜ☆（＾～＾）
-            let (start_date, file) = Logger::new_today_file();
+            let (start_date, file) =
+                Logger::new_today_file(&self.file_prefix, &self.file_suffix, &self.file_extention);
             self.start_date = start_date;
             self.file = file;
         }

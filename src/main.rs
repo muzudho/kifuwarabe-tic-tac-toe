@@ -23,9 +23,9 @@ use std::{thread, time};
 use test::test_win_lose_judgement;
 
 fn main() {
-    // TODO テスト中☆（＾～＾） 古いログ・ファイルを削除しようぜ☆（＾～＾）？
-    // 古いログ・ファイルを削除しようぜ☆（＾～＾）？
-    if let Ok(logger) = LOGGER.lock() {
+    // 使うログ・ファイルの名前を設定しようぜ☆（＾～＾）？
+    if let Ok(mut logger) = LOGGER.lock() {
+        logger.set_file_name("tic-tac-toe", ".log", ".toml");
         logger.remove_old_logs();
     }
 
