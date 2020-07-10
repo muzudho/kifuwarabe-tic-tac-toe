@@ -1,4 +1,5 @@
 use chrono::{Local, Utc};
+use std::cell::RefCell;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
@@ -47,14 +48,17 @@ lazy_static! {
     };
 }
 
-pub struct Log {
-    seq: u128,
-}
-impl Default for Log {
-    fn default() -> Self {
-        Log { seq: 1 }
-    }
-}
+// スレッド・ローカル
+//
+// * 参考
+//      * [ミュータブルなスレッドローカルデータを thread_local!() マクロと RefCell で実現する](https://qiita.com/tatsuya6502/items/bed3702517b36afbdbca)
+//
+// ログの連番だぜ☆（＾～＾）
+thread_local!(pub static SEQ: RefCell<u128> = {
+    RefCell::new(1)
+});
+
+pub struct Log {}
 impl Log {
     /// コンソール表示とともに、ファイルへ書き込みます。末尾に改行は付けません。
     #[allow(dead_code)]
@@ -101,35 +105,42 @@ impl Log {
             );
             // 複数行か、単一行かを区別するぜ☆（＾～＾）
             // TOMLの書式を真似る。
-            let toml = format!(
-                "[\"Now={}&Pid={}&Thr={:?}\"]
+            SEQ.with(move |seq| {
+                let toml = format!(
+                    "[\"Now={}&Pid={}&Thr={:?}&Seq={}\"]
 Info = {}
 
 ",
-                Local::now().format("%Y-%m-%dT%H:%M:%S%z"),
-                process::id(),
-                // Rust でスレッドID 取れね☆（＾～＾）
-                thread::current().id(),
-                // TODO 末尾以外で改行コードがまだあるかどうか☆（＾～＾）これが判定できない☆（＾～＾）？
-                if 1 < s.lines().count() {
-                    // 複数行で出力しようぜ☆（＾～＾）？
-                    format!(
-                        "\"\"\"
+                    // ISO8601 なら "%Y-%m-%dT%H:%M:%S%z" なんだが、「UTCは止めてくれ！」と言うビューとモデルを切り分けられない人はいるので
+                    // 書式は あなたの置かれている状況に合わせて自由とするぜ☆（＾～＾）
+                    Local::now().format("%Y-%m-%d %H:%M:%S"),
+                    // Rustは 「ThreadId(1)」という分けわかんない文字列を返してくるんで、何が返ってくるか分かんないでそのままにしとこうぜ☆（＾～＾）？
+                    process::id(),
+                    // Rust でスレッドID 取れね☆（＾～＾）
+                    thread::current().id(),
+                    seq.borrow(),
+                    // TODO 末尾以外で改行コードがまだあるかどうか☆（＾～＾）これが判定できない☆（＾～＾）？
+                    if 1 < s.lines().count() {
+                        // 複数行で出力しようぜ☆（＾～＾）？
+                        format!(
+                            "\"\"\"
 {}
 \"\"\"",
-                        body
-                    )
-                    .to_string()
-                } else {
-                    // 単一行で出力できるぜ☆（＾～＾）
-                    format!("\"{}\"", body).to_string()
+                            body
+                        )
+                        .to_string()
+                    } else {
+                        // 単一行で出力できるぜ☆（＾～＾）
+                        format!("\"{}\"", body).to_string()
+                    }
+                );
+                *seq.borrow_mut() += 1;
+                // write_allメソッドを使うには use std::io::Write; が必要
+                if let Err(_why) = LOGFILE.lock().unwrap().write_all(toml.as_bytes()) {
+                    // 大会向けに、ログ書き込み失敗は出力しないことにする
+                    // panic!("(Err.148) couldn't write log. : {}",Error::description(&why)),
                 }
-            );
-            // write_allメソッドを使うには use std::io::Write; が必要
-            if let Err(_why) = LOGFILE.lock().unwrap().write_all(toml.as_bytes()) {
-                // 大会向けに、ログ書き込み失敗は出力しないことにする
-                // panic!("(Err.148) couldn't write log. : {}",Error::description(&why)),
-            }
+            });
         }
     }
     /// ファイルに書き込みます。末尾に改行を付けます。
