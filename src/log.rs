@@ -56,28 +56,38 @@ thread_local!(pub static SEQ: RefCell<u128> = {
     RefCell::new(1)
 });
 
+pub struct LogFile {
+    // 現在使用対象のログファイルの年月日だぜ☆（＾～＾）
+    pub start_date: Date<Local>,
+    pub file: File,
+}
+impl LogFile {
+    pub fn new(start_date: Date<Local>, file: File) -> Self {
+        LogFile {
+            start_date: start_date,
+            file: file,
+        }
+    }
+}
+
 pub struct Logger {
     file_prefix: String,
     file_suffix: String,
     file_extention: String,
     pub retention_days: i64,
-    // 現在使用対象のログファイルの年月日だぜ☆（＾～＾）
-    start_date: Date<Local>,
-    file: File,
+    log_file: Option<LogFile>,
 }
 impl Default for Logger {
     fn default() -> Self {
         let prefix = "default";
         let suffix = ".log";
         let extention = ".toml";
-        let (start_date, file) = Logger::new_today_file(prefix, suffix, extention);
         Logger {
             file_prefix: prefix.to_string(),
             file_suffix: suffix.to_string(),
             file_extention: extention.to_string(),
             retention_days: 7,
-            start_date: start_date,
-            file: file,
+            log_file: None,
         }
     }
 }
@@ -95,9 +105,9 @@ impl Logger {
         &self.file_extention
     }
     pub fn set_file_name(&mut self, prefix: &str, suffix: &str, extention: &str) {
-        let (start_date, file) = Logger::new_today_file(prefix, suffix, extention);
-        self.start_date = start_date;
-        self.file = file;
+        self.file_prefix = prefix.to_string();
+        self.file_suffix = suffix.to_string();
+        self.file_extention = extention.to_string();
     }
     fn new_today_file(
         file_prefix: &str,
@@ -195,21 +205,25 @@ impl Logger {
 
     /// 日付を跨いだら新しいファイルに乗り換える仕組みだけど、テストできてない☆（＾～＾）知らね☆（＾～＾）
     fn current_file(&mut self) -> &File {
-        if self.start_date < Local::today() {
-            // 日付が変わってたら☆（＾～＾）
+        // 日付が変わってたら☆（＾～＾）
+        let date_changed = if let Some(log_file) = &self.log_file {
+            log_file.start_date < Local::today()
+        } else {
+            false
+        };
+        // 新しいファイルに乗り換えようぜ☆（＾～＾）
+        if date_changed {
+            self.log_file = None;
+        }
 
-            // 古いログ・ファイルを削除しようぜ☆（＾～＾）？
-            if let Ok(logger) = LOGGER.lock() {
-                logger.remove_old_logs();
-                // 削除したファイルとか、ロガーで書き込みとかしたいが、無限ループしても嫌だしな☆（＾～＾）
-            }
-            // 新しいファイルに乗り換えようぜ☆（＾～＾）
+        // 未設定なら新規作成☆（＾～＾）
+        if let None = self.log_file {
             let (start_date, file) =
                 Logger::new_today_file(&self.file_prefix, &self.file_suffix, &self.file_extention);
-            self.start_date = start_date;
-            self.file = file;
+            self.log_file = Some(LogFile::new(start_date, file));
         }
-        &self.file
+
+        &self.log_file.as_ref().unwrap().file
     }
 }
 

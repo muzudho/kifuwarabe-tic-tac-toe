@@ -23,11 +23,16 @@ use std::{thread, time};
 use test::test_win_lose_judgement;
 
 fn main() {
-    // 使うログ・ファイルの名前を設定しようぜ☆（＾～＾）？
-    if let Ok(mut logger) = LOGGER.lock() {
+    let remove_file_count = if let Ok(mut logger) = LOGGER.lock() {
+        // この中で Log::xxxxx() は呼び出すなだぜ☆（＾～＾）！無限ループする☆（＾～＾）！
+        // 使うログ・ファイルの名前を設定しようぜ☆（＾～＾）？
         logger.set_file_name("tic-tac-toe", ".log", ".toml");
-        logger.remove_old_logs();
-    }
+        // 古いログ・ファイルを削除しようぜ☆（＾～＾）？ 自動では削除しないから、１日１回、お前が実行しろだぜ☆ｍ９（＾～＾）
+        logger.remove_old_logs()
+    } else {
+        0
+    };
+    Log::traceln(&format!("Remove file count={}", remove_file_count));
 
     // しょっぱなにプログラムが壊れてないかテストしているぜ☆（＾～＾）
     // こんなとこに書かない方がいいが、テストを毎回するのが めんどくさいんで 実行するたびにテストさせているぜ☆（＾～＾）
