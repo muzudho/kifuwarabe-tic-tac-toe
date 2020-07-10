@@ -1,8 +1,11 @@
-use chrono::{Date, Local, Utc};
+use chrono::{Date, Duration, Local, TimeZone, Utc};
+use regex::Regex;
 use std::cell::RefCell;
+use std::fs;
 use std::fs::File;
 use std::fs::OpenOptions;
 use std::io::Write;
+use std::ops::Add;
 use std::path::Path;
 use std::process;
 use std::sync::Mutex;
@@ -44,6 +47,20 @@ lazy_static! {
         Mutex::new(LogFile::new())
     };
 }
+// スレッド・ローカル
+//
+// * 参考
+//      * [ミュータブルなスレッドローカルデータを thread_local!() マクロと RefCell で実現する](https://qiita.com/tatsuya6502/items/bed3702517b36afbdbca)
+//
+// ログ・ディレクトリーの設定だぜ☆（＾～＾）
+thread_local!(pub static LOG_DIRECTORY: RefCell<LogDirectory> = {
+    RefCell::new(LogDirectory::default())
+});
+// ログの連番だぜ☆（＾～＾）
+thread_local!(pub static SEQ: RefCell<u128> = {
+    RefCell::new(1)
+});
+
 pub struct LogFile {
     date_file_opened: Date<Utc>,
     file: File,
@@ -73,7 +90,10 @@ impl LogFile {
         if self.date_file_opened < Utc::today() {
             // 日付が変わってたら☆（＾～＾）
 
-            // TODO 古いログ・ファイルを削除しようぜ☆（＾～＾）？
+            // 古いログ・ファイルを削除しようぜ☆（＾～＾）？
+            LOG_DIRECTORY.with(|log_directory| {
+                log_directory.borrow().remove_old_logs();
+            });
 
             // 新しいファイルに乗り換えようぜ☆（＾～＾）
             let new_file = LogFile::new();
@@ -83,16 +103,76 @@ impl LogFile {
         &self.file
     }
 }
+pub struct LogDirectory {
+    pub retention_days: i64,
+}
+impl Default for LogDirectory {
+    fn default() -> Self {
+        LogDirectory { retention_days: 7 }
+    }
+}
+impl LogDirectory {
+    /// TODO 古いログを削除しようぜ☆（＾～＾）？
+    /// なんだこのクソむずかしい日付処理は☆（＾～＾）！？
+    pub fn remove_old_logs(&self) {
+        let re = if let Ok(x) = Regex::new(r"./tic-tac-toe-(\d{4})-(\d{2})-(\d{2}).log.toml") {
+            x
+        } else {
+            return;
+        };
+        let paths = if let Ok(x) = fs::read_dir("./") {
+            x
+        } else {
+            return;
+        };
+        for path in paths {
+            let name = if let Ok(x) = path {
+                x.path().display().to_string()
+            } else {
+                continue;
+            };
+            println!("Name: {}", name);
+            if let Some(caps) = re.captures(&name) {
+                println!("CapsLen: {}", caps.len());
+                let year: i32 = if let Some(cap) = caps.get(1) {
+                    if let Ok(n) = cap.as_str().parse() {
+                        n
+                    } else {
+                        0
+                    }
+                } else {
+                    0
+                };
+                let month: u32 = if let Some(cap) = caps.get(2) {
+                    if let Ok(n) = cap.as_str().parse() {
+                        n
+                    } else {
+                        0
+                    }
+                } else {
+                    0
+                };
+                let day: u32 = if let Some(cap) = caps.get(3) {
+                    if let Ok(n) = cap.as_str().parse() {
+                        n
+                    } else {
+                        0
+                    }
+                } else {
+                    0
+                };
+                println!("Ymd=|{}|{}|{}|", year, month, day);
+                if month != 0 && day != 0 {
+                    let file_date = Local.ymd(year, month, day);
 
-// スレッド・ローカル
-//
-// * 参考
-//      * [ミュータブルなスレッドローカルデータを thread_local!() マクロと RefCell で実現する](https://qiita.com/tatsuya6502/items/bed3702517b36afbdbca)
-//
-// ログの連番だぜ☆（＾～＾）
-thread_local!(pub static SEQ: RefCell<u128> = {
-    RefCell::new(1)
-});
+                    if file_date.add(Duration::days(self.retention_days)) < Local::today() {
+                        println!("TODO Delete: {}", name);
+                    }
+                }
+            }
+        }
+    }
+}
 
 pub struct Log {}
 impl Log {
