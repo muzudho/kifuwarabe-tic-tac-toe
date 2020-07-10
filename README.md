@@ -58,7 +58,7 @@ During development, you may need to reproduce the behavior of your computer.
 It is difficult to compare the behavior. Instead, it is useful to get the logs and compare the logs.  
 **But logger's difficult to make, so copy and paste it.**  
 
-* [x] Step 1. 'log.rs' (You can code in 15 minutes)
+* [x] Step 1. 'log.rs' (You can **COPY & PASTE** in 5 minutes)
   * [x] Write - Write to a file.
   * [x] Clear - Log to empty.
   * [x] Info - Write and display.
