@@ -3,6 +3,7 @@
 #[macro_use]
 extern crate lazy_static;
 extern crate chrono;
+extern crate regex;
 
 mod command_line_parser;
 mod computer_player;
@@ -17,10 +18,27 @@ mod win_lose_judgment;
 use command_line_parser::CommandLineParser;
 use log::Log;
 use look_and_model::{GameResult, Piece, Position, Search};
+use regex::Regex;
 use std;
+use std::fs;
 use std::{thread, time};
 use test::test_win_lose_judgement;
+
 fn main() {
+    let re = Regex::new(r"./tic-tac-toe-(\d{4}-\d{2}-\d{2}).log.toml").unwrap();
+    let paths = fs::read_dir("./").unwrap();
+
+    for path in paths {
+        let name = path.unwrap().path().display().to_string();
+        println!("Name: {}", name);
+        if let Some(caps) = re.captures(&name) {
+            println!("CapsLen: {}", caps.len());
+            if let Some(cap) = caps.get(1) {
+                println!("Cap1: {}", cap.as_str());
+            }
+        }
+    }
+
     // しょっぱなにプログラムが壊れてないかテストしているぜ☆（＾～＾）
     // こんなとこに書かない方がいいが、テストを毎回するのが めんどくさいんで 実行するたびにテストさせているぜ☆（＾～＾）
     // Step 1.
