@@ -62,30 +62,72 @@ pub struct Log {}
 impl Log {
     /// コンソール表示とともに、ファイルへ書き込みます。末尾に改行は付けません。
     #[allow(dead_code)]
-    pub fn print(s: &str) {
+    pub fn info(s: &str) {
         print!("{}", s);
-        Log::write(s)
+        Log::write(s, "Info")
     }
 
     /// コンソール表示とともに、ファイルへ書き込みます。末尾に改行は付けます。
     #[allow(dead_code)]
-    pub fn println(s: &str) {
+    pub fn infoln(s: &str) {
         println!("{}", s);
-        Log::writeln(s);
+        Log::writeln(s, "Info");
+    }
+
+    /// コンソール表示せず、ファイルへ書き込みます。末尾に改行は付けません。
+    #[allow(dead_code)]
+    pub fn trace(s: &str) {
+        Log::write(s, "Trace")
+    }
+
+    /// コンソール表示せず、ファイルへ書き込みます。末尾に改行は付けます。
+    #[allow(dead_code)]
+    pub fn traceln(s: &str) {
+        Log::writeln(s, "Trace");
+    }
+
+    /// 無視してよい異常。
+    #[allow(dead_code)]
+    pub fn warn(s: &str) {
+        Log::write(s, "Warn")
+    }
+
+    /// 無視してよい異常。
+    #[allow(dead_code)]
+    pub fn warnln(s: &str) {
+        Log::writeln(s, "Warn");
+    }
+
+    /// 記録するべき誤り。
+    #[allow(dead_code)]
+    pub fn error(s: &str) {
+        Log::write(s, "Error")
+    }
+
+    /// 記録するべき誤り。
+    #[allow(dead_code)]
+    pub fn errorln(s: &str) {
+        Log::writeln(s, "Error");
     }
 
     /// panic! の第一引数に渡せだぜ☆（＾～＾） 強制終了する前に、ヤケクソで読み筋欄に表示できないかトライするぜ☆（＾～＾）
     #[allow(dead_code)]
     pub fn panic(s: &str) -> String {
-        let s2 = format!("info string panic! {}", s).to_string();
-        Log::writeln(&s2);
-        println!("{}", s2);
-        s2
+        let t = format!("info string panic! {}", s).to_string();
+        Log::writeln(&t, "Fatal");
+        println!("{}", t);
+        t
     }
 
+    /// ファイルに書き込みます。末尾に改行を付けます。
+    #[allow(dead_code)]
+    fn writeln(s: &str, level: &str) {
+        let s = &format!("{}{}", s, NEW_LINE);
+        Log::write(s, level);
+    }
     /// ファイルに書き込みます。末尾に改行は付けません。
     #[allow(dead_code)]
-    pub fn write(s: &str) {
+    fn write(s: &str, level: &str) {
         if LOG_ENABLE {
             // 末尾の 改行コード は、エスケープするぜ☆（＾～＾）
             let mut body = if s[s.len() - NEW_LINE.len()..] == *NEW_LINE {
@@ -103,23 +145,22 @@ impl Log {
                 body.len(),
                 s.lines().count()
             );
-            // 複数行か、単一行かを区別するぜ☆（＾～＾）
-            // TOMLの書式を真似る。
             SEQ.with(move |seq| {
+                // TOMLの書式を真似る。
                 let toml = format!(
                     "[\"Now={}&Pid={}&Thr={:?}&Seq={}\"]
-Info = {}
+{} = {}
 
 ",
                     // ISO8601 なら "%Y-%m-%dT%H:%M:%S%z" なんだが、「UTCは止めてくれ！」と言うビューとモデルを切り分けられない人はいるので
                     // 書式は あなたの置かれている状況に合わせて自由とするぜ☆（＾～＾）
                     Local::now().format("%Y-%m-%d %H:%M:%S"),
-                    // Rustは 「ThreadId(1)」という分けわかんない文字列を返してくるんで、何が返ってくるか分かんないでそのままにしとこうぜ☆（＾～＾）？
                     process::id(),
-                    // Rust でスレッドID 取れね☆（＾～＾）
+                    // Rustは 「ThreadId(1)」という分けわかんない文字列を返してくるんで、何が返ってくるか分かんないでそのままにしとこうぜ☆（＾～＾）？
                     thread::current().id(),
                     seq.borrow(),
-                    // TODO 末尾以外で改行コードがまだあるかどうか☆（＾～＾）これが判定できない☆（＾～＾）？
+                    level,
+                    // 複数行か、単一行かを区別するぜ☆（＾～＾）
                     if 1 < s.lines().count() {
                         // 複数行で出力しようぜ☆（＾～＾）？
                         format!(
@@ -142,10 +183,5 @@ Info = {}
                 }
             });
         }
-    }
-    /// ファイルに書き込みます。末尾に改行を付けます。
-    #[allow(dead_code)]
-    pub fn writeln(s: &str) {
-        Log::write(&format!("{}{}", s, NEW_LINE));
     }
 }

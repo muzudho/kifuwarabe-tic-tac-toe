@@ -122,7 +122,7 @@ impl Position {
                         machine_state = MachineState::Phase;
                     }
                     _ => {
-                        Log::println(&format!("Error   | xfen starting_board error: {}", ch));
+                        Log::errorln(&format!("xfen starting_board error: {}", ch));
                         return None;
                     }
                 },
@@ -135,7 +135,7 @@ impl Position {
                             pos.friend = Piece::Nought;
                         }
                         _ => {
-                            Log::println(&format!("Error   | xfen phase error: {}", ch));
+                            Log::errorln(&format!("xfen phase error: {}", ch));
                             return None;
                         }
                     }
@@ -171,8 +171,8 @@ impl Position {
         let addr: usize = match arg_str.parse() {
             Ok(x) => x,
             Err(_x) => {
-                Log::println(&format!(
-                    "Error   | `do 数字` で入力してくれだぜ☆（＾～＾） 引数=|{}|",
+                Log::errorln(&format!(
+                    "`do 数字` で入力してくれだぜ☆（＾～＾） 引数=|{}|",
                     arg_str
                 ));
                 return;
@@ -182,14 +182,11 @@ impl Position {
         // 合法手判定☆（＾～＾）
         // 移動先のマスに駒があってはダメ☆（＾～＾）
         if addr < 1 || 9 < addr {
-            Log::println(&format!(
-                "Error   | 1～9 で指定してくれだぜ☆（＾～＾） 番地={}",
-                addr
-            ));
+            Log::errorln(&format!("1～9 で指定してくれだぜ☆（＾～＾） 番地={}", addr));
             return;
         } else if let Some(_piece_val) = self.board[addr as usize] {
-            Log::println(&format!(
-                "Error   | 移動先のマスに駒があってはダメだぜ☆（＾～＾） 番地={}",
+            Log::errorln(&format!(
+                "移動先のマスに駒があってはダメだぜ☆（＾～＾） 番地={}",
                 addr
             ));
             return;
@@ -201,11 +198,11 @@ impl Position {
         // これは PositionHelper, WinLoseJudgment を作ってから実装しろだぜ☆（＾～＾）
         if self.is_opponent_win() {
             if let Some(result) = Position::result(GameResult::Win, Some(self.opponent())) {
-                Log::println(&result);
+                Log::infoln(&result);
             }
         } else if self.is_draw() {
             if let Some(result) = Position::result(GameResult::Draw, None) {
-                Log::println(&result);
+                Log::infoln(&result);
             }
         }
     }
