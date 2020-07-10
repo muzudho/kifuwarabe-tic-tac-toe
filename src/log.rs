@@ -1,6 +1,7 @@
 use chrono::{Local, Utc};
 use std::cell::RefCell;
 use std::fs::File;
+use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
 use std::process;
@@ -41,10 +42,15 @@ lazy_static! {
     /// ログ・ファイルのミューテックス（排他制御）
     pub static ref LOGFILE: Mutex<File> = {
         // ファイル名を作るぜ☆（＾～＾）
+        // TODO でも、これだと日付を跨いでも ファイル名が切り替わらないよな☆（＾～＾）？
         let name = format!("{}-{}.log.toml",LOG_FILE_STEM,Utc::today().format("%Y-%m-%d").to_string());
         // File::createの返り値は`io::Result<File>` なので .unwrap() で中身を取り出す
         // 毎回新規作成するので、空っぽから始まります。
-        Mutex::new(File::create(Path::new(&name)).unwrap())
+        let file = OpenOptions::new()
+            .append(true)
+            .open(Path::new(&name))
+            .unwrap();
+        Mutex::new(file)
     };
 }
 
