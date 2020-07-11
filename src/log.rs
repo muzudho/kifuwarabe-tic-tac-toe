@@ -21,7 +21,9 @@ const NEW_LINE: &'static str = "\n";
 #[cfg(not(windows))]
 const NEW_LINE_SEQUENCE: &'static str = "\\n";
 
-/// ログ・レベル
+/// Log detail level.
+/// The files are listed below in order from smallest to largest:
+/// Fatal < Error < Warn < Notice < Info < Debug < Trace
 pub enum LogLevel {
     /// Not included in the distribution.
     /// Remove this level from the source after using it for debugging.
@@ -52,11 +54,7 @@ pub enum LogLevel {
 }
 pub const LOG_ENABLE: bool = true;
 
-// グローバル定数
-//
-// 使い方（lazy_static!マクロ）
-// ============================
-// 定数の値を実行時に決めることができる。
+// グローバル変数
 //
 // Cargo.toml に１行追記
 // > [dependencies]
@@ -74,124 +72,151 @@ lazy_static! {
         Mutex::new(Logger::default())
     };
 }
-// スレッド・ローカル
+// Thread local scope variable.
 //
-// * 参考
+// * References
 //      * [ミュータブルなスレッドローカルデータを thread_local!() マクロと RefCell で実現する](https://qiita.com/tatsuya6502/items/bed3702517b36afbdbca)
 //
-// ログの連番だぜ☆（＾～＾）
+// Use the line number in the log.
 thread_local!(pub static SEQ: RefCell<u128> = {
     RefCell::new(1)
 });
 
+// Easy to use logging.
 pub struct Log {}
 impl Log {
-    /// コンソール表示とともに、ファイルへ書き込みます。末尾に改行は付けません。
-    #[allow(dead_code)]
-    pub fn info(s: &str) {
-        print!("{}", s);
-        Log::write(s, "Info")
-    }
-
-    /// コンソール表示とともに、ファイルへ書き込みます。末尾に改行は付けます。
-    #[allow(dead_code)]
-    pub fn infoln(s: &str) {
-        println!("{}", s);
-        Log::writeln(s, "Info");
-    }
-
-    /// コンソール表示せず、ファイルへ書き込みます。末尾に改行は付けません。
+    /// Trace level. No trailing newline.
     #[allow(dead_code)]
     pub fn trace(s: &str) {
         Log::write(s, "Trace")
     }
 
-    /// コンソール表示せず、ファイルへ書き込みます。末尾に改行は付けます。
+    /// Trace level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn traceln(s: &str) {
         Log::writeln(s, "Trace");
     }
 
-    /// 無視してよい異常。
+    /// Debug level. No trailing newline.
+    #[allow(dead_code)]
+    pub fn debug(s: &str) {
+        Log::write(s, "Debug")
+    }
+
+    /// Debug level. There is a trailing newline.
+    #[allow(dead_code)]
+    pub fn debugln(s: &str) {
+        Log::writeln(s, "Debug");
+    }
+
+    /// Info level. No trailing newline.
+    #[allow(dead_code)]
+    pub fn info(s: &str) {
+        Log::write(s, "Info")
+    }
+
+    /// Info level. There is a trailing newline.
+    #[allow(dead_code)]
+    pub fn infoln(s: &str) {
+        Log::writeln(s, "Info");
+    }
+
+    /// Notice level. No trailing newline.
+    #[allow(dead_code)]
+    pub fn notice(s: &str) {
+        Log::write(s, "Notice")
+    }
+
+    /// Notice level. There is a trailing newline.
+    #[allow(dead_code)]
+    pub fn noticeln(s: &str) {
+        Log::writeln(s, "Notice");
+    }
+
+    /// Warning level. No trailing newline.
     #[allow(dead_code)]
     pub fn warn(s: &str) {
         Log::write(s, "Warn")
     }
 
-    /// 無視してよい異常。
+    /// Warning level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn warnln(s: &str) {
         Log::writeln(s, "Warn");
     }
 
-    /// 記録するべき誤り。
+    /// Error level. No trailing newline.
     #[allow(dead_code)]
     pub fn error(s: &str) {
         Log::write(s, "Error")
     }
 
-    /// 記録するべき誤り。
+    /// Error level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn errorln(s: &str) {
         Log::writeln(s, "Error");
     }
 
-    /// panic! の第一引数に渡せだぜ☆（＾～＾） 強制終了する前に、ヤケクソで読み筋欄に表示できないかトライするぜ☆（＾～＾）
+    /// Fatal level. No trailing newline.
+    /// 'panic!' Pass this as the first argument.
     #[allow(dead_code)]
-    pub fn panic(s: &str) -> String {
-        // コンピューター将棋の USIプロトコル で 'info string' というのがあって真似ている☆（＾～＾）嫌なら変えろだぜ☆（＾～＾）
-        let t = format!("info string panic! {}", s).to_string();
-        Log::writeln(&t, "Fatal");
-        println!("{}", t);
+    pub fn fatal(s: &str) -> String {
+        let t = format!("{}", s).to_string();
+        Log::write(&t, "Fatal");
+        t
+    }
+    /// Fatal level. There is a trailing newline.
+    /// 'panic!' Pass this as the first argument.
+    #[allow(dead_code)]
+    pub fn fatalln(s: &str) -> String {
+        let t = format!("{}{}", s, NEW_LINE).to_string();
+        Log::write(&t, "Fatal");
         t
     }
 
-    /// ファイルに書き込みます。末尾に改行を付けます。
+    /// Write to a log file. There is a trailing newline.
     #[allow(dead_code)]
     fn writeln(s: &str, level: &str) {
         let s = &format!("{}{}", s, NEW_LINE);
         Log::write(s, level);
     }
-    /// ファイルに書き込みます。末尾に改行は付けません。
+    /// Write to a log file. No trailing newline.
     #[allow(dead_code)]
     fn write(s: &str, level: &str) {
         if LOG_ENABLE {
-            // 末尾の 改行コード は、エスケープするぜ☆（＾～＾）
+            // Escape the trailing newline at last.
             let mut body = if s[s.len() - NEW_LINE.len()..] == *NEW_LINE {
-                // 末尾に 改行コード が有った☆（＾～＾）
+                // Do.
                 format!("{}{}", s.trim_end(), NEW_LINE_SEQUENCE)
             } else {
-                // 末尾に 改行コード が無かった☆（＾～＾）
+                // Don't.
                 s.to_string()
             };
-            // ダブル・クォーテーションはエスケープするぜ☆（＾～＾）
+            // Escape the double quotation.
             body = body.replace("\"", "\\\"");
-            /*
-            println!(
-                "Body    =|{}| Len=|{}| LinesCount=|{}|",
-                body,
-                body.len(),
-                s.lines().count()
-            );
-            */
             SEQ.with(move |seq| {
-                // TOMLの書式を真似る。
+                // Write as TOML.
                 let toml = format!(
+                    // Table name to keep for ordering.
+                    // For example, you can parse it easily by writing the table name like a GET query.
                     "[\"Now={}&Pid={}&Thr={:?}&Seq={}\"]
 {} = {}
 
 ",
-                    // ISO8601 なら "%Y-%m-%dT%H:%M:%S%z" なんだが、「UTCは止めてくれ！」と言うビューとモデルを切り分けられない人はいるので
-                    // 書式は あなたの置かれている状況に合わせて自由とするぜ☆（＾～＾）
+                    // If you use ISO8601, It's "%Y-%m-%dT%H:%M:%S%z". However, it does not set the date format.
+                    // Make it easier to read.
                     Local::now().format("%Y-%m-%d %H:%M:%S"),
+                    // Process ID.
                     process::id(),
-                    // Rustは 「ThreadId(1)」という分けわかんない文字列を返してくるんで、何が返ってくるか分かんないでそのままにしとこうぜ☆（＾～＾）？
+                    // Thread ID. However, Note that you are not limited to numbers.
                     thread::current().id(),
+                    // Line number. This is to avoid duplication.
                     seq.borrow(),
+                    // Log detail level.
                     level,
-                    // 複数行か、単一行かを区別するぜ☆（＾～＾）
+                    // Message.
                     if 1 < s.lines().count() {
-                        // 複数行で出力しようぜ☆（＾～＾）？
+                        // Multi-line string.
                         format!(
                             "\"\"\"
 {}
@@ -200,16 +225,17 @@ impl Log {
                         )
                         .to_string()
                     } else {
-                        // 単一行で出力できるぜ☆（＾～＾）
+                        // One liner.
                         format!("\"{}\"", body).to_string()
                     }
                 );
                 *seq.borrow_mut() += 1;
-                // write_allメソッドを使うには use std::io::Write; が必要
                 if let Ok(mut logger) = LOGGER.lock() {
+                    // write_all method required to use 'use std::io::Write;'.
                     if let Err(_why) = logger.current_file().write_all(toml.as_bytes()) {
-                        // 大会向けに、ログ書き込み失敗は出力しないことにする
-                        // panic!("(Err.148) couldn't write log. : {}",Error::description(&why)),
+                        // Nothing is output even if log writing fails.
+                        // Submitting a message to the competition can result in fouls.
+                        // panic!("couldn't write log. : {}",Error::description(&why)),
                     }
                 }
             });
@@ -217,9 +243,11 @@ impl Log {
     }
 }
 
+/// Used for editing and locking files.
 pub struct LogFile {
-    // 現在使用対象のログファイルの年月日だぜ☆（＾～＾）
+    /// Used for file name and deletion. Year, Month, Day.
     pub start_date: Date<Local>,
+    /// Used for editing and locking files.
     pub file: File,
 }
 impl LogFile {
@@ -231,16 +259,25 @@ impl LogFile {
     }
 }
 
+/// Examples:
+///
+/// All: 'tic-tac-toe-2020-07-11.log.toml'
+/// Prefix: 'tic-tac-toe'
+/// StartDate: '-2020-07-11'
+/// Suffix: '.log'
+/// Extention: '.toml'
+///
+/// If you don't like the .toml extension, leave the suffix empty and the .log extension.
 pub struct Logger {
-    /// 何のログか分かるように名前を付けてやれだぜ☆（＾～＾）
+    /// For example, the short name of your application.
     file_prefix: String,
-    /// このファイルは消してもいい、という符号としてファイル名の一部に '.log' と付けるのに使うことを想定しているぜ☆（＾～＾）
+    /// For example, '.log'. To be safe, include a word that clearly states that you can delete the file.
     file_suffix: String,
-    /// 拡張子だぜ☆（＾～＾） '.toml' と付けるのを想定しているが、「TOML？何それ！」みたいに煙たがられたら、 suffix を空文字にして拡張子を '.log' にでもしとけだぜ☆（＾～＾）
+    /// If you don't like the .toml extension, leave the suffix empty and the .log extension.
     file_extention: String,
-    /// ファイルを保持する日数だぜ☆（＾～＾）これを超えたら消す☆（＾～＾）
+    /// File retention days. Delete the file after day from StartDate.
     pub retention_days: i64,
-    /// ファイルをつかむのに使うぜ☆（＾～＾）
+    /// Controll file.
     log_file: Option<LogFile>,
 }
 impl Default for Logger {
@@ -258,35 +295,52 @@ impl Default for Logger {
     }
 }
 impl Logger {
+    /// Example:
+    ///
+    /// If 'tic-tac-toe-2020-07-11.log.toml', This is 'tic-tac-toe'.
     #[allow(dead_code)]
     pub fn get_file_prefix(&self) -> &str {
         &self.file_prefix
     }
+    /// Example:
+    ///
+    /// If 'tic-tac-toe-2020-07-11.log.toml', This is '.log'.
     #[allow(dead_code)]
     pub fn get_file_suffix(&self) -> &str {
         &self.file_suffix
     }
+    /// Example:
+    ///
+    /// If 'tic-tac-toe-2020-07-11.log.toml', This is '.toml'.
     #[allow(dead_code)]
     pub fn get_file_extention(&self) -> &str {
         &self.file_extention
     }
-    /// ログ・ファイル名の日付以外のところを決めろだぜ☆（＾～＾）
+    /// Set name except StartDate.
+    ///
+    /// Examples:
+    ///
+    /// All: 'tic-tac-toe-2020-07-11.log.toml'
+    /// Prefix: 'tic-tac-toe'
+    /// StartDate: '-2020-07-11'
+    /// Suffix: '.log'
+    /// Extention: '.toml'
     pub fn set_file_name(&mut self, prefix: &str, suffix: &str, extention: &str) {
         self.file_prefix = prefix.to_string();
         self.file_suffix = suffix.to_string();
         self.file_extention = extention.to_string();
     }
-    /// 今日の日付が付いたログ・ファイルをつかむぜ☆（＾～＾）
+    /// Create new file, or get exists file.
     fn new_today_file(
         file_prefix: &str,
         file_suffix: &str,
         file_extention: &str,
     ) -> (Date<Local>, File) {
-        // 'default-2020-07-11.log.toml' みたいな感じのファイル名を作るぜ☆（＾～＾）
         let start_date = Local::today();
         let file = OpenOptions::new()
             .create(true)
             .append(true)
+            // Example: 'default-2020-07-11.log.toml'.
             .open(Path::new(&format!(
                 "{}-{}{}{}",
                 file_prefix,
@@ -297,10 +351,9 @@ impl Logger {
             .unwrap();
         (start_date, file)
     }
-    /// 古いログを削除しようぜ☆（＾～＾）？
-    /// なんだこのクソむずかしい日付処理は☆（＾～＾）！？
+    /// For log rotation.
     pub fn remove_old_logs(&self) -> usize {
-        // 削除したファイル数だぜ☆（＾～＾）
+        // Removed files count.
         let mut count = 0;
         // Example:
         //      all = './tic-tac-toe-2020-07-11.log.toml'
@@ -328,11 +381,9 @@ impl Logger {
             } else {
                 continue;
             };
-            // println!("Name: {}", name);
             // File name pattern match:
             if let Some(caps) = re.captures(&name) {
-                // println!("CapsLen: {}", caps.len());
-                // 年月日を抽出するぜ☆（＾～＾）
+                // Extract year, month, day.
                 let year: i32 = if let Some(cap) = caps.get(1) {
                     if let Ok(n) = cap.as_str().parse() {
                         n
@@ -360,16 +411,15 @@ impl Logger {
                 } else {
                     0
                 };
-                // println!("Ymd=|{}|{}|{}|", year, month, day);
                 if month != 0 && day != 0 {
                     let file_date = Local.ymd(year, month, day);
 
-                    // ファイルの保存期間を超えていれば
+                    // Over the retention days.
                     if file_date.add(Duration::days(self.retention_days)) < Local::today() {
-                        // そのファイルを削除するぜ☆（＾～＾）
-                        // println!("Delete: {}", name);
+                        // Remove file.
                         if let Ok(_why) = fs::remove_file(name) {
-                            // ファイルの削除に失敗したときの理由が、大会で送信されても嫌だしな☆（＾～＾）表示しないぜ☆（＾～＾）
+                            // Nothing is output even if log writing fails.
+                            // Submitting a message to the competition can result in fouls.
                             // println!("! {:?}", why.kind());
                         } else {
                             count += 1;
@@ -381,26 +431,27 @@ impl Logger {
         count
     }
 
-    /// 日付を跨いだら新しいファイルに乗り換える仕組みだけど、テストできてない☆（＾～＾）知らね☆（＾～＾）
+    /// Get file, or rotation file.
     fn current_file(&mut self) -> &File {
-        // 日付が変わってたら☆（＾～＾）
+        // Check day.
         let date_changed = if let Some(log_file) = &self.log_file {
             log_file.start_date < Local::today()
         } else {
             false
         };
-        // 新しいファイルに乗り換えようぜ☆（＾～＾）
+        // Remove file, if day changed.
         if date_changed {
             self.log_file = None;
         }
 
-        // 未設定なら新規作成☆（＾～＾）
+        // New file, if file removed or new.
         if let None = self.log_file {
             let (start_date, file) =
                 Logger::new_today_file(&self.file_prefix, &self.file_suffix, &self.file_extention);
             self.log_file = Some(LogFile::new(start_date, file));
         }
 
+        // Return file handle.
         &self.log_file.as_ref().unwrap().file
     }
 }

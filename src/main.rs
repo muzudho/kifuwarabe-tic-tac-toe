@@ -22,6 +22,14 @@ use std;
 use std::{thread, time};
 use test::test_win_lose_judgement;
 
+impl Log {
+    /// 標準出力に文字列を出力するとともに、ログ・ファイルにも Info レベルで記録するぜ☆（＾～＾）
+    pub fn println(s: &str) {
+        println!("{}", s);
+        Log::infoln(s);
+    }
+}
+
 fn main() {
     let remove_file_count = if let Ok(mut logger) = LOGGER.lock() {
         // この中で Log::xxxxx() は呼び出すなだぜ☆（＾～＾）！無限ループする☆（＾～＾）！
@@ -32,29 +40,29 @@ fn main() {
     } else {
         0
     };
-    Log::traceln(&format!("Remove file count={}", remove_file_count));
+    Log::noticeln(&format!("Remove file count={}", remove_file_count));
 
     // しょっぱなにプログラムが壊れてないかテストしているぜ☆（＾～＾）
     // こんなとこに書かない方がいいが、テストを毎回するのが めんどくさいんで 実行するたびにテストさせているぜ☆（＾～＾）
     // Step 1.
-    Log::traceln("Hello, world!!");
-    Log::infoln("こんにちわ、世界！！");
+    Log::noticeln("Hello, world!!");
+    Log::println("こんにちわ、世界！！");
     // こんにちわ、世界！！
 
     // Step 2.
-    Log::infoln(&format!("Nought=|{}|", Piece::Nought));
+    Log::println(&format!("Nought=|{}|", Piece::Nought));
     // Nought=|O|
-    Log::infoln(&format!("Cross =|{}|", Piece::Cross));
+    Log::println(&format!("Cross =|{}|", Piece::Cross));
     // Cross =|X|
-    Log::infoln(&format!("Win   =|{}|", GameResult::Win));
+    Log::println(&format!("Win   =|{}|", GameResult::Win));
     // Win   =|win|
-    Log::infoln(&format!("Draw  =|{}|", GameResult::Draw));
+    Log::println(&format!("Draw  =|{}|", GameResult::Draw));
     // Draw  =|draw|
-    Log::infoln(&format!("Lose  =|{}|", GameResult::Lose));
+    Log::println(&format!("Lose  =|{}|", GameResult::Lose));
     // Lose  =|lose|
 
     let mut pos = Position::default();
-    Log::infoln(&pos.pos());
+    Log::println(&pos.pos());
     // [Next 1 move(s) | Go O]
     //
     // +---+---+---+
@@ -65,25 +73,25 @@ fn main() {
     // |   |   |   |    1 2 3
     // +---+---+---+
     // ぜったい None が返ってこない仕様のときは .unwrap() でヌル・チェックを飛ばせだぜ☆（＾～＾）
-    Log::infoln(&Position::result(GameResult::Win, Some(Piece::Nought)).unwrap());
+    Log::println(&Position::result(GameResult::Win, Some(Piece::Nought)).unwrap());
     // win O
 
     let search = Search::new(pos.friend, pos.pieces_num, true);
-    Log::infoln(&format!("pv=|{}|", search.pv(&pos)));
+    Log::println(&format!("pv=|{}|", search.pv(&pos)));
     // pv=||
-    Log::infoln(&Search::info_header(&pos));
+    Log::println(&Search::info_header(&pos));
     // info nps ...... nodes ...... pv O X O X O X O X O
     // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしろだぜ☆（＾～＾）
-    Log::infoln(&search.info_forward(123, &pos, 1, Some("Hello!")));
+    Log::println(&search.info_forward(123, &pos, 1, Some("Hello!")));
     // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
-    Log::infoln(&search.info_forward_leaf(456, &pos, 1, GameResult::Win, Some("Hello!")));
+    Log::println(&search.info_forward_leaf(456, &pos, 1, GameResult::Win, Some("Hello!")));
     // info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
-    Log::infoln(&search.info_backward(789, &pos, 1, GameResult::Win, Some("Hello!")));
+    Log::println(&search.info_backward(789, &pos, 1, GameResult::Win, Some("Hello!")));
     // info nps    789 nodes      0 pv                   |       | <- from height 1 | + [1] | win  | + "Hello!"
 
     // Step 3.
     pos.do_move(1);
-    Log::infoln(&pos.pos());
+    Log::println(&pos.pos());
     // [Next 2 move(s) | Go x]
     //
     //         +---+---+---+
@@ -94,7 +102,7 @@ fn main() {
     //         | o |   |   |    1 2 3
     //         +---+---+---+
     pos.undo_move();
-    Log::infoln(&pos.pos());
+    Log::println(&pos.pos());
     // [Next 1 move(s) | Go o]
     //
     //         +---+---+---+
@@ -104,35 +112,35 @@ fn main() {
     //         +---+---+---+    4 5 6
     //         |   |   |   |    1 2 3
     //         +---+---+---+
-    Log::infoln(&format!("opponent={}", pos.opponent()));
+    Log::println(&format!("opponent={}", pos.opponent()));
 
     // Step 4.
     let mut p = CommandLineParser::new("Go to the Moon!");
-    Log::infoln(&format!("Go to   =|{}|", p.starts_with("Go to")));
+    Log::println(&format!("Go to   =|{}|", p.starts_with("Go to")));
     // Go to   =|True|
-    Log::infoln(&format!("Goto    =|{}|", p.starts_with("Goto")));
+    Log::println(&format!("Goto    =|{}|", p.starts_with("Goto")));
     // Goto    =|False|
-    Log::infoln(&format!("p.starts=|{}|", p.starts));
+    Log::println(&format!("p.starts=|{}|", p.starts));
     // p.starts=|0|
-    Log::infoln(&format!(
+    Log::println(&format!(
         "p.rest  =|{}|",
         if let Some(rest) = p.rest() { rest } else { "" }
     ));
     // p.rest  =|Go to the Moon!|
     p.go_next_to("Go to");
-    Log::infoln(&format!("p.starts=|{}|", p.starts));
+    Log::println(&format!("p.starts=|{}|", p.starts));
     // p.starts=|5|
-    Log::infoln(&format!(
+    Log::println(&format!(
         "p.rest  =|{}|",
         if let Some(rest) = p.rest() { rest } else { "" }
     ));
     // p.rest  =| the Moon!|
 
     // Step 5.
-    Log::infoln(&format!("xfen=|{}|", pos.to_xfen()));
+    Log::println(&format!("xfen=|{}|", pos.to_xfen()));
     // xfen=|xfen 3/3/3 o|
     pos.do_("2");
-    Log::infoln(&pos.pos());
+    Log::println(&pos.pos());
     // [Next 2 move(s) | Go x]
     //
     // +---+---+---+
@@ -148,7 +156,7 @@ fn main() {
     } else {
         panic!("Invalid xfen=|{}|", xfen)
     };
-    Log::infoln(&pos.pos());
+    Log::println(&pos.pos());
     // [Next 9 move(s) | Go o]
     //
     // +---+---+---+
@@ -164,7 +172,7 @@ fn main() {
     } else {
         panic!("Invalid xfen=|{}|", xfen)
     };
-    Log::infoln(&pos.pos());
+    Log::println(&pos.pos());
     // win x
     // [Next 10 move(s) | Go o]
     //
@@ -176,7 +184,7 @@ fn main() {
     // | x | o | o |    1 2 3
     // +---+---+---+
     pos.undo();
-    Log::infoln(&pos.pos());
+    Log::println(&pos.pos());
     // [Next 9 move(s) | Go x]
     //
     // +---+---+---+
@@ -195,7 +203,7 @@ fn main() {
     } else {
         panic!("Invalid xfen=|{}|", xfen)
     };
-    Log::infoln(&format!("win=|{}|", pos.is_opponent_win()));
+    Log::println(&format!("win=|{}|", pos.is_opponent_win()));
     // win=|True|
     let xfen = "xfen xox/oxo/oxo x";
     pos = if let Some(pos) = Position::from_xfen(xfen) {
@@ -203,17 +211,17 @@ fn main() {
     } else {
         panic!("Invalid xfen=|{}|", xfen)
     };
-    Log::infoln(&format!("draw=|{}|", pos.is_draw()));
+    Log::println(&format!("draw=|{}|", pos.is_draw()));
     // draw=|True|
 
     // Step 8.
     // 探索してないんだから、 nodes も nps も 0 になるはずだよな☆（＾～＾）
     thread::sleep(time::Duration::from_secs(1));
-    Log::infoln(&format!("nodes={}", search.nodes));
+    Log::println(&format!("nodes={}", search.nodes));
     // nodes=0
-    Log::infoln(&format!("sec  ={}", search.sec()));
+    Log::println(&format!("sec  ={}", search.sec()));
     // sec  =1
-    Log::infoln(&format!("nps  ={}", search.nps()));
+    Log::println(&format!("nps  ={}", search.nps()));
     // nps  =0
 
     // Step 9.
@@ -244,9 +252,9 @@ fn main() {
     // info nps      9 nodes      9 pv 9 6               | + [6] | .       height 8 |       | win  | + "Hooray!"
     // info nps      9 nodes      9 pv 9                 |       | <- from height 7 | - [6] | win  |
     // info nps      9 nodes      9 pv                   |       | <- from height 6 | + [9] | lose | + "Resign."
-    Log::infoln(&format!("result=|{}|", result));
+    Log::println(&format!("result=|{}|", result));
     // result=|draw|
-    Log::infoln(&format!(
+    Log::println(&format!(
         "bestmove=|{}|",
         if let Some(addr) = addr {
             format!("{}", addr).to_string()
@@ -260,7 +268,7 @@ fn main() {
     test_win_lose_judgement();
 
     // 説明を出そうぜ☆（＾～＾）
-    Log::infoln(
+    Log::println(
         "きふわらべの〇×ゲーム
 
 コマンド:
@@ -287,7 +295,12 @@ fn main() {
         match std::io::stdin().read_line(&mut line) {
             Ok(_n) => {}
             // エラー番号は適当に近くの行番号でも振っとけだぜ☆（＾～＾）ちょっぴり散らばる☆（＾～＾）
-            Err(e) => panic!(format!("(Err.32)  Failed to read line. / {}", e)),
+            // コンピューター将棋の USIプロトコル で 'info string' というのがあって
+            // 最後に画面に出せるかもしれないから頭に付けている☆（＾～＾）
+            Err(e) => panic!(format!(
+                "info string (Err.32)  Failed to read line. / {}",
+                e
+            )),
         };
 
         // コマンドライン☆（＾～＾） p は parser の意味で使ってるぜ☆（＾～＾）
@@ -304,10 +317,10 @@ fn main() {
             let mut search = Search::new(pos.friend, pos.pieces_num, info_enable);
             let (addr, result) = search.go(&mut pos);
             if let Some(addr) = addr {
-                Log::infoln(&format!("info result={:?} nps={}", result, search.nps()));
-                Log::infoln(&format!("bestmove {}", addr));
+                Log::println(&format!("info result={:?} nps={}", result, search.nps()));
+                Log::println(&format!("bestmove {}", addr));
             } else {
-                Log::infoln("resign");
+                Log::println("resign");
             }
         } else if p.starts_with("info-off") {
             info_enable = false;
@@ -321,17 +334,17 @@ fn main() {
                 }
             }
         } else if p.starts_with("pos") {
-            Log::infoln(&pos.pos());
+            Log::println(&pos.pos());
         } else if p.starts_with("quit") {
             return;
         } else if p.starts_with("undo") {
             pos.undo();
         } else if p.starts_with("uxi") {
-            Log::infoln("uxiok tic-tac-toe v20200704.0.0");
+            Log::println("uxiok tic-tac-toe v20200704.0.0");
         } else if p.starts_with("xfen") {
-            Log::infoln(&format!("{}", pos.to_xfen()));
+            Log::println(&format!("{}", pos.to_xfen()));
         } else {
-            Log::infoln(&format!("Debug   | Invalid command=|{:?}|", p));
+            Log::println(&format!("Debug   | Invalid command=|{:?}|", p));
         }
     }
 }
