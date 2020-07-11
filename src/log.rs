@@ -25,32 +25,47 @@ const NEW_LINE_SEQUENCE: &'static str = "\\n";
 /// The files are listed below in order from smallest to largest:
 /// Fatal < Error < Warn < Notice < Info < Debug < Trace
 pub enum LogLevel {
-    /// Not included in the distribution.
-    /// Remove this level from the source after using it for debugging.
-    /// If you want to find a bug in the program, write a lot.
-    Trace,
+    /// Cannot continue.
+    /// If the program could not be implemented due to force majeure.
+    #[allow(dead_code)]
+    Fatal,
+    /// Why you didn't get the results you expected.
+    /// It may continue, such as trying other means.
+    Error,
+    /// It will be abnormal soon, but there is no problem and you can ignore it.
+    /// For example, he reported that it took longer to access than expected.
+    /// For example, report that capacity is approaching the limit.
+    Warn,
+    /// It must be enabled in the server production environment.
+    /// Record of passing important points correctly.
+    /// I am monitoring while confirming that it operates normally.
+    Notice,
+    /// Report highlights.
+    /// Everything that needs to be reported regularly in the production environment.
+    Info,
     /// It should be in a place with many accidents.
     /// This level is disabled in production environments.
     /// Leave it in the source and enable it for troubleshooting.
     /// Often, this is the production level of a desktop operating environment.
     Debug,
-    /// Report highlights.
-    /// Everything that needs to be reported regularly in the production environment.
-    Info,
-    /// It must be enabled in the server production environment.
-    /// Record of passing important points correctly.
-    /// I am monitoring while confirming that it operates normally.
-    Notice,
-    /// It will be abnormal soon, but there is no problem and you can ignore it.
-    /// For example, he reported that it took longer to access than expected.
-    /// For example, report that capacity is approaching the limit.
-    Warn,
-    /// Why you didn't get the results you expected.
-    /// It may continue, such as trying other means.
-    Error,
-    /// Cannot continue.
-    /// If the program could not be implemented due to force majeure.
-    Fatal,
+    /// Not included in the distribution.
+    /// Remove this level from the source after using it for debugging.
+    /// If you want to find a bug in the program, write a lot.
+    Trace,
+}
+impl LogLevel {
+    pub fn number(&self) -> usize {
+        use crate::log::LogLevel::*;
+        match self {
+            Fatal => 1,
+            Error => 2,
+            Warn => 3,
+            Notice => 4,
+            Info => 5,
+            Debug => 6,
+            Trace => 7,
+        }
+    }
 }
 pub const LOG_ENABLE: bool = true;
 
@@ -85,76 +100,109 @@ thread_local!(pub static SEQ: RefCell<u128> = {
 // Easy to use logging.
 pub struct Log {}
 impl Log {
+    pub fn enabled(level: LogLevel) -> bool {
+        if let Ok(logger) = LOGGER.lock() {
+            if logger.log_level.number() <= level.number() {
+                return true;
+            }
+        }
+        false
+    }
+
     /// Trace level. No trailing newline.
     #[allow(dead_code)]
     pub fn trace(s: &str) {
-        Log::write(s, "Trace")
+        if Log::enabled(LogLevel::Trace) {
+            Log::write(s, "Trace")
+        }
     }
 
     /// Trace level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn traceln(s: &str) {
-        Log::writeln(s, "Trace");
+        if Log::enabled(LogLevel::Trace) {
+            Log::writeln(s, "Trace");
+        }
     }
 
     /// Debug level. No trailing newline.
     #[allow(dead_code)]
     pub fn debug(s: &str) {
-        Log::write(s, "Debug")
+        if Log::enabled(LogLevel::Debug) {
+            Log::write(s, "Debug")
+        }
     }
 
     /// Debug level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn debugln(s: &str) {
-        Log::writeln(s, "Debug");
+        if Log::enabled(LogLevel::Debug) {
+            Log::writeln(s, "Debug");
+        }
     }
 
     /// Info level. No trailing newline.
     #[allow(dead_code)]
     pub fn info(s: &str) {
-        Log::write(s, "Info")
+        if Log::enabled(LogLevel::Info) {
+            Log::write(s, "Info")
+        }
     }
 
     /// Info level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn infoln(s: &str) {
-        Log::writeln(s, "Info");
+        if Log::enabled(LogLevel::Info) {
+            Log::writeln(s, "Info");
+        }
     }
 
     /// Notice level. No trailing newline.
     #[allow(dead_code)]
     pub fn notice(s: &str) {
-        Log::write(s, "Notice")
+        if Log::enabled(LogLevel::Notice) {
+            Log::write(s, "Notice")
+        }
     }
 
     /// Notice level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn noticeln(s: &str) {
-        Log::writeln(s, "Notice");
+        if Log::enabled(LogLevel::Notice) {
+            Log::writeln(s, "Notice");
+        }
     }
 
     /// Warning level. No trailing newline.
     #[allow(dead_code)]
     pub fn warn(s: &str) {
-        Log::write(s, "Warn")
+        if Log::enabled(LogLevel::Warn) {
+            Log::write(s, "Warn")
+        }
     }
 
     /// Warning level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn warnln(s: &str) {
-        Log::writeln(s, "Warn");
+        if Log::enabled(LogLevel::Warn) {
+            Log::writeln(s, "Warn");
+        }
     }
 
     /// Error level. No trailing newline.
     #[allow(dead_code)]
     pub fn error(s: &str) {
-        Log::write(s, "Error")
+        if Log::enabled(LogLevel::Error) {
+            Log::write(s, "Error")
+        }
     }
 
     /// Error level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn errorln(s: &str) {
-        Log::writeln(s, "Error");
+        if Log::enabled(LogLevel::Error) {
+            Log::writeln(s, "Error");
+        }
     }
 
     /// Fatal level. No trailing newline.
@@ -279,6 +327,8 @@ pub struct Logger {
     pub retention_days: i64,
     /// Controll file.
     log_file: Option<LogFile>,
+    /// Activation.
+    pub log_level: LogLevel,
 }
 impl Default for Logger {
     fn default() -> Self {
@@ -291,6 +341,7 @@ impl Default for Logger {
             file_extention: extention.to_string(),
             retention_days: 7,
             log_file: None,
+            log_level: LogLevel::Trace,
         }
     }
 }
