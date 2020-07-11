@@ -2,8 +2,7 @@ use chrono::{Date, Duration, Local, TimeZone};
 use regex::Regex;
 use std::cell::RefCell;
 use std::fs;
-use std::fs::File;
-use std::fs::OpenOptions;
+use std::fs::{File, OpenOptions};
 use std::io::Write;
 use std::ops::Add;
 use std::path::Path;
@@ -21,24 +20,25 @@ const NEW_LINE: &'static str = "\n";
 #[cfg(not(windows))]
 const NEW_LINE_SEQUENCE: &'static str = "\\n";
 
-/// Log detail level.
-/// The files are listed below in order from smallest to largest:
-/// Fatal < Error < Warn < Notice < Info < Debug < Trace
-pub enum LogLevel {
-    /// Cannot continue.
-    /// If the program could not be implemented due to force majeure.
+/// The higher this level, the more will be omitted.
+///
+/// |<-- Low Level ------------------------- High level -->|
+/// |<-- High priority ------------------- Low priority -->|
+/// | Fatal < Error < Warn < Notice < Info < Debug < Trace |
+pub enum Level {
+    /// If the program cannot continue.
     #[allow(dead_code)]
     Fatal,
-    /// Why you didn't get the results you expected.
-    /// It may continue, such as trying other means.
+    /// I didn't get the expected result, so I'll continue with the other method.
     Error,
     /// It will be abnormal soon, but there is no problem and you can ignore it.
-    /// For example, he reported that it took longer to access than expected.
-    /// For example, report that capacity is approaching the limit.
+    /// For example:
+    ///     * He reported that it took longer to access than expected.
+    ///     * Report that capacity is approaching the limit.
     Warn,
     /// It must be enabled in the server production environment.
     /// Record of passing important points correctly.
-    /// I am monitoring while confirming that it operates normally.
+    /// We are monitoring that it is working properly.
     Notice,
     /// Report highlights.
     /// Everything that needs to be reported regularly in the production environment.
@@ -53,9 +53,9 @@ pub enum LogLevel {
     /// If you want to find a bug in the program, write a lot.
     Trace,
 }
-impl LogLevel {
+impl Level {
     pub fn number(&self) -> usize {
-        use crate::log::LogLevel::*;
+        use crate::log::Level::*;
         match self {
             Fatal => 1,
             Error => 2,
@@ -67,32 +67,34 @@ impl LogLevel {
         }
     }
 }
-pub const LOG_ENABLE: bool = true;
 
-// グローバル変数
+// Logger grobal variable.
 //
-// Cargo.toml に１行追記
-// > [dependencies]
-// > lazy_static = "1.0.0"
+// Cargo.toml に１行追記:
 //
-// main.rs の冒頭あたりに次の２行を記述
-// > #[macro_use]
-// > extern crate lazy_static;
+// ```toml
+// [dependencies]
+// lazy_static = "1.0.0"
+// ```
 //
-// 「How can I use mutable lazy_static?」
-// https://users.rust-lang.org/t/how-can-i-use-mutable-lazy-static/3751/3
+// main.rs の冒頭あたりに次の２行を記述:
+//
+// ```toml
+// #[macro_use]
+// extern crate lazy_static;
+// ```
+//
+// * References
+//      * [How can I use mutable lazy_static?](https://users.rust-lang.org/t/how-can-i-use-mutable-lazy-static/3751/3)
 lazy_static! {
-    /// ロガーのミューテックス（排他制御）
-    pub static ref LOGGER: Mutex<Logger> = {
-        Mutex::new(Logger::default())
-    };
+    pub static ref LOGGER: Mutex<Logger> = Mutex::new(Logger::default());
 }
+// Use the line number in the log.
+//
 // Thread local scope variable.
 //
 // * References
 //      * [ミュータブルなスレッドローカルデータを thread_local!() マクロと RefCell で実現する](https://qiita.com/tatsuya6502/items/bed3702517b36afbdbca)
-//
-// Use the line number in the log.
 thread_local!(pub static SEQ: RefCell<u128> = {
     RefCell::new(1)
 });
@@ -100,7 +102,8 @@ thread_local!(pub static SEQ: RefCell<u128> = {
 // Easy to use logging.
 pub struct Log {}
 impl Log {
-    pub fn enabled(level: LogLevel) -> bool {
+    /// Check level.
+    pub fn enabled(level: Level) -> bool {
         if let Ok(logger) = LOGGER.lock() {
             if logger.log_level.number() <= level.number() {
                 return true;
@@ -112,7 +115,7 @@ impl Log {
     /// Trace level. No trailing newline.
     #[allow(dead_code)]
     pub fn trace(s: &str) {
-        if Log::enabled(LogLevel::Trace) {
+        if Log::enabled(Level::Trace) {
             Log::write(s, "Trace")
         }
     }
@@ -120,7 +123,7 @@ impl Log {
     /// Trace level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn traceln(s: &str) {
-        if Log::enabled(LogLevel::Trace) {
+        if Log::enabled(Level::Trace) {
             Log::writeln(s, "Trace");
         }
     }
@@ -128,7 +131,7 @@ impl Log {
     /// Debug level. No trailing newline.
     #[allow(dead_code)]
     pub fn debug(s: &str) {
-        if Log::enabled(LogLevel::Debug) {
+        if Log::enabled(Level::Debug) {
             Log::write(s, "Debug")
         }
     }
@@ -136,7 +139,7 @@ impl Log {
     /// Debug level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn debugln(s: &str) {
-        if Log::enabled(LogLevel::Debug) {
+        if Log::enabled(Level::Debug) {
             Log::writeln(s, "Debug");
         }
     }
@@ -144,7 +147,7 @@ impl Log {
     /// Info level. No trailing newline.
     #[allow(dead_code)]
     pub fn info(s: &str) {
-        if Log::enabled(LogLevel::Info) {
+        if Log::enabled(Level::Info) {
             Log::write(s, "Info")
         }
     }
@@ -152,7 +155,7 @@ impl Log {
     /// Info level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn infoln(s: &str) {
-        if Log::enabled(LogLevel::Info) {
+        if Log::enabled(Level::Info) {
             Log::writeln(s, "Info");
         }
     }
@@ -160,7 +163,7 @@ impl Log {
     /// Notice level. No trailing newline.
     #[allow(dead_code)]
     pub fn notice(s: &str) {
-        if Log::enabled(LogLevel::Notice) {
+        if Log::enabled(Level::Notice) {
             Log::write(s, "Notice")
         }
     }
@@ -168,7 +171,7 @@ impl Log {
     /// Notice level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn noticeln(s: &str) {
-        if Log::enabled(LogLevel::Notice) {
+        if Log::enabled(Level::Notice) {
             Log::writeln(s, "Notice");
         }
     }
@@ -176,7 +179,7 @@ impl Log {
     /// Warning level. No trailing newline.
     #[allow(dead_code)]
     pub fn warn(s: &str) {
-        if Log::enabled(LogLevel::Warn) {
+        if Log::enabled(Level::Warn) {
             Log::write(s, "Warn")
         }
     }
@@ -184,7 +187,7 @@ impl Log {
     /// Warning level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn warnln(s: &str) {
-        if Log::enabled(LogLevel::Warn) {
+        if Log::enabled(Level::Warn) {
             Log::writeln(s, "Warn");
         }
     }
@@ -192,7 +195,7 @@ impl Log {
     /// Error level. No trailing newline.
     #[allow(dead_code)]
     pub fn error(s: &str) {
-        if Log::enabled(LogLevel::Error) {
+        if Log::enabled(Level::Error) {
             Log::write(s, "Error")
         }
     }
@@ -200,7 +203,7 @@ impl Log {
     /// Error level. There is a trailing newline.
     #[allow(dead_code)]
     pub fn errorln(s: &str) {
-        if Log::enabled(LogLevel::Error) {
+        if Log::enabled(Level::Error) {
             Log::writeln(s, "Error");
         }
     }
@@ -231,79 +234,61 @@ impl Log {
     /// Write to a log file. No trailing newline.
     #[allow(dead_code)]
     fn write(s: &str, level: &str) {
-        if LOG_ENABLE {
-            // Escape the trailing newline at last.
-            let mut body = if s[s.len() - NEW_LINE.len()..] == *NEW_LINE {
-                // Do.
-                format!("{}{}", s.trim_end(), NEW_LINE_SEQUENCE)
-            } else {
-                // Don't.
-                s.to_string()
-            };
-            // Escape the double quotation.
-            body = body.replace("\"", "\\\"");
-            SEQ.with(move |seq| {
-                // Write as TOML.
-                let toml = format!(
-                    // Table name to keep for ordering.
-                    // For example, you can parse it easily by writing the table name like a GET query.
-                    "[\"Now={}&Pid={}&Thr={:?}&Seq={}\"]
+        // Escape the trailing newline at last.
+        let mut body = if s[s.len() - NEW_LINE.len()..] == *NEW_LINE {
+            // Do.
+            format!("{}{}", s.trim_end(), NEW_LINE_SEQUENCE)
+        } else {
+            // Don't.
+            s.to_string()
+        };
+        // Escape the double quotation.
+        body = body.replace("\"", "\\\"");
+        SEQ.with(move |seq| {
+            // Write as TOML.
+            let toml = format!(
+                // Table name to keep for ordering.
+                // For example, you can parse it easily by writing the table name like a GET query.
+                "[\"Now={}&Pid={}&Thr={:?}&Seq={}\"]
 {} = {}
 
 ",
-                    // If you use ISO8601, It's "%Y-%m-%dT%H:%M:%S%z". However, it does not set the date format.
-                    // Make it easier to read.
-                    Local::now().format("%Y-%m-%d %H:%M:%S"),
-                    // Process ID.
-                    process::id(),
-                    // Thread ID. However, Note that you are not limited to numbers.
-                    thread::current().id(),
-                    // Line number. This is to avoid duplication.
-                    seq.borrow(),
-                    // Log detail level.
-                    level,
-                    // Message.
-                    if 1 < s.lines().count() {
-                        // Multi-line string.
-                        format!(
-                            "\"\"\"
+                // If you use ISO8601, It's "%Y-%m-%dT%H:%M:%S%z". However, it does not set the date format.
+                // Make it easier to read.
+                Local::now().format("%Y-%m-%d %H:%M:%S"),
+                // Process ID.
+                process::id(),
+                // Thread ID. However, Note that you are not limited to numbers.
+                thread::current().id(),
+                // Line number. This is to avoid duplication.
+                seq.borrow(),
+                // Log detail level.
+                level,
+                // Message.
+                if 1 < s.lines().count() {
+                    // Multi-line string.
+                    format!(
+                        "\"\"\"
 {}
 \"\"\"",
-                            body
-                        )
-                        .to_string()
-                    } else {
-                        // One liner.
-                        format!("\"{}\"", body).to_string()
-                    }
-                );
-                *seq.borrow_mut() += 1;
-                if let Ok(mut logger) = LOGGER.lock() {
-                    // write_all method required to use 'use std::io::Write;'.
-                    if let Err(_why) = logger.current_file().write_all(toml.as_bytes()) {
-                        // Nothing is output even if log writing fails.
-                        // Submitting a message to the competition can result in fouls.
-                        // panic!("couldn't write log. : {}",Error::description(&why)),
-                    }
+                        body
+                    )
+                    .to_string()
+                } else {
+                    // One liner.
+                    format!("\"{}\"", body).to_string()
                 }
-            });
-        }
-    }
-}
-
-/// Used for editing and locking files.
-pub struct LogFile {
-    /// Used for file name and deletion. Year, Month, Day.
-    pub start_date: Date<Local>,
-    /// Used for editing and locking files.
-    pub file: File,
-}
-impl LogFile {
-    pub fn new(start_date: Date<Local>, file: File) -> Self {
-        LogFile {
-            start_date: start_date,
-            file: file,
-        }
+            );
+            *seq.borrow_mut() += 1;
+            if let Ok(mut logger) = LOGGER.lock() {
+                // write_all method required to use 'use std::io::Write;'.
+                if let Err(_why) = logger.current_file().write_all(toml.as_bytes()) {
+                    // Nothing is output even if log writing fails.
+                    // Submitting a message to the competition can result in fouls.
+                    // panic!("couldn't write log. : {}",Error::description(&why)),
+                }
+            }
+        });
     }
 }
 
@@ -328,7 +313,7 @@ pub struct Logger {
     /// Controll file.
     log_file: Option<LogFile>,
     /// Activation.
-    pub log_level: LogLevel,
+    pub log_level: Level,
 }
 impl Default for Logger {
     fn default() -> Self {
@@ -341,7 +326,7 @@ impl Default for Logger {
             file_extention: extention.to_string(),
             retention_days: 7,
             log_file: None,
-            log_level: LogLevel::Trace,
+            log_level: Level::Trace,
         }
     }
 }
@@ -504,5 +489,21 @@ impl Logger {
 
         // Return file handle.
         &self.log_file.as_ref().unwrap().file
+    }
+}
+
+/// Used for editing and locking files.
+struct LogFile {
+    /// Used for file name and deletion. Year, Month, Day.
+    pub start_date: Date<Local>,
+    /// Used for editing and locking files.
+    pub file: File,
+}
+impl LogFile {
+    pub fn new(start_date: Date<Local>, file: File) -> Self {
+        LogFile {
+            start_date: start_date,
+            file: file,
+        }
     }
 }
