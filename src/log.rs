@@ -11,7 +11,7 @@ use std::process;
 use std::sync::Mutex;
 use std::thread;
 
-// TODO Windows と Linuxディストリビューションの改行の違いどうにかならんのか☆（＾～＾）？
+// For multi-platform. Windows, or not.
 #[cfg(windows)]
 const NEW_LINE: &'static str = "\r\n";
 #[cfg(windows)]
@@ -21,7 +21,35 @@ const NEW_LINE: &'static str = "\n";
 #[cfg(not(windows))]
 const NEW_LINE_SEQUENCE: &'static str = "\\n";
 
-/// ログ
+/// ログ・レベル
+pub enum LogLevel {
+    /// Not included in the distribution.
+    /// Remove this level from the source after using it for debugging.
+    /// If you want to find a bug in the program, write a lot.
+    Trace,
+    /// It should be in a place with many accidents.
+    /// This level is disabled in production environments.
+    /// Leave it in the source and enable it for troubleshooting.
+    /// Often, this is the production level of a desktop operating environment.
+    Debug,
+    /// Report highlights.
+    /// Everything that needs to be reported regularly in the production environment.
+    Info,
+    /// It must be enabled in the server production environment.
+    /// Record of passing important points correctly.
+    /// I am monitoring while confirming that it operates normally.
+    Notice,
+    /// It will be abnormal soon, but there is no problem and you can ignore it.
+    /// For example, he reported that it took longer to access than expected.
+    /// For example, report that capacity is approaching the limit.
+    Warn,
+    /// Why you didn't get the results you expected.
+    /// It may continue, such as trying other means.
+    Error,
+    /// Cannot continue.
+    /// If the program could not be implemented due to force majeure.
+    Fatal,
+}
 pub const LOG_ENABLE: bool = true;
 
 // グローバル定数
@@ -55,6 +83,139 @@ lazy_static! {
 thread_local!(pub static SEQ: RefCell<u128> = {
     RefCell::new(1)
 });
+
+pub struct Log {}
+impl Log {
+    /// コンソール表示とともに、ファイルへ書き込みます。末尾に改行は付けません。
+    #[allow(dead_code)]
+    pub fn info(s: &str) {
+        print!("{}", s);
+        Log::write(s, "Info")
+    }
+
+    /// コンソール表示とともに、ファイルへ書き込みます。末尾に改行は付けます。
+    #[allow(dead_code)]
+    pub fn infoln(s: &str) {
+        println!("{}", s);
+        Log::writeln(s, "Info");
+    }
+
+    /// コンソール表示せず、ファイルへ書き込みます。末尾に改行は付けません。
+    #[allow(dead_code)]
+    pub fn trace(s: &str) {
+        Log::write(s, "Trace")
+    }
+
+    /// コンソール表示せず、ファイルへ書き込みます。末尾に改行は付けます。
+    #[allow(dead_code)]
+    pub fn traceln(s: &str) {
+        Log::writeln(s, "Trace");
+    }
+
+    /// 無視してよい異常。
+    #[allow(dead_code)]
+    pub fn warn(s: &str) {
+        Log::write(s, "Warn")
+    }
+
+    /// 無視してよい異常。
+    #[allow(dead_code)]
+    pub fn warnln(s: &str) {
+        Log::writeln(s, "Warn");
+    }
+
+    /// 記録するべき誤り。
+    #[allow(dead_code)]
+    pub fn error(s: &str) {
+        Log::write(s, "Error")
+    }
+
+    /// 記録するべき誤り。
+    #[allow(dead_code)]
+    pub fn errorln(s: &str) {
+        Log::writeln(s, "Error");
+    }
+
+    /// panic! の第一引数に渡せだぜ☆（＾～＾） 強制終了する前に、ヤケクソで読み筋欄に表示できないかトライするぜ☆（＾～＾）
+    #[allow(dead_code)]
+    pub fn panic(s: &str) -> String {
+        // コンピューター将棋の USIプロトコル で 'info string' というのがあって真似ている☆（＾～＾）嫌なら変えろだぜ☆（＾～＾）
+        let t = format!("info string panic! {}", s).to_string();
+        Log::writeln(&t, "Fatal");
+        println!("{}", t);
+        t
+    }
+
+    /// ファイルに書き込みます。末尾に改行を付けます。
+    #[allow(dead_code)]
+    fn writeln(s: &str, level: &str) {
+        let s = &format!("{}{}", s, NEW_LINE);
+        Log::write(s, level);
+    }
+    /// ファイルに書き込みます。末尾に改行は付けません。
+    #[allow(dead_code)]
+    fn write(s: &str, level: &str) {
+        if LOG_ENABLE {
+            // 末尾の 改行コード は、エスケープするぜ☆（＾～＾）
+            let mut body = if s[s.len() - NEW_LINE.len()..] == *NEW_LINE {
+                // 末尾に 改行コード が有った☆（＾～＾）
+                format!("{}{}", s.trim_end(), NEW_LINE_SEQUENCE)
+            } else {
+                // 末尾に 改行コード が無かった☆（＾～＾）
+                s.to_string()
+            };
+            // ダブル・クォーテーションはエスケープするぜ☆（＾～＾）
+            body = body.replace("\"", "\\\"");
+            /*
+            println!(
+                "Body    =|{}| Len=|{}| LinesCount=|{}|",
+                body,
+                body.len(),
+                s.lines().count()
+            );
+            */
+            SEQ.with(move |seq| {
+                // TOMLの書式を真似る。
+                let toml = format!(
+                    "[\"Now={}&Pid={}&Thr={:?}&Seq={}\"]
+{} = {}
+
+",
+                    // ISO8601 なら "%Y-%m-%dT%H:%M:%S%z" なんだが、「UTCは止めてくれ！」と言うビューとモデルを切り分けられない人はいるので
+                    // 書式は あなたの置かれている状況に合わせて自由とするぜ☆（＾～＾）
+                    Local::now().format("%Y-%m-%d %H:%M:%S"),
+                    process::id(),
+                    // Rustは 「ThreadId(1)」という分けわかんない文字列を返してくるんで、何が返ってくるか分かんないでそのままにしとこうぜ☆（＾～＾）？
+                    thread::current().id(),
+                    seq.borrow(),
+                    level,
+                    // 複数行か、単一行かを区別するぜ☆（＾～＾）
+                    if 1 < s.lines().count() {
+                        // 複数行で出力しようぜ☆（＾～＾）？
+                        format!(
+                            "\"\"\"
+{}
+\"\"\"",
+                            body
+                        )
+                        .to_string()
+                    } else {
+                        // 単一行で出力できるぜ☆（＾～＾）
+                        format!("\"{}\"", body).to_string()
+                    }
+                );
+                *seq.borrow_mut() += 1;
+                // write_allメソッドを使うには use std::io::Write; が必要
+                if let Ok(mut logger) = LOGGER.lock() {
+                    if let Err(_why) = logger.current_file().write_all(toml.as_bytes()) {
+                        // 大会向けに、ログ書き込み失敗は出力しないことにする
+                        // panic!("(Err.148) couldn't write log. : {}",Error::description(&why)),
+                    }
+                }
+            });
+        }
+    }
+}
 
 pub struct LogFile {
     // 現在使用対象のログファイルの年月日だぜ☆（＾～＾）
@@ -241,138 +402,5 @@ impl Logger {
         }
 
         &self.log_file.as_ref().unwrap().file
-    }
-}
-
-pub struct Log {}
-impl Log {
-    /// コンソール表示とともに、ファイルへ書き込みます。末尾に改行は付けません。
-    #[allow(dead_code)]
-    pub fn info(s: &str) {
-        print!("{}", s);
-        Log::write(s, "Info")
-    }
-
-    /// コンソール表示とともに、ファイルへ書き込みます。末尾に改行は付けます。
-    #[allow(dead_code)]
-    pub fn infoln(s: &str) {
-        println!("{}", s);
-        Log::writeln(s, "Info");
-    }
-
-    /// コンソール表示せず、ファイルへ書き込みます。末尾に改行は付けません。
-    #[allow(dead_code)]
-    pub fn trace(s: &str) {
-        Log::write(s, "Trace")
-    }
-
-    /// コンソール表示せず、ファイルへ書き込みます。末尾に改行は付けます。
-    #[allow(dead_code)]
-    pub fn traceln(s: &str) {
-        Log::writeln(s, "Trace");
-    }
-
-    /// 無視してよい異常。
-    #[allow(dead_code)]
-    pub fn warn(s: &str) {
-        Log::write(s, "Warn")
-    }
-
-    /// 無視してよい異常。
-    #[allow(dead_code)]
-    pub fn warnln(s: &str) {
-        Log::writeln(s, "Warn");
-    }
-
-    /// 記録するべき誤り。
-    #[allow(dead_code)]
-    pub fn error(s: &str) {
-        Log::write(s, "Error")
-    }
-
-    /// 記録するべき誤り。
-    #[allow(dead_code)]
-    pub fn errorln(s: &str) {
-        Log::writeln(s, "Error");
-    }
-
-    /// panic! の第一引数に渡せだぜ☆（＾～＾） 強制終了する前に、ヤケクソで読み筋欄に表示できないかトライするぜ☆（＾～＾）
-    #[allow(dead_code)]
-    pub fn panic(s: &str) -> String {
-        // コンピューター将棋の USIプロトコル で 'info string' というのがあって真似ている☆（＾～＾）嫌なら変えろだぜ☆（＾～＾）
-        let t = format!("info string panic! {}", s).to_string();
-        Log::writeln(&t, "Fatal");
-        println!("{}", t);
-        t
-    }
-
-    /// ファイルに書き込みます。末尾に改行を付けます。
-    #[allow(dead_code)]
-    fn writeln(s: &str, level: &str) {
-        let s = &format!("{}{}", s, NEW_LINE);
-        Log::write(s, level);
-    }
-    /// ファイルに書き込みます。末尾に改行は付けません。
-    #[allow(dead_code)]
-    fn write(s: &str, level: &str) {
-        if LOG_ENABLE {
-            // 末尾の 改行コード は、エスケープするぜ☆（＾～＾）
-            let mut body = if s[s.len() - NEW_LINE.len()..] == *NEW_LINE {
-                // 末尾に 改行コード が有った☆（＾～＾）
-                format!("{}{}", s.trim_end(), NEW_LINE_SEQUENCE)
-            } else {
-                // 末尾に 改行コード が無かった☆（＾～＾）
-                s.to_string()
-            };
-            // ダブル・クォーテーションはエスケープするぜ☆（＾～＾）
-            body = body.replace("\"", "\\\"");
-            /*
-            println!(
-                "Body    =|{}| Len=|{}| LinesCount=|{}|",
-                body,
-                body.len(),
-                s.lines().count()
-            );
-            */
-            SEQ.with(move |seq| {
-                // TOMLの書式を真似る。
-                let toml = format!(
-                    "[\"Now={}&Pid={}&Thr={:?}&Seq={}\"]
-{} = {}
-
-",
-                    // ISO8601 なら "%Y-%m-%dT%H:%M:%S%z" なんだが、「UTCは止めてくれ！」と言うビューとモデルを切り分けられない人はいるので
-                    // 書式は あなたの置かれている状況に合わせて自由とするぜ☆（＾～＾）
-                    Local::now().format("%Y-%m-%d %H:%M:%S"),
-                    process::id(),
-                    // Rustは 「ThreadId(1)」という分けわかんない文字列を返してくるんで、何が返ってくるか分かんないでそのままにしとこうぜ☆（＾～＾）？
-                    thread::current().id(),
-                    seq.borrow(),
-                    level,
-                    // 複数行か、単一行かを区別するぜ☆（＾～＾）
-                    if 1 < s.lines().count() {
-                        // 複数行で出力しようぜ☆（＾～＾）？
-                        format!(
-                            "\"\"\"
-{}
-\"\"\"",
-                            body
-                        )
-                        .to_string()
-                    } else {
-                        // 単一行で出力できるぜ☆（＾～＾）
-                        format!("\"{}\"", body).to_string()
-                    }
-                );
-                *seq.borrow_mut() += 1;
-                // write_allメソッドを使うには use std::io::Write; が必要
-                if let Ok(mut logger) = LOGGER.lock() {
-                    if let Err(_why) = logger.current_file().write_all(toml.as_bytes()) {
-                        // 大会向けに、ログ書き込み失敗は出力しないことにする
-                        // panic!("(Err.148) couldn't write log. : {}",Error::description(&why)),
-                    }
-                }
-            });
-        }
     }
 }
