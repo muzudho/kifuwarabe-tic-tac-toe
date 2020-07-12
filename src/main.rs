@@ -354,7 +354,7 @@ fn main() {
         } else if p.starts_with("pos") {
             Log::println(&pos.pos());
         } else if p.starts_with("quit") {
-            return;
+            break;
         } else if p.starts_with("undo") {
             pos.undo();
         } else if p.starts_with("uxi") {
@@ -365,4 +365,12 @@ fn main() {
             Log::println(&format!("Debug   | Invalid command=|{:?}|", p));
         }
     }
+
+    // Wait for logging to complete. Time out 30 seconds.
+    Log::wait_for_logging_to_complete(30, |elapsed_secs, rest_threads| {
+        println!(
+            "{} second(s). Wait for {} thread(s).",
+            elapsed_secs, rest_threads
+        );
+    });
 }
