@@ -58,14 +58,8 @@ During development, you may need to reproduce the behavior of your computer.
 It is difficult to compare the behavior. Instead, it is useful to get the logs and compare the logs.  
 **But logger's difficult to make, so copy and paste it.**  
 
-* [x] Step 1. 'log.rs' (You can **COPY & PASTE** in 5 minutes)
-  * [x] Write - Write to a file.
-  * [x] Clear - Log to empty.
-  * [x] Info - Write and display.
-  * [x] Trace - Write.
-  * [x] Warn - Write.
-  * [x] Error - Write.
-  * [x] Fatal - Write.
+* [x] Step 1. Use logger library. (You can **COPY & PASTE** in 1 minutes)
+  * [x] Use casual_logger library.
 
 The first thing you have to create is your motive.  
 It is important to start with the appearance.  
@@ -153,4 +147,20 @@ position xfen 3/3/o1x o
 # oxx
 # xoo
 position xfen xo1/oxx/xoo o
+```
+
+# Documentation
+
+Input:  
+
+```shell
+cargo doc --open
+```
+
+# Test
+
+Input:  
+
+```shell
+cargo test
 ```

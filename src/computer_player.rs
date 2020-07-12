@@ -1,7 +1,8 @@
 //! サーチ☆（＾～＾）探索部とか言われてるやつだぜ☆（＾～＾）
 
-use crate::log::Log;
 use crate::look_and_model::{GameResult, Position, Search, BOARD_LEN, SQUARES_NUM};
+use crate::LogExt;
+use casual_logger::Log;
 
 impl Search {
     /// 最善の番地を返すぜ☆（＾～＾）

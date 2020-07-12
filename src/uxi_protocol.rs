@@ -1,6 +1,7 @@
 //! 局面データを文字列にしたり、文字列を局面データに復元するのに使うぜ☆（＾～＾）
-use crate::log::Log;
 use crate::look_and_model::{GameResult, Piece, Position};
+use crate::LogExt;
+use casual_logger::Log;
 
 impl Position {
     /// 現局面を xfen に変換するぜ☆（＾～＾）
