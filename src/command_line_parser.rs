@@ -1,4 +1,5 @@
 //! 入力されたコマンドを、読み取る手伝いをするぜ☆（＾～＾）
+use casual_logger::Log;
 use std::fmt;
 
 pub struct CommandLineParser {
@@ -12,7 +13,7 @@ impl CommandLineParser {
         // trim すると空白も消えるぜ☆（＾～＾）
         let line: String = match line.trim().parse() {
             Ok(n) => n,
-            Err(e) => panic!(format!("(Err.38)  Failed to parse. / {}", e)),
+            Err(e) => panic!(Log::fatal(&format!("(Err.38)  Failed to parse. / {}", e))),
         };
         // 文字数を調べようぜ☆（＾～＾）
         let len = line.chars().count();
