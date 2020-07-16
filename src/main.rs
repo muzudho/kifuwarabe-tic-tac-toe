@@ -1,4 +1,5 @@
-//! このファイルがプログラムの入り口とか、スタート地点みたいなもんだぜ☆（＾～＾）プログラムのエントリー・ポイントと言う☆（＾～＾）
+//! This is the entry point to the program.  
+//! プログラムへの入り口です。  
 
 extern crate chrono;
 extern crate lazy_static;
@@ -20,6 +21,8 @@ use std;
 use std::{thread, time};
 use test::test_win_lose_judgement;
 
+/// Extend the functionality of the log.  
+/// ログの機能を拡張します。  
 pub trait LogExt {
     fn print_debugln(s: &str);
     fn print_infoln(s: &str);
@@ -94,7 +97,7 @@ fn main() {
         Log::print_debugln(&Position::result(GameResult::Win, Some(Piece::Nought)).unwrap());
         // win O
 
-        let search = Search::new(pos.friend, pos.pieces_num, true);
+        let search = Search::new(pos.friend, pos.pieces_num);
         Log::print_debugln(&format!("pv=|{}|", search.pv(&pos)));
         // pv=||
         Log::print_debugln(&Search::info_header(&pos));
@@ -255,7 +258,7 @@ fn main() {
         } else {
             panic!("Invalid xfen=|{}|", xfen)
         };
-        let mut search = Search::new(pos.friend, pos.pieces_num, true);
+        let mut search = Search::new(pos.friend, pos.pieces_num);
         let (addr, result) = search.go(&mut pos);
         // info nps ...... nodes ...... pv O X O X O X O X O
         // info nps      1 nodes      1 pv 6                 | - [6] | ->   to height 8 |       |      | - "Search."
@@ -311,7 +314,6 @@ fn main() {
 
     // 初期局面
     let mut pos = Position::default();
-    let mut info_enable = true;
 
     // [Ctrl]+[C] でループを終了
     loop {
@@ -339,7 +341,7 @@ fn main() {
                 pos.do_(rest);
             }
         } else if p.starts_with("go") {
-            let mut search = Search::new(pos.friend, pos.pieces_num, info_enable);
+            let mut search = Search::new(pos.friend, pos.pieces_num);
             let (addr, result) = search.go(&mut pos);
             if let Some(addr) = addr {
                 Log::print_infoln(&format!("info result={:?} nps={}", result, search.nps()));
@@ -348,9 +350,9 @@ fn main() {
                 Log::print_noticeln("resign");
             }
         } else if p.starts_with("info-off") {
-            info_enable = false;
+            Log::set_level(Level::Notice);
         } else if p.starts_with("info-on") {
-            info_enable = true;
+            Log::set_level(Level::Info);
         } else if p.starts_with("position") {
             p.go_next_to("position ");
             if let Some(rest) = p.rest() {

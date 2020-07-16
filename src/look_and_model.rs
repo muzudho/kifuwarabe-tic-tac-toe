@@ -162,22 +162,19 @@ pub struct Search {
     /// Start the stopwatch when this structure is created.  
     /// この構造体を生成した時点からストップ・ウォッチを開始します。  
     pub stopwatch: Instant,
-    /// info の出力の有無。
-    pub info_enable: bool,
 }
 impl Search {
-    /// 初期値だぜ☆（＾～＾）
-    pub fn new(friend: Piece, start_pieces_num: usize, info_enable: bool) -> Self {
+    pub fn new(friend: Piece, start_pieces_num: usize) -> Self {
         Search {
             start_friend: friend,
             start_pieces_num: start_pieces_num,
             nodes: 0,
             stopwatch: Instant::now(),
-            info_enable: info_enable,
         }
     }
 
-    /// Principal variation. 今読んでる読み筋☆（＾～＾）
+    /// Principal variation.
+    /// 今読んでる読み筋。
     pub fn pv(&self, pos: &Position) -> String {
         let mut pv = String::new();
         for t in self.start_pieces_num..pos.pieces_num {
@@ -186,7 +183,8 @@ impl Search {
         pv.trim_end().to_string()
     }
 
-    /// 見出しだぜ☆（＾～＾）
+    /// Header.
+    /// 見出し。
     pub fn info_header(pos: &Position) -> String {
         match pos.friend {
             Piece::Nought => "info nps ...... nodes ...... pv O X O X O X O X O".to_string(),
@@ -196,7 +194,8 @@ impl Search {
         }
     }
 
-    /// 前向き探索中だぜ☆（＾～＾）
+    /// Information during a forward search.
+    /// 前向き探索中の情報。
     pub fn info_forward(
         &self,
         nps: u64,
@@ -229,7 +228,9 @@ impl Search {
         )
         .to_string()
     }
-    /// 前向き探索で葉に着いたぜ☆（＾～＾）
+
+    /// It's a leaf. Information during a forward search.
+    /// 葉。前向き探索中の情報。
     pub fn info_forward_leaf(
         &self,
         nps: u64,
@@ -264,7 +265,8 @@ impl Search {
         )
         .to_string()
     }
-    /// 後ろ向き探索のときの表示だぜ☆（＾～＾）
+    /// Information during a backward search.
+    /// 後ろ向き探索中の情報。
     pub fn info_backward(
         &self,
         nps: u64,
