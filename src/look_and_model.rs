@@ -1,7 +1,8 @@
 use std::fmt;
 use std::time::Instant;
 
-/// 駒とか、石とかのことだが、〇×は 何なんだろうな、マーク☆（＾～＾）？
+/// Circle and cross mark. It corresponds to the stone in Go.  
+/// 丸と十字の印です。囲碁で言うところの石に当たります。  
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Piece {
     /// 〇
@@ -19,7 +20,8 @@ impl fmt::Display for Piece {
     }
 }
 
-/// 〇×ゲームは完全解析できるから、評価ではなくて、ゲームの結果が分かるんだよな☆（＾～＾）
+/// It is a game that can be fully analyzed, so please use the result instead of the evaluation value.  
+/// 完全解析できるゲームなので、評価値ではなく結果を使います。  
 #[derive(Debug)]
 pub enum GameResult {
     Win,
@@ -37,33 +39,46 @@ impl fmt::Display for GameResult {
     }
 }
 
-/// 1スタートで9まで☆（＾～＾） 配列には0番地もあるから、要素数は10だぜ☆（＾～＾）
+/// The addresses of the squares start with 1 and end with 9.  
+/// The array starts at 0, so the size is 10.  
+/// マスの番地は1から始まり9で終わります。  
+/// 配列は 0 から始まるのでサイズは10です。  
 pub const BOARD_LEN: usize = 10;
 
-/// 盤上に置ける最大の駒数だぜ☆（＾～＾） ９マスしか置くとこないから９だぜ☆（＾～＾）
+/// The maximum number of stones that can be placed on the board.  
+/// Since there are only 9 squares, it will be 9.  
+/// 盤上に置ける石の最大数。  
+/// ９マスしかないから９です。  
 pub const SQUARES_NUM: usize = 9;
 
-/// 局面☆（＾～＾）ゲームデータをセーブしたり、ロードしたりするときの保存されてる現状だぜ☆（＾～＾）
+/// A record of the game used to suspend or resume it.  
+/// ゲームを中断したり、再開したりするときに使うゲームの記録です。  
 #[derive(Debug)]
 pub struct Position {
-    /// 次に盤に置く駒☆（＾～＾）
-    /// 英語では 手番は your turn, 相手版は your opponent's turn なんで 手番という英語は無い☆（＾～＾）
-    /// 自分という意味の単語はプログラム用語と被りまくるんで、
-    /// あまり被らない 味方(friend) を手番の意味で たまたま使ってるだけだぜ☆（＾～＾）
+    /// The stone to be placed next.  
+    /// friend is a broken word for first person.  
+    /// 次に置かれる石。  
+    /// friend は 一人称 の砕けた言い方。  
     pub friend: Piece,
 
-    /// 開始局面の盤の各マス☆（＾～＾） [0] は未使用☆（＾～＾）
+    /// The board at the start. [0] is unused.  
+    /// 開始時の盤面。 [0] は未使用。  
     pub starting_board: [Option<Piece>; BOARD_LEN],
-    /// 盤の上に最初から駒が何個置いてあったかだぜ☆（＾～＾）
+
+    /// The number of stones on the board at the start.  
+    /// 開始時に盤の上に有った石の数。  
     pub starting_pieces_num: usize,
 
-    /// 現状の盤の各マス☆（＾～＾） [0] は未使用☆（＾～＾）
+    /// The current board. [0] is unused.  
+    /// 現在の盤面。 [0] は未使用。  
     pub board: [Option<Piece>; BOARD_LEN],
 
-    /// 棋譜だぜ☆（＾～＾）駒を置いた番地を並べてけだぜ☆（＾～＾）
+    /// Match record. An array of addresses where the pieces will be placed.  
+    /// 棋譜。駒を置いた番地を並べたもの。  
     pub history: [u8; SQUARES_NUM],
 
-    /// 盤の上に駒が何個置いてあるかだぜ☆（＾～＾）
+    /// The number of stones currently on the board.  
+    /// 現在、盤の上に有る石の数。  
     pub pieces_num: usize,
 }
 impl Default for Position {
@@ -79,6 +94,8 @@ impl Default for Position {
     }
 }
 impl Position {
+    /// Display of square.  
+    /// マスの表示。  
     fn cell(&self, index: usize) -> String {
         if let Some(piece) = self.board[index] {
             format!(" {} ", piece)
@@ -86,6 +103,8 @@ impl Position {
             "   ".to_string()
         }
     }
+    /// Display of position.  
+    /// 局面の表示。  
     pub fn pos(&self) -> String {
         let s = &mut format!(
             "[Next {} move(s) | Go {}]
@@ -94,7 +113,6 @@ impl Position {
             self.pieces_num + 1,
             self.friend
         );
-        // 書式指定子は cell関数の方に任せるぜ☆（＾～＾）
         s.push_str(&format!(
             "\
 +---+---+---+
@@ -117,18 +135,8 @@ impl Position {
         s.to_string()
     }
 
-    /// 本当は 以下のように書けばいいんだが、"ステップ・バイ・ステップ" という趣旨なんで 回りくどい作り方をしておくぜ☆（＾～＾）
-    ///
-    /// pub fn result(&self) -> Option<String> {
-    ///     if self.is_opponent_win() {
-    ///         Some(format!("win {}", self.opponent()).to_string())
-    ///     } else if self.is_draw() {
-    ///         Some(format!("draw").to_string())
-    ///     } else {
-    ///         None
-    ///     }
-    /// }
-    ///
+    /// Display results.  
+    /// 結果の表示。  
     pub fn result(result: GameResult, winner: Option<Piece>) -> Option<String> {
         match result {
             // ぜったい None が返ってこない仕様のときは .unwrap() でヌル・チェックを飛ばせだぜ☆（＾～＾）
@@ -139,15 +147,20 @@ impl Position {
     }
 }
 
-/// 探索部☆（＾～＾）
+/// Search.  
+/// 探索部。  
 pub struct Search {
-    /// この探索を始めたのはどっち側か☆（＾～＾）
+    /// The person who started this search.  
+    /// この探索を始めた方。  
     pub start_friend: Piece,
-    /// この探索を始めたときに石はいくつ置いてあったか☆（＾～＾）
+    /// The number of stones on the board at the start of this search.  
+    /// この探索の開始時に盤の上に有った石の数。  
     pub start_pieces_num: usize,
-    /// 探索した状態ノード数☆（＾～＾）
+    /// Number of state nodes searched.  
+    /// 探索した状態ノード数。  
     pub nodes: u32,
-    /// この構造体を生成した時点からストップ・ウォッチを開始するぜ☆（＾～＾）
+    /// Start the stopwatch when this structure is created.  
+    /// この構造体を生成した時点からストップ・ウォッチを開始します。  
     pub stopwatch: Instant,
     /// info の出力の有無。
     pub info_enable: bool,

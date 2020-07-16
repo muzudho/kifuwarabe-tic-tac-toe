@@ -2,11 +2,11 @@ use crate::look_and_model::{GameResult, Position, Search, BOARD_LEN, SQUARES_NUM
 use crate::LogExt;
 use casual_logger::Log;
 
-// Search.
-// 探索部。
+/// Search.  
+/// 探索部。  
 impl Search {
-    /// This is the place to put the stone.
-    /// 石を置く場所です。
+    /// This is the place to put the stone.  
+    /// 石を置く場所です。  
     pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, GameResult) {
         if self.info_enable {
             Log::print_infoln(&Search::info_header(pos));
@@ -14,8 +14,8 @@ impl Search {
         self.node(pos)
     }
 
-    /// The state node of the search tree. Commonly called search.
-    /// 検索ツリーの状態ノード。一般に 'search' と呼ばれます。
+    /// The state node of the search tree. Commonly called search.  
+    /// 検索ツリーの状態ノード。一般に 'search' と呼ばれます。  
     fn node(&mut self, pos: &mut Position) -> (Option<u8>, GameResult) {
         let mut best_addr = None;
         let mut best_result = GameResult::Lose;

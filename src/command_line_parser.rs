@@ -33,14 +33,14 @@ impl CommandLineParser {
         len2 <= self.len && &self.line[self.starts..len2] == expected
     }
 
-    /// Advance the scanning position.
-    /// 読み取り位置を進めます。
+    /// Advance the scanning position.  
+    /// 読み取り位置を進めます。  
     pub fn go_next_to(&mut self, expected: &str) {
         self.starts += expected.len();
     }
 
-    /// The rest of the string.
-    /// 文字列の残りの部分。
+    /// The rest of the string.  
+    /// 文字列の残りの部分。  
     pub fn rest(&self) -> Option<&str> {
         if self.starts < self.line.len() {
             Some(&self.line[self.starts..])
@@ -53,10 +53,10 @@ impl fmt::Debug for CommandLineParser {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-        // Tips. It is convenient to make a table by enclosing it with vertical bars.
-        // Example: value=|apple|banana|cherry|
-        // テクニック。 '|' で囲んでテーブルを作成すると便利です。
-        // 例: value=|りんご|バナナ|さくらんぼ|
+        // Tips. It is convenient to make a table by enclosing it with vertical bars.  
+        // Example: value=|apple|banana|cherry|  
+        // テクニック。 '|' で囲んでテーブルを作成すると便利です。  
+        // 例: value=|りんご|バナナ|さくらんぼ|  
         "line=|{}| len={} starts={}",
             self.line, self.len, self.starts
         )
