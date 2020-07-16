@@ -1,7 +1,8 @@
-//! 入力されたコマンドを、読み取る手伝いをするぜ☆（＾～＾）
 use casual_logger::Log;
 use std::fmt;
 
+/// Parses the command to make it easier to use.  
+/// コマンドを解析して、使いやすくします。  
 pub struct CommandLineParser {
     line: String,
     len: usize,
@@ -9,13 +10,14 @@ pub struct CommandLineParser {
 }
 impl CommandLineParser {
     pub fn new(line: &str) -> Self {
-        // 末尾の改行を除こうぜ☆（＾～＾）
-        // trim すると空白も消えるぜ☆（＾～＾）
+        // Erase the trailing newline.
+        // 末尾の改行を削除します。
         let line: String = match line.trim().parse() {
             Ok(n) => n,
             Err(e) => panic!(Log::fatal(&format!("(Err.38)  Failed to parse. / {}", e))),
         };
-        // 文字数を調べようぜ☆（＾～＾）
+        // character count.
+        // 文字数。
         let len = line.chars().count();
         CommandLineParser {
             line: line,
@@ -24,15 +26,21 @@ impl CommandLineParser {
         }
     }
 
+    /// Does the character match from the beginning?  
+    /// 文字は先頭から一致していますか？  
     pub fn starts_with(&self, expected: &str) -> bool {
         let len2 = expected.len();
         len2 <= self.len && &self.line[self.starts..len2] == expected
     }
 
+    /// Advance the scanning position.
+    /// 読み取り位置を進めます。
     pub fn go_next_to(&mut self, expected: &str) {
         self.starts += expected.len();
     }
 
+    /// The rest of the string.
+    /// 文字列の残りの部分。
     pub fn rest(&self) -> Option<&str> {
         if self.starts < self.line.len() {
             Some(&self.line[self.starts..])
@@ -45,9 +53,10 @@ impl fmt::Debug for CommandLineParser {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-        // 文字列を タテボウで クォートする(挟む)のは わたしの癖で、
-        // |apple|banana|cherry| のように区切れる☆（＾～＾）
-        // そのうち めんどくさくなったら お前もこうなる☆ｍ９（＾～＾）
+        // Tips. It is convenient to make a table by enclosing it with vertical bars.
+        // Example: value=|apple|banana|cherry|
+        // テクニック。 '|' で囲んでテーブルを作成すると便利です。
+        // 例: value=|りんご|バナナ|さくらんぼ|
         "line=|{}| len={} starts={}",
             self.line, self.len, self.starts
         )
