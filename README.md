@@ -126,18 +126,18 @@ Participation:
 | Year | Game  | Event                                                              | Rank |  All |
 | ---- | ----- | ------------------------------------------------------------------ | ---: | ---: |
 | 2014 | Shogi | [SDT2](https://denou.jp/tournament2014/)                           |   24 |   25 |
-| 2015 | Shogi | [WCSC25](http://www2.computer-shogi.org/wcsc25/)                   |   39 |   39 |
+| 2015 | Shogi | [WCSC25](http://www2.computer-shogi.org/wcsc25/index_e.html)       |   39 |   39 |
 | 2015 | Shogi | [SDT3](https://denou.jp/tournament2015/)                           |   28 |   28 |
 | 2016 | Go    | [UEC9](http://www.computer-go.jp/uec/public_html/eng/index.shtml)  |   25 |   30 |
-| 2016 | Shogi | [WCSC26](http://www2.computer-shogi.org/wcsc26/)                   |   26 |   51 |
+| 2016 | Shogi | [WCSC26](http://www2.computer-shogi.org/wcsc26/index_e.html)       |   26 |   51 |
 | 2016 | Shogi | [SDT4](https://denou.jp/tournament2016/)                           |   33 |   35 |
 | 2017 | Go    | [UEC10](http://www.computer-go.jp/uec/public_html/eng/index.shtml) |   25 |   30 |
-| 2017 | Shogi | [WCSC27](http://www2.computer-shogi.org/wcsc27/)                   |   47 |   50 |
+| 2017 | Shogi | [WCSC27](http://www2.computer-shogi.org/wcsc27/index_e.html)       |   47 |   50 |
 | 2017 | Shogi | [SDT5](https://denou.jp/tournament2017/)                           |   42 |   42 |
 | 2017 | Go    | [AIR2017](https://www.igoshogi.net/ai_ryusei2017/01/en/)           |   16 |   18 |
-| 2018 | Shogi | [WCSC28](http://www2.computer-shogi.org/wcsc28/)                   |   55 |   56 |
+| 2018 | Shogi | [WCSC28](http://www2.computer-shogi.org/wcsc28/index_e.html)       |   55 |   56 |
 | 2018 | Go    | [AIR2018](https://www.igoshogi.net/ai_ryusei/01/en/)               |   14 |   14 |
-| 2019 | Shogi | [WCSC29](http://www2.computer-shogi.org/wcsc29/)                   |   52 |   56 |
+| 2019 | Shogi | [WCSC29](http://www2.computer-shogi.org/wcsc29/index_e.html)       |   52 |   56 |
 | 2019 | Go    | [UEC11](http://entcog.c.ooco.jp/entcog/new_uec/en/)                |   15 |   18 |
 | 2020 | Shogi | [WCSOC1](http://www2.computer-shogi.org/wcso1.html)                |   34 |   39 |
 
