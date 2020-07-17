@@ -75,7 +75,7 @@ fn main() {
         Log::print_debug(&Position::result(GameResult::Win, Some(Piece::Nought)).unwrap());
         // win O
 
-        let search = Search::new(pos.friend, pos.pieces_num);
+        let search = Search::new(pos.turn, pos.pieces_num);
         Log::print_debug(&format!("pv=|{}|", search.pv(&pos, ',')));
         // pv=||
         Log::print_debug(&Search::info_header(&pos));
@@ -231,7 +231,7 @@ fn main() {
         } else {
             panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
         };
-        let mut search = Search::new(pos.friend, pos.pieces_num);
+        let mut search = Search::new(pos.turn, pos.pieces_num);
         let (sq, result) = search.go(&mut pos);
         // info nps ...... nodes ...... pv O X O X O X O X O
         // info nps      1 nodes      1 pv 6                 | - [6] | ->   to height 8 |       |      | - "Search."
@@ -332,7 +332,7 @@ Let's input from `pos`.
                 pos.do_(rest);
             }
         } else if p.starts_with("go") {
-            let mut search = Search::new(pos.friend, pos.pieces_num);
+            let mut search = Search::new(pos.turn, pos.pieces_num);
             let (sq, result) = search.go(&mut pos);
             if let Some(sq) = sq {
                 Log::print_info(&format!("info result={:?} nps={}", result, search.nps()));
@@ -358,7 +358,7 @@ Let's input from `pos`.
         } else if p.starts_with("undo") {
             pos.undo();
         } else if p.starts_with("uxi") {
-            Log::print_notice("uxiok tic-tac-toe v20200704.0.0");
+            Log::print_notice("uxiok tic-tac-toe v20200718.0.0");
         } else if p.starts_with("xfen") {
             Log::print_notice(&format!("{}", pos.to_xfen()));
         } else {

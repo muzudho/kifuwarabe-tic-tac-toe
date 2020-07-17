@@ -55,11 +55,9 @@ pub const SQUARES_NUM: usize = 9;
 /// ゲームを中断したり、再開したりするときに使うゲームの記録です。  
 #[derive(Debug)]
 pub struct Position {
-    /// The stone to be placed next.  
-    /// friend is a broken word for first person.  
-    /// 次に置かれる石。  
-    /// friend は 一人称 の砕けた言い方。  
-    pub friend: Piece,
+    /// Turn. The stone to be placed next.  
+    /// 手番。次に置かれる石。  
+    pub turn: Piece,
 
     /// The board at the start. [0] is unused.  
     /// 開始時の盤面。 [0] は未使用。  
@@ -84,7 +82,7 @@ pub struct Position {
 impl Default for Position {
     fn default() -> Self {
         Position {
-            friend: Piece::Nought,
+            turn: Piece::Nought,
             starting_board: [None; BOARD_LEN],
             starting_pieces_num: 0,
             board: [None; BOARD_LEN],
@@ -111,7 +109,7 @@ impl Position {
 
 ",
             self.pieces_num + 1,
-            self.friend
+            self.turn
         );
         s.push_str(&format!(
             "\
@@ -152,7 +150,7 @@ impl Position {
 pub struct Search {
     /// The person who started this search.  
     /// この探索を始めた方。  
-    pub start_friend: Piece,
+    pub start_turn: Piece,
     /// The number of stones on the board at the start of this search.  
     /// この探索の開始時に盤の上に有った石の数。  
     pub start_pieces_num: usize,
@@ -164,9 +162,9 @@ pub struct Search {
     pub stopwatch: Instant,
 }
 impl Search {
-    pub fn new(friend: Piece, start_pieces_num: usize) -> Self {
+    pub fn new(turn: Piece, start_pieces_num: usize) -> Self {
         Search {
-            start_friend: friend,
+            start_turn: turn,
             start_pieces_num: start_pieces_num,
             nodes: 0,
             stopwatch: Instant::now(),
@@ -191,7 +189,7 @@ impl Search {
     /// Header.
     /// 見出し。
     pub fn info_header(pos: &Position) -> String {
-        match pos.friend {
+        match pos.turn {
             Piece::Nought => {
                 "info string \"nps\":......, \"nodes\":......, \"pv\":[O,X,O,X,O,X,O,X,O]"
                     .to_string()
@@ -212,11 +210,6 @@ impl Search {
         sq: usize,
         comment: Option<&str>,
     ) -> String {
-        let friend_str = if pos.friend == self.start_friend {
-            "+".to_string()
-        } else {
-            "-".to_string()
-        };
         format!(
             "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}], \"push\":\"{}\",               \"pieces\":{},                  \"turn\":\"{}\"{} }}",
             nps,
@@ -224,7 +217,7 @@ impl Search {
             self.pv(pos,','),
             sq,
             pos.pieces_num,
-            friend_str,
+            pos.turn,
             if let Some(comment) = comment {
                 format!(", \"comment\":\"{}\"",comment).to_string()
             } else {
@@ -244,11 +237,6 @@ impl Search {
         result: GameResult,
         comment: Option<&str>,
     ) -> String {
-        let friend_str = if pos.friend == self.start_friend {
-            "+".to_string()
-        } else {
-            "-".to_string()
-        };
         format!(
             "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}], \"push\":\"{}\", \"leaf\": true, \"pieces\":{}, \"result\":{:6}, \"turn\":\"{}\"{} }}",
             nps,
@@ -257,7 +245,7 @@ impl Search {
             sq,
             pos.pieces_num,
             format!("\"{}\"",result.to_string()),
-            friend_str,
+            pos.turn,
             if let Some(comment) = comment {
                 format!(", \"comment\":\"{}\"", comment).to_string()
             } else {
@@ -276,11 +264,6 @@ impl Search {
         result: GameResult,
         comment: Option<&str>,
     ) -> String {
-        let friend_str = if pos.friend == self.start_friend {
-            "+".to_string()
-        } else {
-            "-".to_string()
-        };
         return format!(
             "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}], \"pop\" :\"{}\",               \"pieces\":{}, \"result\":{:6}, \"turn\":\"{}\"{} }}",
             nps,
@@ -289,7 +272,7 @@ impl Search {
             sq,
             pos.pieces_num,
             format!("\"{}\"",result.to_string()),
-            friend_str,
+            pos.turn,
             if let Some(comment) = comment {
                 format!(", \"comment\":\"{}\"", comment).to_string()
             } else {

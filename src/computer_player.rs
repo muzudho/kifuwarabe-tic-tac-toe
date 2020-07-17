@@ -48,7 +48,7 @@ impl Search {
                             pos,
                             sq,
                             GameResult::Win,
-                            Some("Hooray!"),
+                            Some("Resign."),
                         ));
                     }
 
@@ -136,7 +136,7 @@ impl Search {
                                 pos,
                                 sq,
                                 GameResult::Win,
-                                Some("Ok."),
+                                Some("Hooray!"),
                             ));
                         }
 
@@ -184,7 +184,7 @@ impl Search {
                                 pos,
                                 sq,
                                 GameResult::Lose,
-                                Some("Resign."),
+                                Some("Damn!"),
                             ));
                         }
                     }

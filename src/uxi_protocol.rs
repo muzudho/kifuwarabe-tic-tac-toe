@@ -47,7 +47,7 @@ impl Position {
 
         // Next stone.
         // 次に置く石。
-        match self.friend {
+        match self.turn {
             Piece::Nought => {
                 xfen.push_str(" o");
             }
@@ -148,10 +148,10 @@ impl Position {
                 MachineState::Phase => {
                     match ch {
                         'x' => {
-                            pos.friend = Piece::Cross;
+                            pos.turn = Piece::Cross;
                         }
                         'o' => {
-                            pos.friend = Piece::Nought;
+                            pos.turn = Piece::Nought;
                         }
                         _ => {
                             Log::error(&format!("(Err.157) xfen phase error: {}", ch));

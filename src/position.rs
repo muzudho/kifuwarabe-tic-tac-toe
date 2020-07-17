@@ -10,7 +10,7 @@ impl Position {
     pub fn do_move(&mut self, sq: usize) {
         // I placed a stone.
         // 石を置いた。
-        self.board[sq] = Some(self.friend);
+        self.board[sq] = Some(self.turn);
         // Write on the game record.
         // 棋譜に書きます。
         self.history[self.pieces_num] = sq as u8;
@@ -19,7 +19,7 @@ impl Position {
         self.pieces_num += 1;
         // Change of turn.
         // 手番交代。
-        self.friend = self.opponent();
+        self.turn = self.opponent();
     }
 
     /// 1 back.  
@@ -27,7 +27,7 @@ impl Position {
     pub fn undo_move(&mut self) {
         // Change of turn.
         // 手番交代。
-        self.friend = self.opponent();
+        self.turn = self.opponent();
         // The number of stones points to the next element of the array,
         // so first reduce it and then extract the contents of the array.
         // 石の数は配列の次の要素を指しているので、先に戻してから、配列の中身を取り出してください。
@@ -41,7 +41,7 @@ impl Position {
     /// 相手番。
     pub fn opponent(&self) -> Piece {
         use crate::position::Piece::*;
-        match self.friend {
+        match self.turn {
             Nought => Cross,
             Cross => Nought,
         }
