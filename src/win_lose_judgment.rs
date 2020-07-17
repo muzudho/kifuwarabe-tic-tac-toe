@@ -1,12 +1,15 @@
-//! 勝敗判定☆（＾～＾）
+//! Win/Loss judgment.
+//! 勝敗判定。
 use crate::look_and_model::{Position, BOARD_LEN};
 
+/// A record of the game used to suspend or resume it.  
+/// ゲームを中断したり、再開したりするときに使うゲームの記録です。  
 impl Position {
-    /// 石を置いてから 勝敗判定をするので、
-    /// 反対側の手番のやつが 石を３つ並べてたかどうかを調べるんだぜ☆（＾～＾）
+    /// It will now be determined whether the player who already placed the stone, not the player who placed the stone, won.
+    /// これから石を置くプレイヤーではなく、既に石を置いたプレイヤーが勝ったか判定します。  
     pub fn is_opponent_win(&self) -> bool {
-        // 8パターンしかないので、全部チェックしてしまおうぜ☆（＾～＾）
-
+        // Since there are only 8 patterns, let's check all.
+        // 8パターンしかないので、全部チェックしましょう。
         let opponent = self.opponent();
 
         // xxx
@@ -59,9 +62,9 @@ impl Position {
             && Some(opponent) == self.board[1])
     }
 
-    /// 石を置いてから 引き分け判定をするので、
-    /// 反対側の手番のやつが 勝ってなくて、
-    /// かつ、全てのマスが埋まってたら引き分けだぜ☆（＾～＾）
+    /// If the player who has already placed the stone is not winning
+    /// and the current player has no place to place the stone, it is a draw.
+    /// 既に石を置いたプレイヤーが勝っていなくて、今のプレイヤーが石を置く場所がなければ引き分けです。
     pub fn is_draw(&self) -> bool {
         if self.is_opponent_win() {
             return false;
