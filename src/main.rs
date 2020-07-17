@@ -7,6 +7,7 @@ extern crate regex;
 
 mod command_line_parser;
 mod computer_player;
+mod log;
 mod look_and_model;
 mod performance_measurement;
 mod position;
@@ -16,75 +17,19 @@ mod win_lose_judgment;
 
 use casual_logger::{Level, Log};
 use command_line_parser::CommandLineParser;
+use log::LogExt;
 use look_and_model::{GameResult, Piece, Position, Search};
 use std;
 use std::{thread, time};
 use test::test_win_lose_judgement;
 
-/// Extend the functionality of the log.  
-/// ログの機能を拡張します。  
-pub trait LogExt {
-    fn print_debug(s: &str);
-    fn print_info(s: &str);
-    fn print_notice(s: &str);
-    fn print_error(s: &str);
-    fn print_fatal(s: &str);
-}
-impl LogExt for Log {
-    /// Display 'debug' level messages and write to log.  
-    /// デバッグ レベル メッセージを表示し、ログに書き込みます。  
-    fn print_debug(s: &str) {
-        if Log::enabled(Level::Debug) {
-            println!("{}", s);
-        }
-        Log::debug(s);
-    }
-
-    /// Display 'info' level messages and write to log.  
-    /// 情報レベル メッセージを表示し、ログに書き込みます。  
-    fn print_info(s: &str) {
-        if Log::enabled(Level::Info) {
-            println!("{}", s);
-        }
-        Log::info(s);
-    }
-
-    /// Display 'notice' level messages and write to log.  
-    /// 通知レベル メッセージを表示し、ログに書き込みます。  
-    fn print_notice(s: &str) {
-        if Log::enabled(Level::Notice) {
-            println!("{}", s);
-        }
-        Log::notice(s);
-    }
-
-    /// Display 'error' level messages and write to log.  
-    /// エラー レベル メッセージを表示し、ログに書き込みます。  
-    fn print_error(s: &str) {
-        if Log::enabled(Level::Notice) {
-            println!("{}", s);
-        }
-        Log::error(s);
-    }
-
-    /// Display 'fatal' level messages and write to log.  
-    /// 致命的レベル メッセージを表示し、ログに書き込みます。  
-    fn print_fatal(s: &str) {
-        // In the Computer Shogi USI protocol, "info string" is a display text.
-        // コンピューター将棋の USIプロトコル で 'info string' というのがあって
-        // 強制終了の直前に画面に出せるかもしれないから付けています。
-        Log::fatal(&format!("info string {}", s));
-    }
-}
-
 fn main() {
     // Log file name.
     // ログ ファイル名。
-    Log::set_file_name("tic-tac-toe");
+    Log::set_file_name("kifuwarabe-tic-tac-toe");
     // Log level.
     // ログ レベル。
-    Log::set_level(Level::Trace);
-    // Log::set_level(Level::Info);
+    Log::set_level(Level::Info);
     // Log file retention days.
     // ログ ファイル保持日数。
     Log::set_retention_days(2);

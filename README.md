@@ -1,65 +1,68 @@
 # Kifuwarabe's tic-tac-toe
 
-〇×ゲームだぜ☆（＾～＾）  
+Kifuwarabe(きふわらべ) is computer shogi/go thinking engine.  
 
-* [プログラミング入門動画](https://www.youtube.com/playlist?list=PLllMJuAE0iK6kSsi96OBXBgNZHFg7KB9f) - 小学生は変女に Scratch でも教えられてろだぜ☆（＾～＾）
-* 他のプログラム言語で○×ゲーム
-  * [Go ver](https://github.com/muzudho/tic-tac-toe-on-golang)
-  * [Python ver](https://github.com/muzudho/tic-tac-toe-on-python)
+* [2014 Shogi SDT2](https://denou.jp/tournament2014/)
+* [2015 Shogi WCSC25](http://www2.computer-shogi.org/wcsc25/)
+* [2015 Shogi SDT3](https://denou.jp/tournament2015/)
+* [2016 Go    UEC9](http://www.computer-go.jp/uec/public_html/eng/index.shtml)
+* [2016 Shogi WCSC26](http://www2.computer-shogi.org/wcsc26/)
+* [2016 Shogi SDT4](https://denou.jp/tournament2016/)
+* [2017 Go    UEC10](http://www.computer-go.jp/uec/public_html/eng/index.shtml)
+* [2017 Shogi WCSC27](http://www2.computer-shogi.org/wcsc27/)
+* [2017 Shogi SDT5](https://denou.jp/tournament2017/)
+* [2017 Go    AIR2017](https://www.igoshogi.net/ai_ryusei2017/01/en/)
+* [2018 Shogi WCSC28](http://www2.computer-shogi.org/wcsc28/)
+* [2018 Go    AIR2018](https://www.igoshogi.net/ai_ryusei/01/en/)
+* [2019 Shogi WCSC29](http://www2.computer-shogi.org/wcsc29/)
+* [2019 Go    UEC11](http://entcog.c.ooco.jp/entcog/new_uec/en/)
+* [2020 Shogi WCSOC1](http://www2.computer-shogi.org/wcso1.html)
 
-## Visual Studio Code を使っている人へ
+This is tic-tac-toe edition.  
+There is **no** GUI (Graphical user interface), It's CUI (Characterbased user interface).  
 
-* やれ。
-  * メインメニューから `[File] - [Preferences] - [Settings]` を開く。
-  * Search settings 欄へ `files.autoGuessEncoding` と入力。
-  * `Files: Auto Guess Encoding` チェックボックスをチェック。
-  * まだ Settings を閉じるなだぜ。視認性の悪い画面を良く見ろ、 `User`, `Workspace`, `tic-tac-toe` と３つタブが並んでるだろ☆ それぞれある☆
-  * 保存。
+Kifuwarabe's tic-tac-toe other programming languages edition:  
 
-## Test run
+* [Go edition](https://github.com/muzudho/tic-tac-toe-on-golang)
+* [Python edition](https://github.com/muzudho/tic-tac-toe-on-python)
 
-あなたのローカルPCでテストする方法です。  
+## Set up
 
-Input:  
+Set up Visual studio code.  
+
+Supports multi-byte character strings:  
+
+* `[File] - [Preferences] - [Settings]` from main menu.
+* Key type `files.autoGuessEncoding` into `Search settings` text box.
+* Check `Files: Auto Guess Encoding` check box each `User`, `Workspace`, `tic-tac-toe` tab.
+* Save.
+
+Appear the terminal:  
+
+* `[Terminal] - [New Terminal]` from main menu.
+
+Find out how to install Rust:  
+
+* [Rust](https://www.rust-lang.org/)
+
+## How to use
+
+Code:  
 
 ```shell
-cargo run
+cargo run --release
 ```
-
-## Run
-
-**Dockerなんか　うまくいかね☆（＾～＾）**
-
-あらかじめ、Docker をインストールしておいてください。  
-このエグザンプルでは、動作確認は、Dockerコンテナ上の仮想Ubuntuで行うものとします。  
-
-Dockerイメージを作成するために、以下のコマンドを打鍵してください。  
-
-Input:  
-
-```shell
-docker build --tag tic-tac-toe:0.1 .
-```
-
-Dockerコンテナを起動するために、以下のコマンドを打鍵してください。  
-
-Input:  
-
-```shell
-docker run --name tic-tac-toe -it --rm tic-tac-toe:0.1
-```
-
-TODO カレント・ディレクトリの移動
-TODO cargo run
 
 ## How to make tic tac toe?
 
 During development, you may need to reproduce the behavior of your computer.  
 It is difficult to compare the behavior. Instead, it is useful to get the logs and compare the logs.  
-**But logger's difficult to make, so copy and paste it.**  
+**But logger's difficult to make, so use library.**  
 
-* [x] Step 1. Use logger library. (You can **COPY & PASTE** in 1 minutes)
+* [x] Step 1. Use logger library.
   * [x] Use casual_logger library.
+* [x] 'log.rs'
+  * [x] Extend the logger.
 
 The first thing you have to create is your motive.  
 It is important to start with the appearance.  
@@ -102,7 +105,7 @@ Let's make a principal command.
   * [x] pos.
   * [x] do.
   * [x] undo.
-  * [ ] uxi.
+  * [x] uxi.
   * [x] xfen.
 
 Before you make a computer player, let's judge the outcome. And let's test.  
@@ -110,7 +113,7 @@ Before you make a computer player, let's judge the outcome. And let's test.
 * [x] Step 7. 'win_lose_judgment.rs'
   * [x] Win.
   * [x] Draw - Not win, not lose, can not play.
-  * [-] Lose. - Not win is lose.
+  * [ ] Lose. - Not win is lose.
 
 Before creating a computer player, let's create a mechanism to measure performance.  
 
@@ -122,45 +125,7 @@ Finally, let's make a computer player.
 
 * [x] Step 9. 'computer_player.rs'
   * [x] Search.
-  * [-] Evaluation - None.
+  * [ ] Evaluation - None.
 * [x] 'main.py'
   * [x] Create "go" command.
 * [ ] Remeve all 'TODO' tasks. Examples: '// TODO Write a code here.'
-
-# Test case
-
-```plain
-# mate +3 の局面。 5 -> [6,9]どう打っても -> [9,6]。
-# x..
-# o..
-# o.x
-position xfen x2/o2/o1x o
-
-# mate +5 の局面？
-# ...
-# ...
-# o.x
-position xfen 3/3/o1x o
-
-# Draw の局面。 9。
-# xo.
-# oxx
-# xoo
-position xfen xo1/oxx/xoo o
-```
-
-# Documentation
-
-Input:  
-
-```shell
-cargo doc --open
-```
-
-# Test
-
-Input:  
-
-```shell
-cargo test
-```
