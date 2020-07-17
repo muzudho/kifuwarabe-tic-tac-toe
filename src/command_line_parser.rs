@@ -1,3 +1,4 @@
+use crate::LogExt;
 use casual_logger::Log;
 use std::fmt;
 
@@ -14,7 +15,10 @@ impl CommandLineParser {
         // 末尾の改行を削除します。
         let line: String = match line.trim().parse() {
             Ok(n) => n,
-            Err(e) => panic!(Log::fatal(&format!("(Err.38)  Failed to parse. / {}", e))),
+            Err(e) => panic!(Log::print_fatal(&format!(
+                "(Err.38)  Failed to parse. / {}",
+                e
+            ))),
         };
         // character count.
         // 文字数。

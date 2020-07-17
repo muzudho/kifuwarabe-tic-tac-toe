@@ -27,10 +27,11 @@ pub trait LogExt {
     fn print_debug(s: &str);
     fn print_info(s: &str);
     fn print_notice(s: &str);
+    fn print_fatal(s: &str);
 }
 impl LogExt for Log {
-    /// Display 'debug' level messages and write to log.
-    /// デバッグ レベル メッセージを表示し、ログに書き込みます。
+    /// Display 'debug' level messages and write to log.  
+    /// デバッグ レベル メッセージを表示し、ログに書き込みます。  
     fn print_debug(s: &str) {
         if Log::enabled(Level::Debug) {
             println!("{}", s);
@@ -38,8 +39,8 @@ impl LogExt for Log {
         Log::debug(s);
     }
 
-    /// Display 'info' level messages and write to log.
-    /// 情報レベル メッセージを表示し、ログに書き込みます。
+    /// Display 'info' level messages and write to log.  
+    /// 情報レベル メッセージを表示し、ログに書き込みます。  
     fn print_info(s: &str) {
         if Log::enabled(Level::Info) {
             println!("{}", s);
@@ -47,13 +48,22 @@ impl LogExt for Log {
         Log::info(s);
     }
 
-    /// Display 'notice' level messages and write to log.
-    /// 通知レベル メッセージを表示し、ログに書き込みます。
+    /// Display 'notice' level messages and write to log.  
+    /// 通知レベル メッセージを表示し、ログに書き込みます。  
     fn print_notice(s: &str) {
         if Log::enabled(Level::Notice) {
             println!("{}", s);
         }
         Log::notice(s);
+    }
+
+    /// Display 'fatal' level messages and write to log.  
+    /// 致命的レベル メッセージを表示し、ログに書き込みます。  
+    fn print_fatal(s: &str) {
+        // In the Computer Shogi USI protocol, "info string" is a display text.
+        // コンピューター将棋の USIプロトコル で 'info string' というのがあって
+        // 強制終了の直前に画面に出せるかもしれないから付けています。
+        Log::fatal(&format!("info string {}", s));
     }
 }
 
@@ -188,7 +198,7 @@ fn main() {
         pos = if let Some(pos) = Position::from_xfen(xfen) {
             pos
         } else {
-            panic!(Log::fatal(&format!("Invalid xfen=|{}|", xfen)))
+            panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
         };
         Log::print_debug(&pos.pos());
         // [Next 9 move(s) | Go o]
@@ -204,7 +214,7 @@ fn main() {
         pos = if let Some(pos) = Position::from_xfen(xfen) {
             pos
         } else {
-            panic!(Log::fatal(&format!("Invalid xfen=|{}|", xfen)))
+            panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
         };
         Log::print_debug(&pos.pos());
         // win x
@@ -235,7 +245,7 @@ fn main() {
         pos = if let Some(pos) = Position::from_xfen(xfen) {
             pos
         } else {
-            panic!(Log::fatal(&format!("Invalid xfen=|{}|", xfen)))
+            panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
         };
         Log::print_debug(&format!("win=|{}|", pos.is_opponent_win()));
         // win=|True|
@@ -243,7 +253,7 @@ fn main() {
         pos = if let Some(pos) = Position::from_xfen(xfen) {
             pos
         } else {
-            panic!(Log::fatal(&format!("Invalid xfen=|{}|", xfen)))
+            panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
         };
         Log::print_debug(&format!("draw=|{}|", pos.is_draw()));
         // draw=|True|
@@ -264,7 +274,7 @@ fn main() {
         pos = if let Some(pos) = Position::from_xfen(xfen) {
             pos
         } else {
-            panic!("Invalid xfen=|{}|", xfen)
+            panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
         };
         let mut search = Search::new(pos.friend, pos.pieces_num);
         let (addr, result) = search.go(&mut pos);
@@ -335,29 +345,32 @@ Let's input from `pos`.
 ",
     );
 
-    // 初期局面
+    // Starting position.
+    // 初期局面。
     let mut pos = Position::default();
 
-    // [Ctrl]+[C] でループを終了
+    // End the loop with 'quit'. Forced termination with [Ctrl]+[C].
+    // 'quit' でループを終了。 [Ctrl]+[C] で強制終了。
     loop {
         let mut line: String = String::new();
-        // まず最初に、コマンドライン入力を待機しろだぜ☆（＾～＾）
+        // Wait for command line input from standard input.
+        // 標準入力からのコマンドライン入力を待機します。
         match std::io::stdin().read_line(&mut line) {
             Ok(_n) => {}
-            // エラー番号は適当に近くの行番号でも振っとけだぜ☆（＾～＾）ちょっぴり散らばる☆（＾～＾）
-            // コンピューター将棋の USIプロトコル で 'info string' というのがあって
-            // 最後に画面に出せるかもしれないから頭に付けている☆（＾～＾）
-            Err(e) => panic!(format!(
-                "info string (Err.32)  Failed to read line. / {}",
+            // Tips. You can separate error numbers by simply specifying the line number.
+            // テクニック。 エラー番号は行番号を振っておくだけで少しはばらけます。
+            Err(e) => panic!(Log::print_fatal(&format!(
+                "(Err.364) Failed to read line. / {}",
                 e
-            )),
+            ))),
         };
 
-        // コマンドライン☆（＾～＾） p は parser の意味で使ってるぜ☆（＾～＾）
+        // p is the acronym for parser.
+        // p は parser の頭文字。
         let mut p = CommandLineParser::new(&line);
 
-        // 本当は よく使うコマンド順に並べた方が高速だが、先に見つけた方が選ばれるので後ろの方を漏らしやすくて むずかしいし、
-        // だから、アルファベット順に並べた方が見やすいぜ☆（＾～＾）
+        // It is in alphabetical order because it is easy to find.
+        // 探しやすいからアルファベット順です。
         if p.starts_with("do") {
             p.go_next_to("do ");
             if let Some(rest) = p.rest() {
@@ -399,5 +412,6 @@ Let's input from `pos`.
     }
 
     // Wait for logging to complete.
+    // ロギングが完了するまで待ちます。
     Log::wait();
 }
