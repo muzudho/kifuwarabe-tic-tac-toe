@@ -17,16 +17,16 @@ impl Search {
     /// The state node of the search tree. Commonly called search.  
     /// 検索ツリーの状態ノード。一般に 'search' と呼ばれます。  
     fn node(&mut self, pos: &mut Position) -> (Option<u8>, GameResult) {
-        let mut best_addr = None;
+        let mut best_sq = None;
         let mut best_result = GameResult::Lose;
 
-        for addr in 1..BOARD_LEN {
+        for sq in 1..BOARD_LEN {
             // I only look at the empty square.
             // 空きマスだけを見ます。
-            if let None = pos.board[addr] {
+            if let None = pos.board[sq] {
                 // Let's put a stone for now.
                 // とりあえず石を置きましょう。
-                pos.do_move(addr);
+                pos.do_move(sq);
                 self.nodes += 1;
 
                 // Prior knowledge. Proceeding from the root toward the leaves is called a forward search.
@@ -46,7 +46,7 @@ impl Search {
                         Log::print_info(&self.info_forward_leaf(
                             self.nps(),
                             pos,
-                            addr,
+                            sq,
                             GameResult::Win,
                             Some("Hooray!"),
                         ));
@@ -62,14 +62,14 @@ impl Search {
                         Log::print_info(&self.info_backward(
                             self.nps(),
                             pos,
-                            addr,
+                            sq,
                             GameResult::Win,
                             None,
                         ));
                     }
                     // (4) The search ends.
                     // (四) 探索を終了します。
-                    return (Some(addr as u8), GameResult::Win);
+                    return (Some(sq as u8), GameResult::Win);
                 } else if SQUARES_NUM <= pos.pieces_num {
                     // Draw if there is no place to put.
                     // 置く場所が無ければ引き分け。
@@ -80,7 +80,7 @@ impl Search {
                         Log::print_info(&self.info_forward_leaf(
                             self.nps(),
                             pos,
-                            addr,
+                            sq,
                             GameResult::Draw,
                             Some("It's ok."),
                         ));
@@ -96,14 +96,14 @@ impl Search {
                         Log::print_info(&self.info_backward(
                             self.nps(),
                             pos,
-                            addr,
+                            sq,
                             GameResult::Draw,
                             None,
                         ));
                     }
                     // (4) The search ends.
                     // (四) 探索を終了します。
-                    return (Some(addr as u8), GameResult::Draw);
+                    return (Some(sq as u8), GameResult::Draw);
                 } else {
                     // I will continue.
                     // まだ続けます。
@@ -111,13 +111,13 @@ impl Search {
                     // (1) Outputs information for forward search.
                     // (一) 前向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
-                        Log::print_info(&self.info_forward(self.nps(), pos, addr, Some("Search.")));
+                        Log::print_info(&self.info_forward(self.nps(), pos, sq, Some("Search.")));
                     }
                 }
 
                 // It's opponent's turn.
                 // 相手の番です。
-                let (_opponent_address, opponent_game_result) = self.node(pos);
+                let (_opponent_sq, opponent_game_result) = self.node(pos);
 
                 // (2) Remove the placed stone.
                 // (二) 置いた石は取り除きます。
@@ -134,7 +134,7 @@ impl Search {
                             Log::print_info(&self.info_backward(
                                 self.nps(),
                                 pos,
-                                addr,
+                                sq,
                                 GameResult::Win,
                                 Some("Ok."),
                             ));
@@ -142,7 +142,7 @@ impl Search {
 
                         // (4) The search ends.
                         // (四) 探索を終了します。
-                        return (Some(addr as u8), GameResult::Win);
+                        return (Some(sq as u8), GameResult::Win);
                     }
                     GameResult::Draw => {
                         // If neither is wrong, draw.
@@ -154,7 +154,7 @@ impl Search {
                             Log::print_info(&self.info_backward(
                                 self.nps(),
                                 pos,
-                                addr,
+                                sq,
                                 GameResult::Draw,
                                 Some("Fmmm."),
                             ));
@@ -166,7 +166,7 @@ impl Search {
                             GameResult::Lose => {
                                 // If it gets better, change it to this. Generally called 'Update alpha evaluation'.
                                 // 良くなるならこの手に変えます。一般的には 'α評価値の更新' と呼びます。
-                                best_addr = Some(addr as u8);
+                                best_sq = Some(sq as u8);
                                 best_result = GameResult::Draw;
                             }
                             _ => {}
@@ -182,7 +182,7 @@ impl Search {
                             Log::print_info(&self.info_backward(
                                 self.nps(),
                                 pos,
-                                addr,
+                                sq,
                                 GameResult::Lose,
                                 Some("Resign."),
                             ));
@@ -194,6 +194,6 @@ impl Search {
 
         // End of turn.
         // 手番の終わり。
-        (best_addr, best_result)
+        (best_sq, best_result)
     }
 }

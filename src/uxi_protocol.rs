@@ -16,8 +16,8 @@ impl Position {
         // Starting board.
         // 開始盤面。
         let mut spaces = 0;
-        for addr in [7, 8, 9, 4, 5, 6, 1, 2, 3].iter() {
-            if let Some(piece) = self.starting_board[*addr as usize] {
+        for sq in [7, 8, 9, 4, 5, 6, 1, 2, 3].iter() {
+            if let Some(piece) = self.starting_board[*sq as usize] {
                 if 0 < spaces {
                     xfen.push_str(&spaces.to_string());
                     spaces = 0;
@@ -30,7 +30,7 @@ impl Position {
                 spaces += 1;
             }
 
-            if *addr == 9 || *addr == 6 {
+            if *sq == 9 || *sq == 6 {
                 if 0 < spaces {
                     xfen.push_str(&spaces.to_string());
                     spaces = 0;
@@ -77,14 +77,14 @@ impl Position {
 
         let mut pos = Position::default();
         let mut starts = 0usize;
-        // address. 0 is unused.
-        // 番地。 0 は未使用。
+        // Square. 0 is unused.
+        // マス。 0 は未使用。
         // 7 8 9
         // 4 5 6
         // 1 2 3
         // The upper left is 7.
         // 左上が7。
-        let mut addr = 7;
+        let mut sq = 7;
 
         #[derive(Debug)]
         enum MachineState {
@@ -120,19 +120,19 @@ impl Position {
                     'x' => {
                         // It's not the order of the game, so I don't know the turn.
                         // 棋譜の順ではないので、手番は分かりません。
-                        pos.starting_board[addr] = Some(Piece::Cross);
+                        pos.starting_board[sq] = Some(Piece::Cross);
                         pos.pieces_num += 1;
-                        addr += 1;
+                        sq += 1;
                     }
                     'o' => {
-                        pos.starting_board[addr] = Some(Piece::Nought);
+                        pos.starting_board[sq] = Some(Piece::Nought);
                         pos.pieces_num += 1;
-                        addr += 1;
+                        sq += 1;
                     }
-                    '1' => addr += 1,
-                    '2' => addr += 2,
-                    '3' => addr += 3,
-                    '/' => addr -= 6,
+                    '1' => sq += 1,
+                    '2' => sq += 2,
+                    '3' => sq += 3,
+                    '/' => sq -= 6,
                     ' ' => {
                         // Explicitly clone.
                         // 明示的にクローンしてください。
@@ -187,7 +187,7 @@ impl Position {
     ///
     /// * `arg_str` - The rest of the command line. Here is the place to put the pieces. For example, `1` or `7`. (コマンドラインの残り。ここでは駒を置く場所。 `1` とか `7` など)
     pub fn do_(&mut self, arg_str: &str) {
-        let addr: usize = match arg_str.parse() {
+        let sq: usize = match arg_str.parse() {
             Ok(x) => x,
             Err(_x) => {
                 Log::error(&format!(
@@ -200,18 +200,18 @@ impl Position {
 
         // Legal hand judgment. There should be no stones in the destination square.
         // 合法手判定。 移動先のマスに石があってはいけません。
-        if addr < 1 || 9 < addr {
-            Log::error(&format!("(Err.204) Specify from 1 to 9. Square={}", addr));
+        if sq < 1 || 9 < sq {
+            Log::error(&format!("(Err.204) Specify from 1 to 9. Square={}", sq));
             return;
-        } else if let Some(_piece_val) = self.board[addr as usize] {
+        } else if let Some(_piece_val) = self.board[sq as usize] {
             Log::error(&format!(
                 "(Err.211) Please put it in a place where there are no pieces. Square={}",
-                addr
+                sq
             ));
             return;
         }
 
-        self.do_move(addr);
+        self.do_move(sq);
 
         // Win/loss judgment. Let's implement this after creating Position::result and is_opponent_win().
         // 勝ち負け判定。 これは Position::result, is_opponent_win() を作ったあとで実装しましょう。

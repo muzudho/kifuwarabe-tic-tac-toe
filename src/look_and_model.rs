@@ -175,21 +175,30 @@ impl Search {
 
     /// Principal variation.
     /// 今読んでる読み筋。
-    pub fn pv(&self, pos: &Position) -> String {
+    pub fn pv(&self, pos: &Position, separator: char) -> String {
         let mut pv = String::new();
         for t in self.start_pieces_num..pos.pieces_num {
-            pv.push_str(&format!("{} ", pos.history[t]));
+            pv.push_str(&format!("{}{}", pos.history[t], separator));
         }
-        pv.trim_end().to_string()
+
+        if 0 < pv.len() {
+            pv.pop();
+        }
+
+        pv.to_string()
     }
 
     /// Header.
     /// 見出し。
     pub fn info_header(pos: &Position) -> String {
         match pos.friend {
-            Piece::Nought => "info nps ...... nodes ...... pv O X O X O X O X O".to_string(),
+            Piece::Nought => {
+                "info string \"nps\"=......, \"nodes\"=......, \"pv\"=[O,X,O,X,O,X,O,X,O]"
+                    .to_string()
+            }
             Piece::Cross => {
-                format!("info nps ...... nodes ...... pv X O X O X O X O X").to_string()
+                format!("info string \"nps\"=......, \"nodes\"=......, \"pv\"=[X,O,X,O,X,O,X,O,X]")
+                    .to_string()
             }
         }
     }
@@ -200,7 +209,7 @@ impl Search {
         &self,
         nps: u64,
         pos: &Position,
-        addr: usize,
+        sq: usize,
         comment: Option<&str>,
     ) -> String {
         let friend_str = if pos.friend == self.start_friend {
@@ -209,12 +218,12 @@ impl Search {
             "-".to_string()
         };
         format!(
-            "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | ->   to {} |       |      |{}",
+            "info json {{ \"nps\"={: >6}, \"nodes\"={: >6}, \"pv\"=[{: <17}], \"turn\"=\"{}\", \"sq\"=\"{}\", \"->\", to {} |       |      |{} }}",
             nps,
             self.nodes,
-            self.pv(pos),
+            self.pv(pos,','),
             friend_str,
-            addr,
+            sq,
             if SQUARES_NUM < pos.pieces_num + 1 {
                 "none    ".to_string()
             } else {
@@ -235,7 +244,7 @@ impl Search {
         &self,
         nps: u64,
         pos: &Position,
-        addr: usize,
+        sq: usize,
         result: GameResult,
         comment: Option<&str>,
     ) -> String {
@@ -245,12 +254,12 @@ impl Search {
             "-".to_string()
         };
         format!(
-            "info nps {: >6} nodes {: >6} pv {: <17} | {} [{}] | .       {} |       | {:4} |{}",
+            "info json {{ \"nps\"={: >6}, \"nodes\"={: >6}, \"pv\"=[{: <17}], \"turn\"=\"{}\", \"sq\"=\"{}\", \"dir\"=\"..\", {} |       | {:4} |{} }}",
             nps,
             self.nodes,
-            self.pv(pos),
+            self.pv(pos,','),
             friend_str,
-            addr,
+            sq,
             if SQUARES_NUM < pos.pieces_num {
                 "none    ".to_string()
             } else {
@@ -271,7 +280,7 @@ impl Search {
         &self,
         nps: u64,
         pos: &Position,
-        addr: usize,
+        sq: usize,
         result: GameResult,
         comment: Option<&str>,
     ) -> String {
@@ -281,17 +290,17 @@ impl Search {
             "-".to_string()
         };
         return format!(
-            "info nps {: >6} nodes {: >6} pv {: <17} |       | <- from {} | {} [{}] | {:4} |{}",
+            "info json {{ \"nps\"={: >6}, \"nodes\"={: >6}, \"pv\"=[{: <17}], \"turn\"=\"{}\", \"sq\"=\"{}\", \"dir\"=\"<-\", from {} | | {:4} |{} }}",
             nps,
             self.nodes,
-            self.pv(pos),
+            self.pv(pos,','),
+            friend_str,
+            sq,
             if SQUARES_NUM < pos.pieces_num + 1 {
                 "none    ".to_string()
             } else {
                 format!("height {}", pos.pieces_num + 1)
             },
-            friend_str,
-            addr,
             result.to_string(),
             if let Some(comment) = comment {
                 format!(" {} \"{}\"", friend_str, comment)

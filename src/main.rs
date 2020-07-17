@@ -76,7 +76,7 @@ fn main() {
         // win O
 
         let search = Search::new(pos.friend, pos.pieces_num);
-        Log::print_debug(&format!("pv=|{}|", search.pv(&pos)));
+        Log::print_debug(&format!("pv=|{}|", search.pv(&pos, ',')));
         // pv=||
         Log::print_debug(&Search::info_header(&pos));
         // info nps ...... nodes ...... pv O X O X O X O X O
@@ -232,7 +232,7 @@ fn main() {
             panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
         };
         let mut search = Search::new(pos.friend, pos.pieces_num);
-        let (addr, result) = search.go(&mut pos);
+        let (sq, result) = search.go(&mut pos);
         // info nps ...... nodes ...... pv O X O X O X O X O
         // info nps      1 nodes      1 pv 6                 | - [6] | ->   to height 8 |       |      | - "Search."
         // info nps      2 nodes      2 pv 6 8               | + [8] | ->   to height 9 |       |      | + "Search."
@@ -256,8 +256,8 @@ fn main() {
         // result=|draw|
         Log::print_debug(&format!(
             "bestmove=|{}|",
-            if let Some(addr) = addr {
-                format!("{}", addr).to_string()
+            if let Some(sq) = sq {
+                format!("{}", sq).to_string()
             } else {
                 "resign".to_string()
             }
@@ -333,10 +333,10 @@ Let's input from `pos`.
             }
         } else if p.starts_with("go") {
             let mut search = Search::new(pos.friend, pos.pieces_num);
-            let (addr, result) = search.go(&mut pos);
-            if let Some(addr) = addr {
+            let (sq, result) = search.go(&mut pos);
+            if let Some(sq) = sq {
                 Log::print_info(&format!("info result={:?} nps={}", result, search.nps()));
-                Log::print_notice(&format!("bestmove {}", addr));
+                Log::print_notice(&format!("bestmove {}", sq));
             } else {
                 Log::print_notice("resign");
             }

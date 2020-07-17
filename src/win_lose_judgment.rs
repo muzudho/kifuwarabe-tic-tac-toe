@@ -69,8 +69,8 @@ impl Position {
         if self.is_opponent_win() {
             return false;
         }
-        for addr in 1..BOARD_LEN {
-            if let None = self.board[addr] {
+        for sq in 1..BOARD_LEN {
+            if let None = self.board[sq] {
                 return false;
             }
         }

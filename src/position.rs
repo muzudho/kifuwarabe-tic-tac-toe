@@ -7,13 +7,13 @@ use crate::look_and_model::{Piece, Position};
 impl Position {
     /// Place the stone.  
     /// １手指します。  
-    pub fn do_move(&mut self, addr: usize) {
+    pub fn do_move(&mut self, sq: usize) {
         // I placed a stone.
         // 石を置いた。
-        self.board[addr] = Some(self.friend);
+        self.board[sq] = Some(self.friend);
         // Write on the game record.
         // 棋譜に書きます。
-        self.history[self.pieces_num] = addr as u8;
+        self.history[self.pieces_num] = sq as u8;
         // After writing on the game, count the stones you have placed.
         // 棋譜に書いたあと、置いた石を数えます。
         self.pieces_num += 1;
@@ -34,8 +34,8 @@ impl Position {
         self.pieces_num -= 1;
         // Turn off the stone.
         // 石を消します。
-        let addr = self.history[self.pieces_num];
-        self.board[addr as usize] = None;
+        let sq = self.history[self.pieces_num];
+        self.board[sq as usize] = None;
     }
     /// Opponent.
     /// 相手番。
