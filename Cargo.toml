@@ -1,8 +1,17 @@
 [package]
-name = "tic-tac-toe"
+name = "kifuwarabe_tic_tac_toe"
 version = "0.1.0"
 authors = ["むずでょ <muzudho1@gmail.com>"]
 edition = "2018"
+description = """
+This is tic-tac-toe thinking engine.  
+There is **no** GUI (Graphical user interface), It's CUI (Characterbased user interface).  
+"""
+readme = "README.md"
+repository = "https://github.com/muzudho/kifuwarabe-tic-tac-toe"
+license = "MIT"
+keywords = ["tic-tac-toe"]
+categories = ["game-engines"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
