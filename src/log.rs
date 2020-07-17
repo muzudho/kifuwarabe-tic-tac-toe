@@ -1,3 +1,5 @@
+//! Extend the functionality of the log.  
+//! ログの機能を拡張します。  
 use casual_logger::{Level, Log};
 
 /// Extend the functionality of the log.  

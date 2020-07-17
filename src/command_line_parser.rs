@@ -1,3 +1,5 @@
+//! Parses the command to make it easier to use.  
+//! コマンドを解析して、使いやすくします。  
 use crate::LogExt;
 use casual_logger::Log;
 use std::fmt;

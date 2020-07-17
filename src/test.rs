@@ -1,3 +1,5 @@
+//! Miscellaneous tests.  
+//! 雑多なテストです。  
 use crate::look_and_model::Position;
 
 /// Miscellaneous tests.  

@@ -1,5 +1,5 @@
-//! Win/Loss judgment.
-//! 勝敗判定。
+//! Win/Loss judgment.  
+//! 勝敗判定。  
 use crate::look_and_model::{Position, BOARD_LEN};
 
 /// A record of the game used to suspend or resume it.  

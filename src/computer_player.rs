@@ -1,3 +1,7 @@
+//! The thinking department of a computer.  
+//! See 'Search' struct in 'look_and_model' for details.  
+//! コンピューターの思考部です。  
+//! 詳しくは 'look_and_model' の 'Search' 構造体 を見てください。  
 use crate::look_and_model::{GameResult, Position, Search, BOARD_LEN, SQUARES_NUM};
 use crate::LogExt;
 use casual_logger::{Level, Log};

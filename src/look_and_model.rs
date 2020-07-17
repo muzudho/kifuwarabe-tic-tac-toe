@@ -1,3 +1,5 @@
+//! Display and data structure.  
+//! 表示と、データ構造です。  
 use std::fmt;
 use std::time::Instant;
 
