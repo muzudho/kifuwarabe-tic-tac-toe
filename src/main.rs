@@ -27,6 +27,7 @@ pub trait LogExt {
     fn print_debug(s: &str);
     fn print_info(s: &str);
     fn print_notice(s: &str);
+    fn print_error(s: &str);
     fn print_fatal(s: &str);
 }
 impl LogExt for Log {
@@ -55,6 +56,15 @@ impl LogExt for Log {
             println!("{}", s);
         }
         Log::notice(s);
+    }
+
+    /// Display 'error' level messages and write to log.  
+    /// エラー レベル メッセージを表示し、ログに書き込みます。  
+    fn print_error(s: &str) {
+        if Log::enabled(Level::Notice) {
+            println!("{}", s);
+        }
+        Log::error(s);
     }
 
     /// Display 'fatal' level messages and write to log.  
@@ -360,7 +370,7 @@ Let's input from `pos`.
             // Tips. You can separate error numbers by simply specifying the line number.
             // テクニック。 エラー番号は行番号を振っておくだけで少しはばらけます。
             Err(e) => panic!(Log::print_fatal(&format!(
-                "(Err.364) Failed to read line. / {}",
+                "(Err.373) Failed to read line. / {}",
                 e
             ))),
         };

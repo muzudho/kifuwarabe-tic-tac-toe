@@ -1,15 +1,20 @@
-//! 局面データを文字列にしたり、文字列を局面データに復元するのに使うぜ☆（＾～＾）
+//! Converts a position into a string or restores a string into a position.  
+//! 局面を文字列に変換したり、文字列を局面に復元します。  
 use crate::look_and_model::{GameResult, Piece, Position};
 use crate::LogExt;
 use casual_logger::Log;
 
+/// A record of the game used to suspend or resume it.  
+/// ゲームを中断したり、再開したりするときに使うゲームの記録です。  
 impl Position {
-    /// 現局面を xfen に変換するぜ☆（＾～＾）
+    /// Converts the current position to xfen.  
+    /// 現局面を xfen に変換します。  
     pub fn to_xfen(&self) -> String {
         let mut xfen = String::default();
         xfen.push_str("xfen ");
 
-        // StartingBoard
+        // Starting board.
+        // 開始盤面。
         let mut spaces = 0;
         for addr in [7, 8, 9, 4, 5, 6, 1, 2, 3].iter() {
             if let Some(piece) = self.starting_board[*addr as usize] {
@@ -34,12 +39,14 @@ impl Position {
             }
         }
 
-        // 残ってるスペースの flush を忘れないぜ☆（＾～＾）
+        // Flush the remaining space.
+        // 残っているスペースを flush します。
         if 0 < spaces {
             xfen.push_str(&spaces.to_string());
         }
 
-        // Phase
+        // Next stone.
+        // 次に置く石。
         match self.friend {
             Piece::Nought => {
                 xfen.push_str(" o");
@@ -49,7 +56,8 @@ impl Position {
             }
         }
 
-        // Moves
+        // A game record.
+        // 棋譜。
         if 0 < self.pieces_num - self.starting_pieces_num {
             xfen.push_str(" moves");
             for i in self.starting_pieces_num..self.pieces_num {
@@ -60,49 +68,58 @@ impl Position {
         xfen.to_string()
     }
 
-    /// xfen を board に変換するぜ☆（＾～＾）
+    /// Convert xfen to board.  
+    /// xfen を盤に変換します。  
     pub fn from_xfen(xfen: &str) -> Option<Position> {
         if !xfen.starts_with("xfen ") {
             return None;
         }
 
         let mut pos = Position::default();
-
-        // 文字数☆（＾～＾）
         let mut starts = 0usize;
-        // 番地☆（＾～＾） 0 は未使用☆（＾～＾）
+        // address. 0 is unused.
+        // 番地。 0 は未使用。
         // 7 8 9
         // 4 5 6
         // 1 2 3
+        // The upper left is 7.
+        // 左上が7。
         let mut addr = 7;
 
         #[derive(Debug)]
         enum MachineState {
-            /// 最初☆（＾～＾）
+            /// Parse start.
+            /// パース開始。
             Start,
-            /// 初期局面の盤上を解析中☆（＾～＾）
+            /// Analyzing the board on the initial stage.
+            /// 初期局面の盤上を解析中。
             StartingBoard,
-            /// 手番の解析中☆（＾～＾）
+            /// My turn is being analyzed.
+            /// 手番の解析中。
             Phase,
-            /// ` moves ` 読取中☆（＾～＾）
+            /// Reading ` moves `.
+            /// ` moves ` 読取中。
             MovesLabel,
-            /// 棋譜の解析中☆（＾～＾）
+            /// The game record is being analyzed.
+            /// 棋譜の解析中。
             Moves,
         }
         let mut machine_state = MachineState::Start;
-        // Rust言語では文字列に配列のインデックスを使ったアクセスはできないので、
-        // 一手間かけるぜ☆（＾～＾）
+        // Read one character at a time.
+        // １文字ずつ読取。
         for (i, ch) in xfen.chars().enumerate() {
             match machine_state {
                 MachineState::Start => {
                     if i + 1 == "xfen ".len() {
-                        // 先頭のキーワードを読み飛ばしたら次へ☆（＾～＾）
+                        // If you skip the top `xfen `, go to the next.
+                        // 先頭の `xfen ` を読み飛ばしたら次へ。
                         machine_state = MachineState::StartingBoard;
                     }
                 }
                 MachineState::StartingBoard => match ch {
                     'x' => {
-                        // 手番の順ではないので、手番は分からないぜ☆（＾～＾）
+                        // It's not the order of the game, so I don't know the turn.
+                        // 棋譜の順ではないので、手番は分かりません。
                         pos.starting_board[addr] = Some(Piece::Cross);
                         pos.pieces_num += 1;
                         addr += 1;
@@ -117,13 +134,14 @@ impl Position {
                     '3' => addr += 3,
                     '/' => addr -= 6,
                     ' ' => {
-                        // 明示的にクローン☆（＾～＾）
+                        // Explicitly clone.
+                        // 明示的にクローンしてください。
                         pos.board = pos.starting_board.clone();
                         pos.starting_pieces_num = pos.pieces_num;
                         machine_state = MachineState::Phase;
                     }
                     _ => {
-                        Log::errorln(&format!("xfen starting_board error: {}", ch));
+                        Log::error(&format!("(Err.144) xfen starting_board error: {}", ch));
                         return None;
                     }
                 },
@@ -136,10 +154,11 @@ impl Position {
                             pos.friend = Piece::Nought;
                         }
                         _ => {
-                            Log::errorln(&format!("xfen phase error: {}", ch));
+                            Log::error(&format!("(Err.157) xfen phase error: {}", ch));
                             return None;
                         }
                     }
+                    // Temporary memory.
                     // 一時記憶。
                     starts = i;
                     machine_state = MachineState::MovesLabel;
@@ -161,33 +180,32 @@ impl Position {
         Some(pos)
     }
 
-    /// 未来へ駒を置く
-    /// 最初は、合法手判定や勝敗判定をせずに　とりあえず動かせだぜ☆（＾～＾）
+    /// Place the pieces. If you are programming yourself, legal move decisions can be postponed.  
+    /// 駒を置きます。自分でプログラミングするなら、合法手は後回しで構いません。  
     ///
     /// # Arguments
     ///
-    /// * `arg_str` - コマンドラインの残り。ここでは駒を置く場所。 `1` とか `7` など。
+    /// * `arg_str` - The rest of the command line. Here is the place to put the pieces. For example, `1` or `7`. (コマンドラインの残り。ここでは駒を置く場所。 `1` とか `7` など)
     pub fn do_(&mut self, arg_str: &str) {
-        // Log::println(&format("Trace   | do_ line={}", line));
         let addr: usize = match arg_str.parse() {
             Ok(x) => x,
             Err(_x) => {
-                Log::errorln(&format!(
-                    "`do 数字` で入力してくれだぜ☆（＾～＾） 引数=|{}|",
+                Log::error(&format!(
+                    "(Err.194) Please input 'do <number>'. args=|{}|",
                     arg_str
                 ));
                 return;
             }
         };
 
-        // 合法手判定☆（＾～＾）
-        // 移動先のマスに駒があってはダメ☆（＾～＾）
+        // Legal hand judgment. There should be no stones in the destination square.
+        // 合法手判定。 移動先のマスに石があってはいけません。
         if addr < 1 || 9 < addr {
-            Log::errorln(&format!("1～9 で指定してくれだぜ☆（＾～＾） 番地={}", addr));
+            Log::error(&format!("(Err.204) Specify from 1 to 9. Square={}", addr));
             return;
         } else if let Some(_piece_val) = self.board[addr as usize] {
-            Log::errorln(&format!(
-                "移動先のマスに駒があってはダメだぜ☆（＾～＾） 番地={}",
+            Log::error(&format!(
+                "(Err.211) Please put it in a place where there are no pieces. Square={}",
                 addr
             ));
             return;
@@ -195,8 +213,8 @@ impl Position {
 
         self.do_move(addr);
 
-        // 勝ち負け判定☆（*＾～＾*）
-        // これは PositionHelper, WinLoseJudgment を作ってから実装しろだぜ☆（＾～＾）
+        // Win/loss judgment. Let's implement this after creating Position::result and is_opponent_win().
+        // 勝ち負け判定。 これは Position::result, is_opponent_win() を作ったあとで実装しましょう。
         if self.is_opponent_win() {
             if let Some(result) = Position::result(GameResult::Win, Some(self.opponent())) {
                 Log::print_notice(&result);
@@ -208,7 +226,8 @@ impl Position {
         }
     }
 
-    /// 未来の駒を１つ戻す
+    /// 1 back.  
+    /// １手戻します。  
     pub fn undo(&mut self) {
         self.undo_move();
     }
