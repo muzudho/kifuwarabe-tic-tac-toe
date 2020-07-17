@@ -1,6 +1,18 @@
 //! This is the entry point to the program.  
 //! プログラムへの入り口です。  
 
+// Publish:
+//
+// (1) `cargo test`
+// (2) `cargo run --release`
+// (3) Open auto-generated log file. I check it.
+// (4) Remove the log file.
+// (5) Version up on Cargo.toml.
+// (6) `cargo doc --open`
+// (7) Comit to Git-hub.
+// (8) `cargo publish --dry-run`
+// (9) `cargo publish`
+
 extern crate chrono;
 extern crate lazy_static;
 extern crate regex;
@@ -335,7 +347,11 @@ Let's input from `pos`.
             let mut search = Search::new(pos.turn, pos.pieces_num);
             let (sq, result) = search.go(&mut pos);
             if let Some(sq) = sq {
-                Log::print_info(&format!("info result={:?} nps={}", result, search.nps()));
+                Log::print_info(&format!(
+                    "info string result={:?} nps={}",
+                    result,
+                    search.nps()
+                ));
                 Log::print_notice(&format!("bestmove {}", sq));
             } else {
                 Log::print_notice("resign");
