@@ -218,12 +218,12 @@ impl Search {
             "-".to_string()
         };
         format!(
-            "info json {{ \"nps\"={: >6}, \"nodes\"={: >6}, \"pv\"=[{: <17}], \"turn\"=\"{}\", \"sq\"=\"{}\", \"->\", to {} |       |      |{} }}",
+            "info json {{ \"nps\"={: >6}, \"nodes\"={: >6}, \"pv\"=[{: <17}], \"push\"=\"{}\", \"turn\"=\"{}\", \"leaf\"=false, to {} |       |      |{} }}",
             nps,
             self.nodes,
             self.pv(pos,','),
-            friend_str,
             sq,
+            friend_str,
             if SQUARES_NUM < pos.pieces_num + 1 {
                 "none    ".to_string()
             } else {
@@ -254,12 +254,12 @@ impl Search {
             "-".to_string()
         };
         format!(
-            "info json {{ \"nps\"={: >6}, \"nodes\"={: >6}, \"pv\"=[{: <17}], \"turn\"=\"{}\", \"sq\"=\"{}\", \"dir\"=\"..\", {} |       | {:4} |{} }}",
+            "info json {{ \"nps\"={: >6}, \"nodes\"={: >6}, \"pv\"=[{: <17}], \"push\"=\"{}\", \"turn\"=\"{}\", \"leaf\"= true, {} |       | {:4} |{} }}",
             nps,
             self.nodes,
             self.pv(pos,','),
-            friend_str,
             sq,
+            friend_str,
             if SQUARES_NUM < pos.pieces_num {
                 "none    ".to_string()
             } else {
@@ -290,12 +290,12 @@ impl Search {
             "-".to_string()
         };
         return format!(
-            "info json {{ \"nps\"={: >6}, \"nodes\"={: >6}, \"pv\"=[{: <17}], \"turn\"=\"{}\", \"sq\"=\"{}\", \"dir\"=\"<-\", from {} | | {:4} |{} }}",
+            "info json {{ \"nps\"={: >6}, \"nodes\"={: >6}, \"pv\"=[{: <17}], \"pop\" =\"{}\", \"turn\"=\"{}\", \"leaf\"=false, from {} | | {:4} |{} }}",
             nps,
             self.nodes,
             self.pv(pos,','),
-            friend_str,
             sq,
+            friend_str,
             if SQUARES_NUM < pos.pieces_num + 1 {
                 "none    ".to_string()
             } else {
