@@ -193,11 +193,11 @@ impl Search {
     pub fn info_header(pos: &Position) -> String {
         match pos.friend {
             Piece::Nought => {
-                "info string \"nps\"=......, \"nodes\"=......, \"pv\"=[O,X,O,X,O,X,O,X,O]"
+                "info string \"nps\":......, \"nodes\":......, \"pv\":[O,X,O,X,O,X,O,X,O]"
                     .to_string()
             }
             Piece::Cross => {
-                format!("info string \"nps\"=......, \"nodes\"=......, \"pv\"=[X,O,X,O,X,O,X,O,X]")
+                format!("info string \"nps\":......, \"nodes\":......, \"pv\":[X,O,X,O,X,O,X,O,X]")
                     .to_string()
             }
         }
@@ -218,19 +218,15 @@ impl Search {
             "-".to_string()
         };
         format!(
-            "info json {{ \"nps\"={: >6}, \"nodes\"={: >6}, \"pv\"=[{: <17}], \"push\"=\"{}\", \"turn\"=\"{}\", \"leaf\"=false, to {} |       |      |{} }}",
+            "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}], \"push\":\"{}\",               \"pieces\":{},                  \"turn\":\"{}\"{} }}",
             nps,
             self.nodes,
             self.pv(pos,','),
             sq,
+            pos.pieces_num,
             friend_str,
-            if SQUARES_NUM < pos.pieces_num + 1 {
-                "none    ".to_string()
-            } else {
-                format!("height {}", pos.pieces_num + 1)
-            },
             if let Some(comment) = comment {
-                format!(" {} \"{}\"", friend_str, comment)
+                format!(", \"comment\":\"{}\"",comment).to_string()
             } else {
                 "".to_string()
             },
@@ -254,20 +250,16 @@ impl Search {
             "-".to_string()
         };
         format!(
-            "info json {{ \"nps\"={: >6}, \"nodes\"={: >6}, \"pv\"=[{: <17}], \"push\"=\"{}\", \"turn\"=\"{}\", \"leaf\"= true, {} |       | {:4} |{} }}",
+            "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}], \"push\":\"{}\", \"leaf\": true, \"pieces\":{}, \"result\":{:6}, \"turn\":\"{}\"{} }}",
             nps,
             self.nodes,
             self.pv(pos,','),
             sq,
+            pos.pieces_num,
+            format!("\"{}\"",result.to_string()),
             friend_str,
-            if SQUARES_NUM < pos.pieces_num {
-                "none    ".to_string()
-            } else {
-                format!("height {}", pos.pieces_num)
-            },
-            result.to_string(),
             if let Some(comment) = comment {
-                format!(" {} \"{}\"", friend_str, comment)
+                format!(", \"comment\":\"{}\"", comment).to_string()
             } else {
                 "".to_string()
             },
@@ -290,20 +282,16 @@ impl Search {
             "-".to_string()
         };
         return format!(
-            "info json {{ \"nps\"={: >6}, \"nodes\"={: >6}, \"pv\"=[{: <17}], \"pop\" =\"{}\", \"turn\"=\"{}\", \"leaf\"=false, from {} | | {:4} |{} }}",
+            "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}], \"pop\" :\"{}\",               \"pieces\":{}, \"result\":{:6}, \"turn\":\"{}\"{} }}",
             nps,
             self.nodes,
             self.pv(pos,','),
             sq,
+            pos.pieces_num,
+            format!("\"{}\"",result.to_string()),
             friend_str,
-            if SQUARES_NUM < pos.pieces_num + 1 {
-                "none    ".to_string()
-            } else {
-                format!("height {}", pos.pieces_num + 1)
-            },
-            result.to_string(),
             if let Some(comment) = comment {
-                format!(" {} \"{}\"", friend_str, comment)
+                format!(", \"comment\":\"{}\"", comment).to_string()
             } else {
                 "".to_string()
             }
