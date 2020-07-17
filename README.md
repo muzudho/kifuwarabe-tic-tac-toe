@@ -5,7 +5,7 @@ This is a tic-tac-toe version.
 Kifuwarabe(きふわらべ)'s original is a computer shogi/go thinking engine (AI).  
 There is **no** GUI (Graphical user interface), This is CUI (Characterbased user interface).  
 
-## Demonstoration
+## Demonstration
 
 ```plain
 Kifuwarabe's tic-tac-toe
