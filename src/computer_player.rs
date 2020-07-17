@@ -9,7 +9,7 @@ impl Search {
     /// 石を置く場所です。  
     pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, GameResult) {
         if Log::enabled(Level::Info) {
-            Log::print_infoln(&Search::info_header(pos));
+            Log::print_info(&Search::info_header(pos));
         }
         self.node(pos)
     }
@@ -43,7 +43,7 @@ impl Search {
                     // (1) Outputs information for forward search.
                     // (一) 前向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
-                        Log::print_infoln(&self.info_forward_leaf(
+                        Log::print_info(&self.info_forward_leaf(
                             self.nps(),
                             pos,
                             addr,
@@ -59,7 +59,7 @@ impl Search {
                     // (3) Outputs backward search information.
                     // (三) 後ろ向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
-                        Log::print_infoln(&self.info_backward(
+                        Log::print_info(&self.info_backward(
                             self.nps(),
                             pos,
                             addr,
@@ -77,7 +77,7 @@ impl Search {
                     // (1) Outputs information for forward search.
                     // (一) 前向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
-                        Log::print_infoln(&self.info_forward_leaf(
+                        Log::print_info(&self.info_forward_leaf(
                             self.nps(),
                             pos,
                             addr,
@@ -93,7 +93,7 @@ impl Search {
                     // (3) Outputs backward search information.
                     // (三) 後ろ向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
-                        Log::print_infoln(&self.info_backward(
+                        Log::print_info(&self.info_backward(
                             self.nps(),
                             pos,
                             addr,
@@ -111,12 +111,7 @@ impl Search {
                     // (1) Outputs information for forward search.
                     // (一) 前向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
-                        Log::print_infoln(&self.info_forward(
-                            self.nps(),
-                            pos,
-                            addr,
-                            Some("Search."),
-                        ));
+                        Log::print_info(&self.info_forward(self.nps(), pos, addr, Some("Search.")));
                     }
                 }
 
@@ -136,7 +131,7 @@ impl Search {
                         // (3) Outputs backward search information.
                         // (三) 後ろ向き探索の情報を出力します。
                         if Log::enabled(Level::Info) {
-                            Log::print_infoln(&self.info_backward(
+                            Log::print_info(&self.info_backward(
                                 self.nps(),
                                 pos,
                                 addr,
@@ -156,7 +151,7 @@ impl Search {
                         // (3) Outputs backward search information.
                         // (三) 後ろ向き探索の情報を出力します。
                         if Log::enabled(Level::Info) {
-                            Log::print_infoln(&self.info_backward(
+                            Log::print_info(&self.info_backward(
                                 self.nps(),
                                 pos,
                                 addr,
@@ -184,7 +179,7 @@ impl Search {
                         // (4) I will continue.
                         // (四) まだ続けます。
                         if Log::enabled(Level::Info) {
-                            Log::print_infoln(&self.info_backward(
+                            Log::print_info(&self.info_backward(
                                 self.nps(),
                                 pos,
                                 addr,

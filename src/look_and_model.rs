@@ -115,7 +115,7 @@ impl Position {
         );
         s.push_str(&format!(
             "\
-+---+---+---+
++---+---+---+ Please select a square. Example `do 7`
 |{0}|{1}|{2}| マスを選んでください。例 `do 7`
 +---+---+---+
 |{3}|{4}|{5}|    7 8 9

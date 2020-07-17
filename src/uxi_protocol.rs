@@ -199,11 +199,11 @@ impl Position {
         // これは PositionHelper, WinLoseJudgment を作ってから実装しろだぜ☆（＾～＾）
         if self.is_opponent_win() {
             if let Some(result) = Position::result(GameResult::Win, Some(self.opponent())) {
-                Log::print_noticeln(&result);
+                Log::print_notice(&result);
             }
         } else if self.is_draw() {
             if let Some(result) = Position::result(GameResult::Draw, None) {
-                Log::print_noticeln(&result);
+                Log::print_notice(&result);
             }
         }
     }
