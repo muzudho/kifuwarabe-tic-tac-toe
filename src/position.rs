@@ -1,29 +1,44 @@
-//! ポジション☆（＾～＾）局面とか言われるやつだぜ☆（＾～＾）
+//! Position.  
+//! 局面。  
 use crate::look_and_model::{Piece, Position};
 
+/// A record of the game used to suspend or resume it.  
+/// ゲームを中断したり、再開したりするときに使うゲームの記録です。  
 impl Position {
-    /// １手指すぜ☆（＾～＾）
+    /// Place the stone.  
+    /// １手指します。  
     pub fn do_move(&mut self, addr: usize) {
-        // 石を置くぜ☆（＾～＾）
+        // I placed a stone.
+        // 石を置いた。
         self.board[addr] = Some(self.friend);
-        // 棋譜に記すぜ☆（＾～＾）
+        // Write on the game record.
+        // 棋譜に書きます。
         self.history[self.pieces_num] = addr as u8;
-        // 棋譜に記した後にカウンターを増やすぜ☆（＾～＾）
+        // After writing on the game, count the stones you have placed.
+        // 棋譜に書いたあと、置いた石を数えます。
         self.pieces_num += 1;
-        // 手番は交代だぜ☆（＾～＾）
+        // Change of turn.
+        // 手番交代。
         self.friend = self.opponent();
     }
-    /// １手戻すぜ☆（＾～＾）
+
+    /// 1 back.  
+    /// 1手戻します。  
     pub fn undo_move(&mut self) {
-        // 手番は交代だぜ☆（＾～＾）
+        // Change of turn.
+        // 手番交代。
         self.friend = self.opponent();
-        // 手数は次の要素を指しているんで、先に戻してから、配列の中身を取り出せだぜ☆（＾～＾）
+        // The number of stones points to the next element of the array,
+        // so first reduce it and then extract the contents of the array.
+        // 石の数は配列の次の要素を指しているので、先に戻してから、配列の中身を取り出してください。
         self.pieces_num -= 1;
-        // 置いたところの石は削除な☆（＾～＾）
+        // Turn off the stone.
+        // 石を消します。
         let addr = self.history[self.pieces_num];
         self.board[addr as usize] = None;
     }
-    /// 相手番☆（＾～＾）
+    /// Opponent.
+    /// 相手番。
     pub fn opponent(&self) -> Piece {
         use crate::position::Piece::*;
         match self.friend {
