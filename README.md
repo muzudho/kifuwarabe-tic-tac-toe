@@ -1,9 +1,123 @@
 # Kifuwarabe's tic-tac-toe
 
-This is tic-tac-toe edition.  
-Kifuwarabe(きふわらべ) is computer shogi/go thinking engine.  
-There is **no** GUI (Graphical user interface), It's CUI (Characterbased user interface).  
+This is a tic-tac-toe version.  
+
+Kifuwarabe(きふわらべ)'s original is a computer shogi/go thinking engine (AI).  
+There is **no** GUI (Graphical user interface), This is CUI (Characterbased user interface).  
 Author: Satoshi TAKAHASHI (Handle: むずでょ)  
+
+## Demonstoration
+
+```plain
+Kifuwarabe's tic-tac-toe
+きふわらべの〇×ゲーム
+
+Command:
+コマンド:
+`do 7`      - Mark number 7.
+              手番のプレイヤーが、 7 番地に印を付けます。
+`go`        - The computer shows the next move.
+              コンピューターが次の1手を示します。
+`info-off`  - no info output.
+              info出力なし。
+`info-on`   - There is info output.(Default)
+              info出力あり(既定)。
+`pos`       - Position display.
+              局面表示。
+`position xfen 3/3/3 o moves 5 1 2 8 4 6 3 7 9`
+            - Starting position and moves.
+              初期局面と棋譜を入力。
+`undo`      - 1 back.
+              1手戻します。
+`uxi`       - Returns 'uxiok tic-tac-toe {protocol-version}'. It is a version of the protocol, not software.
+              'uxiok tic-tac-toe {protocol-version}' を返します。ソフトではなくプロトコルのバージョンです。
+`xfen`      - The current xfen string display.
+              現局面のxfen文字列表示。
+
+Let's input from `pos`.
+`pos` から入力してみましょう。
+
+pos
+[Next 1 move(s) | Go O]
+
++---+---+---+ Please select a square. Example `do 7`
+|   |   |   | マスを選んでください。例 `do 7`
++---+---+---+
+|   |   |   |    7 8 9
++---+---+---+    4 5 6
+|   |   |   |    1 2 3
++---+---+---+
+xfen
+xfen 3/3/3 o
+position xfen oxx/1o1/2x o
+pos
+[Next 6 move(s) | Go O]
+
++---+---+---+ Please select a square. Example `do 7`
+| O | X | X | マスを選んでください。例 `do 7`
++---+---+---+
+|   | O |   |    7 8 9
++---+---+---+    4 5 6
+|   |   | X |    1 2 3
++---+---+---+
+do 6
+pos
+[Next 7 move(s) | Go X]
+
++---+---+---+ Please select a square. Example `do 7`
+| O | X | X | マスを選んでください。例 `do 7`
++---+---+---+
+|   | O | O |    7 8 9
++---+---+---+    4 5 6
+|   |   | X |    1 2 3
++---+---+---+
+go
+info string "nps":......, "nodes":......, "pv":[X,O,X,O,X,O,X,O,X]
+info json { "nps":     1, "nodes":     1, "pv":[1                ], "push":"1",               "pieces":7,                  "turn":"O", "comment":"Search." }
+info json { "nps":     2, "nodes":     2, "pv":[1,2              ], "push":"2",               "pieces":8,                  "turn":"X", "comment":"Search." }
+info json { "nps":     3, "nodes":     3, "pv":[1,2,4            ], "push":"4", "leaf": true, "pieces":9, "result":"draw", "turn":"O", "comment":"It's ok." }
+info json { "nps":     3, "nodes":     3, "pv":[1,2              ], "pop" :"4",               "pieces":8, "result":"draw", "turn":"X" }
+info json { "nps":     3, "nodes":     3, "pv":[1                ], "pop" :"2",               "pieces":7, "result":"draw", "turn":"O", "comment":"Fmmm." }
+info json { "nps":     4, "nodes":     4, "pv":[1,4              ], "push":"4", "leaf": true, "pieces":8, "result":"win" , "turn":"X", "comment":"Resign." }
+info json { "nps":     4, "nodes":     4, "pv":[1                ], "pop" :"4",               "pieces":7, "result":"win" , "turn":"O" }
+info json { "nps":     4, "nodes":     4, "pv":[                 ], "pop" :"1",               "pieces":6, "result":"lose", "turn":"X", "comment":"Damn!" }
+info json { "nps":     5, "nodes":     5, "pv":[2                ], "push":"2",               "pieces":7,                  "turn":"O", "comment":"Search." }
+info json { "nps":     6, "nodes":     6, "pv":[2,1              ], "push":"1",               "pieces":8,                  "turn":"X", "comment":"Search." }
+info json { "nps":     7, "nodes":     7, "pv":[2,1,4            ], "push":"4", "leaf": true, "pieces":9, "result":"draw", "turn":"O", "comment":"It's ok." }
+info json { "nps":     7, "nodes":     7, "pv":[2,1              ], "pop" :"4",               "pieces":8, "result":"draw", "turn":"X" }
+info json { "nps":     7, "nodes":     7, "pv":[2                ], "pop" :"1",               "pieces":7, "result":"draw", "turn":"O", "comment":"Fmmm." }
+info json { "nps":     8, "nodes":     8, "pv":[2,4              ], "push":"4", "leaf": true, "pieces":8, "result":"win" , "turn":"X", "comment":"Resign." }
+info json { "nps":     8, "nodes":     8, "pv":[2                ], "pop" :"4",               "pieces":7, "result":"win" , "turn":"O" }
+info json { "nps":     8, "nodes":     8, "pv":[                 ], "pop" :"2",               "pieces":6, "result":"lose", "turn":"X", "comment":"Damn!" }
+info json { "nps":     9, "nodes":     9, "pv":[4                ], "push":"4",               "pieces":7,                  "turn":"O", "comment":"Search." }
+info json { "nps":    10, "nodes":    10, "pv":[4,1              ], "push":"1",               "pieces":8,                  "turn":"X", "comment":"Search." }
+info json { "nps":    11, "nodes":    11, "pv":[4,1,2            ], "push":"2", "leaf": true, "pieces":9, "result":"draw", "turn":"O", "comment":"It's ok." }
+info json { "nps":    11, "nodes":    11, "pv":[4,1              ], "pop" :"2",               "pieces":8, "result":"draw", "turn":"X" }
+info json { "nps":    11, "nodes":    11, "pv":[4                ], "pop" :"1",               "pieces":7, "result":"draw", "turn":"O", "comment":"Fmmm." }
+info json { "nps":    12, "nodes":    12, "pv":[4,2              ], "push":"2",               "pieces":8,                  "turn":"X", "comment":"Search." }
+info json { "nps":    13, "nodes":    13, "pv":[4,2,1            ], "push":"1", "leaf": true, "pieces":9, "result":"draw", "turn":"O", "comment":"It's ok." }
+info json { "nps":    13, "nodes":    13, "pv":[4,2              ], "pop" :"1",               "pieces":8, "result":"draw", "turn":"X" }
+info json { "nps":    13, "nodes":    13, "pv":[4                ], "pop" :"2",               "pieces":7, "result":"draw", "turn":"O", "comment":"Fmmm." }
+info json { "nps":    13, "nodes":    13, "pv":[                 ], "pop" :"4",               "pieces":6, "result":"draw", "turn":"X", "comment":"Fmmm." }
+info string result=Draw nps=13
+bestmove 4
+do 4
+pos
+[Next 8 move(s) | Go O]
+
++---+---+---+ Please select a square. Example `do 7`
+| O | X | X | マスを選んでください。例 `do 7`
++---+---+---+
+| X | O | O |    7 8 9
++---+---+---+    4 5 6
+|   |   | X |    1 2 3
++---+---+---+
+xfen
+xfen oxx/1o1/2x o moves 6 4
+quit
+```
+
+## Introduction
 
 Participation:  
 
@@ -24,6 +138,8 @@ Participation:
 | 2019 | Shogi | [WCSC29](http://www2.computer-shogi.org/wcsc29/)                   |   52 |   56 |
 | 2019 | Go    | [UEC11](http://entcog.c.ooco.jp/entcog/new_uec/en/)                |   15 |   18 |
 | 2020 | Shogi | [WCSOC1](http://www2.computer-shogi.org/wcso1.html)                |   34 |   39 |
+
+2020 Tic-tac-toe is new!  
 
 Kifuwarabe's tic-tac-toe other programming languages edition:  
 
