@@ -90,8 +90,8 @@ impl CommandLineSeek {
     /// True if so.  
     /// そうであれば真です。  
     pub fn starts_with(&self, starting: &str) -> bool {
-        let len2 = starting.len();
-        len2 <= self.len && &self.line[self.current..len2] == starting
+        let next = self.current() + starting.len();
+        next <= self.len && &self.line[self.current..next] == starting
     }
 
     /// Advance the scanning position.  
