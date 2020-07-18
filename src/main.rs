@@ -1,6 +1,8 @@
 //! A small example for practicing the UCI and USI protocol programs.  
+//! Tic-tac-toe is an unspecified UXI protocol. X has no meaning.  
 //! Come see the repository.  
 //! UCIおよびUSIプロトコルプログラムを実践するための小さな例です。  
+//! 三目並べは、未指定のUXIプロトコルです。 Xには意味がありません。  
 //! リポジトリをご覧ください。  
 
 // Publish:

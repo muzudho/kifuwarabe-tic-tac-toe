@@ -1,11 +1,10 @@
 # Kifuwarabe's tic-tac-toe
 
 A small example for practicing the UCI and USI protocol programs.  
+Tic-tac-toe is an unspecified UXI protocol. X has no meaning.  
 Come see the repository.  
 
 This is the tic-tac-toe version of the AI.  
-Tic-tac-toe is an unspecified UXI protocol. X has no meaning.  
-
 Kifuwarabe(きふわらべ)'s original is a computer shogi/go thinking engine (AI).  
 There is **no** GUI (Graphical user interface), This is CUI (Characterbased user interface).  
 
