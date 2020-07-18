@@ -307,6 +307,18 @@ Input:
 quit
 ```
 
+## Knowledge
+
+```plain
+position xfen 3/3/3 o moves 5 1 2 8 4 6 3 7 9
+                            -----------------
+                            Game record. Numbers of square.
+                    -
+                    Turn at the start.
+              -----
+              Board at the start.
+```
+
 ## How to program a tick-tac-tow game?
 
 During development, you may need to reproduce the behavior of your computer.  

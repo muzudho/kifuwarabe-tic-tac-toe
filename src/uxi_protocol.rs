@@ -45,9 +45,9 @@ impl Position {
             xfen.push_str(&spaces.to_string());
         }
 
-        // Next stone.
-        // 次に置く石。
-        match self.turn {
+        // Next stone at the start.
+        // 開始局面で、次に置く石。
+        match self.starting_turn {
             Piece::Nought => {
                 xfen.push_str(" o");
             }
@@ -148,9 +148,11 @@ impl Position {
                 MachineState::Phase => {
                     match ch {
                         'x' => {
+                            pos.starting_turn = Piece::Cross;
                             pos.turn = Piece::Cross;
                         }
                         'o' => {
+                            pos.starting_turn = Piece::Nought;
                             pos.turn = Piece::Nought;
                         }
                         _ => {

@@ -11,6 +11,18 @@ use casual_logger::{Level, Log};
 impl Search {
     /// This is the place to put the stone.  
     /// 石を置く場所です。  
+    ///
+    /// # Arguments
+    ///
+    /// * `pos` - Position.  
+    ///             局面。  
+    ///
+    /// # Returns
+    ///
+    /// * `Option<u8>` - Address of square.  
+    ///                     マスの番地。  
+    /// * `GameResult` - Evaluation.  
+    ///                     評価値。  
     pub fn go(&mut self, pos: &mut Position) -> (Option<u8>, GameResult) {
         if Log::enabled(Level::Info) {
             Log::print_info(&Search::info_header(pos));
@@ -20,6 +32,16 @@ impl Search {
 
     /// The state node of the search tree. Commonly called search.  
     /// 検索ツリーの状態ノード。一般に 'search' と呼ばれます。  
+    ///
+    /// * `pos` - Position.  
+    ///             局面。  
+    ///
+    /// # Returns
+    ///
+    /// * `Option<u8>` - Address of square.  
+    ///                     マスの番地。  
+    /// * `GameResult` - Evaluation.  
+    ///                     評価値。  
     fn node(&mut self, pos: &mut Position) -> (Option<u8>, GameResult) {
         let mut best_sq = None;
         let mut best_result = GameResult::Lose;

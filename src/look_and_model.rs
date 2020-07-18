@@ -57,9 +57,9 @@ pub const SQUARES_NUM: usize = 9;
 /// ゲームを中断したり、再開したりするときに使うゲームの記録です。  
 #[derive(Debug)]
 pub struct Position {
-    /// Turn. The stone to be placed next.  
-    /// 手番。次に置かれる石。  
-    pub turn: Piece,
+    /// Turn. The stone to be placed next at the start.  
+    /// 開始局面での手番。次に置かれる石。  
+    pub starting_turn: Piece,
 
     /// The board at the start. [0] is unused.  
     /// 開始時の盤面。 [0] は未使用。  
@@ -68,6 +68,10 @@ pub struct Position {
     /// The number of stones on the board at the start.  
     /// 開始時に盤の上に有った石の数。  
     pub starting_pieces_num: usize,
+
+    /// Turn. The stone to be placed next.  
+    /// 手番。次に置かれる石。  
+    pub turn: Piece,
 
     /// The current board. [0] is unused.  
     /// 現在の盤面。 [0] は未使用。  
@@ -88,9 +92,10 @@ pub struct Position {
 impl Default for Position {
     fn default() -> Self {
         Position {
-            turn: Piece::Nought,
+            starting_turn: Piece::Nought,
             starting_board: [None; BOARD_LEN],
             starting_pieces_num: 0,
+            turn: Piece::Nought,
             board: [None; BOARD_LEN],
             history: [0; SQUARES_NUM],
             pieces_num: 0,
