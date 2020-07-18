@@ -151,7 +151,7 @@ fn main() {
         // Go to   =|True|
         Log::print_debug(&format!("Goto    =|{}|", p.starts_with("Goto")));
         // Goto    =|False|
-        Log::print_debug(&format!("p.starts=|{}|", p.current));
+        Log::print_debug(&format!("p.starts=|{}|", p.current()));
         // p.starts=|0|
         Log::print_debug(&format!(
             "p.rest  =|{}|",
@@ -159,7 +159,7 @@ fn main() {
         ));
         // p.rest  =|Go to the Moon!|
         p.go_next_to("Go to");
-        Log::print_debug(&format!("p.starts=|{}|", p.current));
+        Log::print_debug(&format!("p.starts=|{}|", p.current()));
         // p.starts=|5|
         Log::print_debug(&format!(
             "p.rest  =|{}|",

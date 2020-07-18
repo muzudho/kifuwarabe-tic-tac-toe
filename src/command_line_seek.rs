@@ -15,9 +15,41 @@ pub struct CommandLineSeek {
     len: usize,
     /// The reading position.  
     /// 読み取り位置です。  
-    pub current: usize,
+    current: usize,
 }
 impl CommandLineSeek {
+    /// The entire command line string.  
+    /// コマンドライン全体の文字列です。  
+    ///
+    /// # Returns
+    ///
+    /// The entire command line string.  
+    /// コマンドライン全体の文字列です。  
+    #[allow(dead_code)]
+    pub fn line(&self) -> &str {
+        &self.line
+    }
+    /// The length of the string.  
+    /// 文字列の長さ。  
+    ///
+    /// # Returns
+    ///
+    /// The length of the string.  
+    /// 文字列の長さ。  
+    #[allow(dead_code)]
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    /// The reading position.  
+    /// 読み取り位置です。  
+    ///
+    /// # Returns
+    ///
+    /// The reading position.  
+    /// 読み取り位置です。  
+    pub fn current(&self) -> usize {
+        self.current
+    }
     /// Create a parser.  
     /// パーサーを作成します。  
     ///

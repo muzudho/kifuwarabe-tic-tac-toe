@@ -54,6 +54,6 @@ impl LogExt for Log {
         // In the Computer Shogi USI protocol, "info string" is a display text.
         // コンピューター将棋の USIプロトコル で 'info string' というのがあって
         // 強制終了の直前に画面に出せるかもしれないから付けています。
-        Log::fatal(&format!("info string {}", s))
+        Log::fatal(&format!("info string panic! {}", s))
     }
 }
