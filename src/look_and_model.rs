@@ -150,9 +150,6 @@ impl Position {
 /// Search.  
 /// 探索部。  
 pub struct Search {
-    /// The person who started this search.  
-    /// この探索を始めた方。  
-    pub start_turn: Piece,
     /// The number of stones on the board at the start of this search.  
     /// この探索の開始時に盤の上に有った石の数。  
     pub start_pieces_num: usize,
@@ -164,9 +161,8 @@ pub struct Search {
     pub stopwatch: Instant,
 }
 impl Search {
-    pub fn new(turn: Piece, start_pieces_num: usize) -> Self {
+    pub fn new(start_pieces_num: usize) -> Self {
         Search {
-            start_turn: turn,
             start_pieces_num: start_pieces_num,
             nodes: 0,
             stopwatch: Instant::now(),

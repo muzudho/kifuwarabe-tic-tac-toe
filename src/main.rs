@@ -93,7 +93,7 @@ fn main() {
         Log::print_debug(&Position::result(GameResult::Win, Some(Piece::Nought)).unwrap());
         // win O
 
-        let search = Search::new(pos.turn, pos.pieces_num);
+        let search = Search::new(pos.pieces_num);
         Log::print_debug(&format!("pv=|{}|", search.pv(&pos, ',')));
         // pv=||
         Log::print_debug(&Search::info_header(&pos));
@@ -249,7 +249,7 @@ fn main() {
         } else {
             panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
         };
-        let mut search = Search::new(pos.turn, pos.pieces_num);
+        let mut search = Search::new(pos.pieces_num);
         let (sq, result) = search.go(&mut pos);
         // info string "nps":......, "nodes":......, "pv":[O,X,O,X,O,X,O,X,O]
         // info json { "nps":     1, "nodes":     1, "pv":[6                ], "push":"6",               "pieces":7,                  "turn":"X", "comment":"Search." }
@@ -350,7 +350,7 @@ Let's input from `pos`.
                 pos.do_(rest);
             }
         } else if p.starts_with("go") {
-            let mut search = Search::new(pos.turn, pos.pieces_num);
+            let mut search = Search::new(pos.pieces_num);
             let (sq, result) = search.go(&mut pos);
             if let Some(sq) = sq {
                 Log::print_info(&format!(
