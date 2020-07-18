@@ -1,7 +1,9 @@
 # Kifuwarabe's tic-tac-toe
 
+A small example for practicing the UCI and USI protocol programs.  
+Come see the repository.  
+
 This is the tic-tac-toe version of the AI.  
-Take a look at the source code of the repository. It is created as a example for practicing UCI and USI protocol programs.  
 Tic-tac-toe is an unspecified UXI protocol. X has no meaning.  
 
 Kifuwarabe(きふわらべ)'s original is a computer shogi/go thinking engine (AI).  
@@ -76,7 +78,7 @@ go
 info string "nps":......, "nodes":......, "pv":[X,O,X,O,X,O,X,O,X]
 info json { "nps":     1, "nodes":     1, "pv":[1                ], "push":"1",               "pieces":7,                  "turn":"O", "comment":"Search." }
 info json { "nps":     2, "nodes":     2, "pv":[1,2              ], "push":"2",               "pieces":8,                  "turn":"X", "comment":"Search." }
-info json { "nps":     3, "nodes":     3, "pv":[1,2,4            ], "push":"4", "leaf": true, "pieces":9, "result":"draw", "turn":"O", "comment":"It's ok." }
+info json { "nps":     3, "nodes":     3, "pv":[1,2,4            ], "push":"4", "leaf": true, "pieces":9, "result":"draw", "turn":"O", "comment":"It is ok." }
 info json { "nps":     3, "nodes":     3, "pv":[1,2              ], "pop" :"4",               "pieces":8, "result":"draw", "turn":"X" }
 info json { "nps":     3, "nodes":     3, "pv":[1                ], "pop" :"2",               "pieces":7, "result":"draw", "turn":"O", "comment":"Fmmm." }
 info json { "nps":     4, "nodes":     4, "pv":[1,4              ], "push":"4", "leaf": true, "pieces":8, "result":"win" , "turn":"X", "comment":"Resign." }
@@ -84,7 +86,7 @@ info json { "nps":     4, "nodes":     4, "pv":[1                ], "pop" :"4", 
 info json { "nps":     4, "nodes":     4, "pv":[                 ], "pop" :"1",               "pieces":6, "result":"lose", "turn":"X", "comment":"Damn!" }
 info json { "nps":     5, "nodes":     5, "pv":[2                ], "push":"2",               "pieces":7,                  "turn":"O", "comment":"Search." }
 info json { "nps":     6, "nodes":     6, "pv":[2,1              ], "push":"1",               "pieces":8,                  "turn":"X", "comment":"Search." }
-info json { "nps":     7, "nodes":     7, "pv":[2,1,4            ], "push":"4", "leaf": true, "pieces":9, "result":"draw", "turn":"O", "comment":"It's ok." }
+info json { "nps":     7, "nodes":     7, "pv":[2,1,4            ], "push":"4", "leaf": true, "pieces":9, "result":"draw", "turn":"O", "comment":"It is ok." }
 info json { "nps":     7, "nodes":     7, "pv":[2,1              ], "pop" :"4",               "pieces":8, "result":"draw", "turn":"X" }
 info json { "nps":     7, "nodes":     7, "pv":[2                ], "pop" :"1",               "pieces":7, "result":"draw", "turn":"O", "comment":"Fmmm." }
 info json { "nps":     8, "nodes":     8, "pv":[2,4              ], "push":"4", "leaf": true, "pieces":8, "result":"win" , "turn":"X", "comment":"Resign." }
@@ -92,11 +94,11 @@ info json { "nps":     8, "nodes":     8, "pv":[2                ], "pop" :"4", 
 info json { "nps":     8, "nodes":     8, "pv":[                 ], "pop" :"2",               "pieces":6, "result":"lose", "turn":"X", "comment":"Damn!" }
 info json { "nps":     9, "nodes":     9, "pv":[4                ], "push":"4",               "pieces":7,                  "turn":"O", "comment":"Search." }
 info json { "nps":    10, "nodes":    10, "pv":[4,1              ], "push":"1",               "pieces":8,                  "turn":"X", "comment":"Search." }
-info json { "nps":    11, "nodes":    11, "pv":[4,1,2            ], "push":"2", "leaf": true, "pieces":9, "result":"draw", "turn":"O", "comment":"It's ok." }
+info json { "nps":    11, "nodes":    11, "pv":[4,1,2            ], "push":"2", "leaf": true, "pieces":9, "result":"draw", "turn":"O", "comment":"It is ok." }
 info json { "nps":    11, "nodes":    11, "pv":[4,1              ], "pop" :"2",               "pieces":8, "result":"draw", "turn":"X" }
 info json { "nps":    11, "nodes":    11, "pv":[4                ], "pop" :"1",               "pieces":7, "result":"draw", "turn":"O", "comment":"Fmmm." }
 info json { "nps":    12, "nodes":    12, "pv":[4,2              ], "push":"2",               "pieces":8,                  "turn":"X", "comment":"Search." }
-info json { "nps":    13, "nodes":    13, "pv":[4,2,1            ], "push":"1", "leaf": true, "pieces":9, "result":"draw", "turn":"O", "comment":"It's ok." }
+info json { "nps":    13, "nodes":    13, "pv":[4,2,1            ], "push":"1", "leaf": true, "pieces":9, "result":"draw", "turn":"O", "comment":"It is ok." }
 info json { "nps":    13, "nodes":    13, "pv":[4,2              ], "pop" :"1",               "pieces":8, "result":"draw", "turn":"X" }
 info json { "nps":    13, "nodes":    13, "pv":[4                ], "pop" :"2",               "pieces":7, "result":"draw", "turn":"O", "comment":"Fmmm." }
 info json { "nps":    13, "nodes":    13, "pv":[                 ], "pop" :"4",               "pieces":6, "result":"draw", "turn":"X", "comment":"Fmmm." }

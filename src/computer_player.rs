@@ -86,7 +86,7 @@ impl Search {
                             pos,
                             sq,
                             GameResult::Draw,
-                            Some("It's ok."),
+                            Some("It is ok."),
                         ));
                     }
 

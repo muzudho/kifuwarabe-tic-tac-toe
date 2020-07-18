@@ -1,5 +1,7 @@
-//! This is the entry point to the program.  
-//! プログラムへの入り口です。  
+//! A small example for practicing the UCI and USI protocol programs.  
+//! Come see the repository.  
+//! UCIおよびUSIプロトコルプログラムを実践するための小さな例です。  
+//! リポジトリをご覧ください。  
 
 // Publish:
 //
@@ -35,6 +37,8 @@ use std;
 use std::{thread, time};
 use test::test_win_lose_judgement;
 
+/// This is the entry point to the program.  
+/// プログラムへの入り口です。  
 fn main() {
     // Log file name.
     // ログ ファイル名。
@@ -245,25 +249,25 @@ fn main() {
         };
         let mut search = Search::new(pos.turn, pos.pieces_num);
         let (sq, result) = search.go(&mut pos);
-        // info nps ...... nodes ...... pv O X O X O X O X O
-        // info nps      1 nodes      1 pv 6                 | - [6] | ->   to height 8 |       |      | - "Search."
-        // info nps      2 nodes      2 pv 6 8               | + [8] | ->   to height 9 |       |      | + "Search."
-        // info nps      3 nodes      3 pv 6 8 9             | - [9] | .       height 9 |       | draw | - "It's ok."
-        // info nps      3 nodes      3 pv 6 8               |       | <- from height 8 | + [9] | draw |
-        // info nps      3 nodes      3 pv 6                 |       | <- from height 7 | - [8] | draw | - "Fmmm."
-        // info nps      4 nodes      4 pv 6 9               | + [9] | ->   to height 9 |       |      | + "Search."
-        // info nps      5 nodes      5 pv 6 9 8             | - [8] | .       height 9 |       | draw | - "It's ok."
-        // info nps      5 nodes      5 pv 6 9               |       | <- from height 8 | + [8] | draw |
-        // info nps      5 nodes      5 pv 6                 |       | <- from height 7 | - [9] | draw | - "Fmmm."
-        // info nps      5 nodes      5 pv                   |       | <- from height 6 | + [6] | draw | + "Fmmm."
-        // info nps      6 nodes      6 pv 8                 | - [8] | ->   to height 8 |       |      | - "Search."
-        // info nps      7 nodes      7 pv 8 6               | + [6] | .       height 8 |       | win  | + "Hooray!"
-        // info nps      7 nodes      7 pv 8                 |       | <- from height 7 | - [6] | win  |
-        // info nps      7 nodes      7 pv                   |       | <- from height 6 | + [8] | lose | + "Resign."
-        // info nps      8 nodes      8 pv 9                 | - [9] | ->   to height 8 |       |      | - "Search."
-        // info nps      9 nodes      9 pv 9 6               | + [6] | .       height 8 |       | win  | + "Hooray!"
-        // info nps      9 nodes      9 pv 9                 |       | <- from height 7 | - [6] | win  |
-        // info nps      9 nodes      9 pv                   |       | <- from height 6 | + [9] | lose | + "Resign."
+        // info string "nps":......, "nodes":......, "pv":[O,X,O,X,O,X,O,X,O]
+        // info json { "nps":     1, "nodes":     1, "pv":[6                ], "push":"6",               "pieces":7,                  "turn":"X", "comment":"Search." }
+        // info json { "nps":     2, "nodes":     2, "pv":[6,8              ], "push":"8",               "pieces":8,                  "turn":"O", "comment":"Search." }
+        // info json { "nps":     3, "nodes":     3, "pv":[6,8,9            ], "push":"9", "leaf": true, "pieces":9, "result":"draw", "turn":"X", "comment":"It is ok." }
+        // info json { "nps":     3, "nodes":     3, "pv":[6,8              ], "pop" :"9",               "pieces":8, "result":"draw", "turn":"O" }
+        // info json { "nps":     3, "nodes":     3, "pv":[6                ], "pop" :"8",               "pieces":7, "result":"draw", "turn":"X", "comment":"Fmmm." }
+        // info json { "nps":     4, "nodes":     4, "pv":[6,9              ], "push":"9",               "pieces":8,                  "turn":"O", "comment":"Search." }
+        // info json { "nps":     5, "nodes":     5, "pv":[6,9,8            ], "push":"8", "leaf": true, "pieces":9, "result":"draw", "turn":"X", "comment":"It is ok." }
+        // info json { "nps":     5, "nodes":     5, "pv":[6,9              ], "pop" :"8",               "pieces":8, "result":"draw", "turn":"O" }
+        // info json { "nps":     5, "nodes":     5, "pv":[6                ], "pop" :"9",               "pieces":7, "result":"draw", "turn":"X", "comment":"Fmmm." }
+        // info json { "nps":     5, "nodes":     5, "pv":[                 ], "pop" :"6",               "pieces":6, "result":"draw", "turn":"O", "comment":"Fmmm." }
+        // info json { "nps":     6, "nodes":     6, "pv":[8                ], "push":"8",               "pieces":7,                  "turn":"X", "comment":"Search." }
+        // info json { "nps":     7, "nodes":     7, "pv":[8,6              ], "push":"6", "leaf": true, "pieces":8, "result":"win" , "turn":"O", "comment":"Resign." }
+        // info json { "nps":     7, "nodes":     7, "pv":[8                ], "pop" :"6",               "pieces":7, "result":"win" , "turn":"X" }
+        // info json { "nps":     7, "nodes":     7, "pv":[                 ], "pop" :"8",               "pieces":6, "result":"lose", "turn":"O", "comment":"Damn!" }
+        // info json { "nps":     8, "nodes":     8, "pv":[9                ], "push":"9",               "pieces":7,                  "turn":"X", "comment":"Search." }
+        // info json { "nps":     9, "nodes":     9, "pv":[9,6              ], "push":"6", "leaf": true, "pieces":8, "result":"win" , "turn":"O", "comment":"Resign." }
+        // info json { "nps":     9, "nodes":     9, "pv":[9                ], "pop" :"6",               "pieces":7, "result":"win" , "turn":"X" }
+        // info json { "nps":     9, "nodes":     9, "pv":[                 ], "pop" :"9",               "pieces":6, "result":"lose", "turn":"O", "comment":"Damn!" }
         Log::print_debug(&format!("result=|{}|", result));
         // result=|draw|
         Log::print_debug(&format!(

@@ -1,11 +1,11 @@
 [package]
 name = "kifuwarabe_tic_tac_toe"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["むずでょ <muzudho1@gmail.com>"]
 edition = "2018"
 description = """
-This is the tic-tac-toe version of the AI.  
-Take a look at the source code of the repository. It is created as a example for practicing UCI and USI protocol programs.  
+A small example for practicing the UCI and USI protocol programs.  
+Come see the repository.  
 """
 readme = "README.md"
 repository = "https://github.com/muzudho/kifuwarabe-tic-tac-toe"
@@ -20,4 +20,4 @@ categories = ["game-engines"]
 lazy_static = "1.4.0"
 chrono = "0.4"
 regex = "1"
-casual_logger = "0.4.7"
+casual_logger = "0.5.0"
