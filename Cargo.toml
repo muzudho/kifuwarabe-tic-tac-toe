@@ -1,10 +1,10 @@
 [package]
 name = "kifuwarabe_tic_tac_toe"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["むずでょ <muzudho1@gmail.com>"]
 edition = "2018"
 description = """
-A small example for practicing the UCI and USI protocol programs.  
+A small example before developing computer chess and computer shogi.  
 Come see the repository.  
 """
 readme = "README.md"

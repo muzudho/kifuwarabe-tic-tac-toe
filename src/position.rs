@@ -14,6 +14,13 @@ impl Position {
         // Write on the game record.
         // 棋譜に書きます。
         self.history[self.pieces_num] = sq as u8;
+        // Write on the pv.
+        // 読み筋に書きます。
+        if self.pv.is_empty() {
+            self.pv.push_str(&sq.to_string());
+        } else {
+            self.pv.push_str(&format!(",{}", sq).to_string());
+        }
         // After writing on the game, count the stones you have placed.
         // 棋譜に書いたあと、置いた石を数えます。
         self.pieces_num += 1;
@@ -32,6 +39,14 @@ impl Position {
         // so first reduce it and then extract the contents of the array.
         // 石の数は配列の次の要素を指しているので、先に戻してから、配列の中身を取り出してください。
         self.pieces_num -= 1;
+        // Remove from the pv.
+        // 読み筋から消します。
+        if 1 < self.pv.len() {
+            self.pv.pop();
+            self.pv.pop();
+        } else if 0 < self.pv.len() {
+            self.pv.pop();
+        }
         // Turn off the stone.
         // 石を消します。
         let sq = self.history[self.pieces_num];

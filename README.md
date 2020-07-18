@@ -1,6 +1,6 @@
 # Kifuwarabe's tic-tac-toe
 
-A small example for practicing the UCI and USI protocol programs.  
+A small example before developing computer chess and computer shogi.  
 Tic-tac-toe is an unspecified UXI protocol. X has no meaning.  
 Come see the repository.  
 

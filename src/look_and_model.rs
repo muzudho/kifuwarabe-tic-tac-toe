@@ -80,6 +80,10 @@ pub struct Position {
     /// The number of stones currently on the board.  
     /// 現在、盤の上に有る石の数。  
     pub pieces_num: usize,
+
+    /// Principal variation.
+    /// 今読んでる読み筋。
+    pub pv: String,
 }
 impl Default for Position {
     fn default() -> Self {
@@ -90,6 +94,7 @@ impl Default for Position {
             board: [None; BOARD_LEN],
             history: [0; SQUARES_NUM],
             pieces_num: 0,
+            pv: String::new(),
         }
     }
 }
@@ -167,21 +172,6 @@ impl Search {
             nodes: 0,
             stopwatch: Instant::now(),
         }
-    }
-
-    /// Principal variation.
-    /// 今読んでる読み筋。
-    pub fn pv(&self, pos: &Position, separator: char) -> String {
-        let mut pv = String::new();
-        for t in self.start_pieces_num..pos.pieces_num {
-            pv.push_str(&format!("{}{}", pos.history[t], separator));
-        }
-
-        if 0 < pv.len() {
-            pv.pop();
-        }
-
-        pv.to_string()
     }
 
     /// Header.

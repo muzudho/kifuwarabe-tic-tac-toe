@@ -1,7 +1,7 @@
-//! A small example for practicing the UCI and USI protocol programs.  
+//! A small example before developing computer chess and computer shogi.  
 //! Tic-tac-toe is an unspecified UXI protocol. X has no meaning.  
 //! Come see the repository.  
-//! UCIおよびUSIプロトコルプログラムを実践するための小さな例です。  
+//! コンピューター・チェスおよびコンピューター将棋を開発する前の小さな例です。  
 //! 三目並べは、未指定のUXIプロトコルです。 Xには意味がありません。  
 //! リポジトリをご覧ください。  
 
@@ -94,17 +94,17 @@ fn main() {
         // win O
 
         let search = Search::new(pos.pieces_num);
-        Log::print_debug(&format!("pv=|{}|", search.pv(&pos, ',')));
+        Log::print_debug(&format!("pv=|{}|", pos.pv));
         // pv=||
         Log::print_debug(&Search::info_header(&pos));
         // info nps ...... nodes ...... pv O X O X O X O X O
         // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしろだぜ☆（＾～＾）
-        Log::print_debug(&search.info_forward(123, &pos, &search.pv(&pos, ','), 1, Some("Hello!")));
+        Log::print_debug(&search.info_forward(123, &pos, &pos.pv, 1, Some("Hello!")));
         // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
         Log::print_debug(&search.info_forward_leaf(
             456,
             &pos,
-            &search.pv(&pos, ','),
+            &pos.pv,
             1,
             GameResult::Win,
             Some("Hello!"),
@@ -113,7 +113,7 @@ fn main() {
         Log::print_debug(&search.info_backward(
             789,
             &pos,
-            &search.pv(&pos, ','),
+            &pos.pv,
             1,
             GameResult::Win,
             Some("Hello!"),
