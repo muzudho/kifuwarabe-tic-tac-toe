@@ -99,11 +99,25 @@ fn main() {
         Log::print_debug(&Search::info_header(&pos));
         // info nps ...... nodes ...... pv O X O X O X O X O
         // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしろだぜ☆（＾～＾）
-        Log::print_debug(&search.info_forward(123, &pos, 1, Some("Hello!")));
+        Log::print_debug(&search.info_forward(123, &pos, &search.pv(&pos, ','), 1, Some("Hello!")));
         // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
-        Log::print_debug(&search.info_forward_leaf(456, &pos, 1, GameResult::Win, Some("Hello!")));
+        Log::print_debug(&search.info_forward_leaf(
+            456,
+            &pos,
+            &search.pv(&pos, ','),
+            1,
+            GameResult::Win,
+            Some("Hello!"),
+        ));
         // info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
-        Log::print_debug(&search.info_backward(789, &pos, 1, GameResult::Win, Some("Hello!")));
+        Log::print_debug(&search.info_backward(
+            789,
+            &pos,
+            &search.pv(&pos, ','),
+            1,
+            GameResult::Win,
+            Some("Hello!"),
+        ));
         // info nps    789 nodes      0 pv                   |       | <- from height 1 | + [1] | win  | + "Hello!"
 
         // Step 3.

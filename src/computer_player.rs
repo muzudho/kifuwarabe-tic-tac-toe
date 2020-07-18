@@ -50,6 +50,7 @@ impl Search {
                         Log::print_info(&self.info_forward_leaf(
                             self.nps(),
                             pos,
+                            &self.pv(pos, ','),
                             sq,
                             GameResult::Win,
                             Some("Resign."),
@@ -66,6 +67,7 @@ impl Search {
                         Log::print_info(&self.info_backward(
                             self.nps(),
                             pos,
+                            &self.pv(pos, ','),
                             sq,
                             GameResult::Win,
                             None,
@@ -84,6 +86,7 @@ impl Search {
                         Log::print_info(&self.info_forward_leaf(
                             self.nps(),
                             pos,
+                            &self.pv(pos, ','),
                             sq,
                             GameResult::Draw,
                             Some("It is ok."),
@@ -100,6 +103,7 @@ impl Search {
                         Log::print_info(&self.info_backward(
                             self.nps(),
                             pos,
+                            &self.pv(pos, ','),
                             sq,
                             GameResult::Draw,
                             None,
@@ -115,7 +119,13 @@ impl Search {
                     // (1) Outputs information for forward search.
                     // (一) 前向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
-                        Log::print_info(&self.info_forward(self.nps(), pos, sq, Some("Search.")));
+                        Log::print_info(&self.info_forward(
+                            self.nps(),
+                            pos,
+                            &self.pv(pos, ','),
+                            sq,
+                            Some("Search."),
+                        ));
                     }
                 }
 
@@ -138,6 +148,7 @@ impl Search {
                             Log::print_info(&self.info_backward(
                                 self.nps(),
                                 pos,
+                                &self.pv(pos, ','),
                                 sq,
                                 GameResult::Win,
                                 Some("Hooray!"),
@@ -158,6 +169,7 @@ impl Search {
                             Log::print_info(&self.info_backward(
                                 self.nps(),
                                 pos,
+                                &self.pv(pos, ','),
                                 sq,
                                 GameResult::Draw,
                                 Some("Fmmm."),
@@ -186,6 +198,7 @@ impl Search {
                             Log::print_info(&self.info_backward(
                                 self.nps(),
                                 pos,
+                                &self.pv(pos, ','),
                                 sq,
                                 GameResult::Lose,
                                 Some("Damn!"),
