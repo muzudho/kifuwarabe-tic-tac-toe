@@ -9,7 +9,7 @@ pub trait LogExt {
     fn print_info(s: &str);
     fn print_notice(s: &str);
     fn print_error(s: &str);
-    fn print_fatal(s: &str);
+    fn print_fatal(s: &str) -> String;
 }
 impl LogExt for Log {
     /// Display 'debug' level messages and write to log.  
@@ -50,10 +50,10 @@ impl LogExt for Log {
 
     /// Display 'fatal' level messages and write to log.  
     /// 致命的レベル メッセージを表示し、ログに書き込みます。  
-    fn print_fatal(s: &str) {
+    fn print_fatal(s: &str) -> String {
         // In the Computer Shogi USI protocol, "info string" is a display text.
         // コンピューター将棋の USIプロトコル で 'info string' というのがあって
         // 強制終了の直前に画面に出せるかもしれないから付けています。
-        Log::fatal(&format!("info string {}", s));
+        Log::fatal(&format!("info string {}", s))
     }
 }

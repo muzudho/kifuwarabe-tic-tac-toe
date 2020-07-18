@@ -21,7 +21,7 @@ extern crate chrono;
 extern crate lazy_static;
 extern crate regex;
 
-mod command_line_parser;
+mod command_line_seek;
 mod computer_player;
 mod log;
 mod look_and_model;
@@ -32,7 +32,7 @@ mod uxi_protocol;
 mod win_lose_judgment;
 
 use casual_logger::{Level, Log};
-use command_line_parser::CommandLineParser;
+use command_line_seek::CommandLineSeek;
 use log::LogExt;
 use look_and_model::{GameResult, Piece, Position, Search};
 use std;
@@ -146,12 +146,12 @@ fn main() {
         Log::print_debug(&format!("opponent={}", pos.opponent()));
 
         // Step 4.
-        let mut p = CommandLineParser::new("Go to the Moon!");
+        let mut p = CommandLineSeek::new("Go to the Moon!");
         Log::print_debug(&format!("Go to   =|{}|", p.starts_with("Go to")));
         // Go to   =|True|
         Log::print_debug(&format!("Goto    =|{}|", p.starts_with("Goto")));
         // Goto    =|False|
-        Log::print_debug(&format!("p.starts=|{}|", p.starts));
+        Log::print_debug(&format!("p.starts=|{}|", p.current));
         // p.starts=|0|
         Log::print_debug(&format!(
             "p.rest  =|{}|",
@@ -159,7 +159,7 @@ fn main() {
         ));
         // p.rest  =|Go to the Moon!|
         p.go_next_to("Go to");
-        Log::print_debug(&format!("p.starts=|{}|", p.starts));
+        Log::print_debug(&format!("p.starts=|{}|", p.current));
         // p.starts=|5|
         Log::print_debug(&format!(
             "p.rest  =|{}|",
@@ -354,7 +354,7 @@ Let's input from `pos`.
 
         // p is the acronym for parser.
         // p は parser の頭文字。
-        let mut p = CommandLineParser::new(&line);
+        let mut p = CommandLineSeek::new(&line);
 
         // It is in alphabetical order because it is easy to find.
         // 探しやすいからアルファベット順です。
