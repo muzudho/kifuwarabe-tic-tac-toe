@@ -10,6 +10,14 @@ There is **no** GUI (Graphical user interface), This is CUI (Characterbased user
 
 ## Demonstration
 
+Terminal:  
+
+```shell
+cargo run --example main
+```
+
+In game:  
+
 ```plain
 Kifuwarabe's tic-tac-toe
 きふわらべの〇×ゲーム
@@ -366,7 +374,7 @@ Before creating the game itself, let's first create the replay function. Let's g
 
 Let's make a principal command.  
 
-* [x] Step 6. 'main.rs'
+* [x] Step 6. 'examples/main.rs' command line.
   * [x] position.
   * [x] pos.
   * [x] do.

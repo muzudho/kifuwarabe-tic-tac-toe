@@ -2,10 +2,10 @@
 //! See 'Search' struct in 'look_and_model' for details.  
 //! コンピューターの思考部です。  
 //! 詳しくは 'look_and_model' の 'Search' 構造体 を見てください。  
+use crate::log::LogExt;
 use crate::look_and_model::{
     GameResult, Position, Search, SearchDirection, BOARD_LEN, SQUARES_NUM,
 };
-use crate::LogExt;
 use casual_logger::{Level, Log};
 
 /// Search.  

@@ -1,53 +1,22 @@
-//! A small example before developing computer chess and computer shogi.  
-//! Tic-tac-toe is an unspecified UXI protocol. X has no meaning.  
-//! Come see the repository.  
-//! コンピューター・チェスおよびコンピューター将棋を開発する前の小さな例です。  
-//! 三目並べは、未指定のUXIプロトコルです。 Xには意味がありません。  
-//! リポジトリをご覧ください。  
-
-// Publish:
-//
-// (1) `cargo test`
-// (2) `cargo run --release`
-// (3) Open auto-generated log file. I check it.
-// (4) Remove the log file.
-// (5) Version up on Cargo.toml.
-// (6) `cargo doc --open`
-// (7) Comit to Git-hub.
-// (8) `cargo publish --dry-run`
-// (9) `cargo publish`
-
-extern crate chrono;
-extern crate lazy_static;
-extern crate regex;
-
-mod command_line_seek;
-mod computer_player;
-mod log;
-mod look_and_model;
-mod performance_measurement;
-mod position;
-mod test;
-mod uxi_protocol;
-mod win_lose_judgment;
-
 use casual_logger::{Level, Log};
-use command_line_seek::CommandLineSeek;
-use log::LogExt;
-use look_and_model::{GameResult, Piece, Position, Search, SearchDirection};
+use kifuwarabe_tic_tac_toe::command_line_seek::CommandLineSeek;
+use kifuwarabe_tic_tac_toe::log::LogExt;
+use kifuwarabe_tic_tac_toe::look_and_model::{
+    GameResult, Piece, Position, Search, SearchDirection,
+};
+use kifuwarabe_tic_tac_toe::test::test_win_lose_judgement;
 use std;
 use std::{thread, time};
-use test::test_win_lose_judgement;
 
 /// This is the entry point to the program.  
 /// プログラムへの入り口です。  
 fn main() {
     // Log file name.
     // ログ ファイル名。
-    Log::set_file_name("kifuwarabe-tic-tac-toe");
+    Log::set_file_name("kifuwarabe-tic-tac-toe-debug");
     // Log level.
     // ログ レベル。
-    Log::set_level(Level::Info);
+    Log::set_level(Level::Debug);
     // Log file retention days.
     // ログ ファイル保持日数。
     Log::set_retention_days(2);
@@ -317,112 +286,6 @@ fn main() {
 
         // End.
         test_win_lose_judgement();
-    }
-
-    // 説明を出そうぜ☆（＾～＾）
-    Log::print_notice(
-        "Kifuwarabe's tic-tac-toe
-きふわらべの〇×ゲーム
-
-Command:
-コマンド:
-`do 7`      - Mark number 7.
-              手番のプレイヤーが、 7 番地に印を付けます。
-`go`        - The computer shows the next move.
-              コンピューターが次の1手を示します。
-`info-off`  - no info output.
-              info出力なし。
-`info-on`   - There is info output.(Default)
-              info出力あり(既定)。
-`pos`       - Position display.
-              局面表示。
-`position xfen 3/3/3 o moves 5 1 2 8 4 6 3 7 9`
-            - Starting position and moves.
-              初期局面と棋譜を入力。
-`undo`      - 1 back.
-              1手戻します。
-`uxi`       - Returns 'uxiok tic-tac-toe {protocol-version}'. It is a version of the protocol, not software.
-              'uxiok tic-tac-toe {protocol-version}' を返します。ソフトではなくプロトコルのバージョンです。
-`xfen`      - The current xfen string display.
-              現局面のxfen文字列表示。
-
-Let's input from `pos`.
-`pos` から入力してみましょう。
-",
-    );
-
-    // Starting position.
-    // 初期局面。
-    let mut pos = Position::default();
-
-    // End the loop with 'quit'. Forced termination with [Ctrl]+[C].
-    // 'quit' でループを終了。 [Ctrl]+[C] で強制終了。
-    loop {
-        let mut line: String = String::new();
-        // Wait for command line input from standard input.
-        // 標準入力からのコマンドライン入力を待機します。
-        match std::io::stdin().read_line(&mut line) {
-            Ok(_n) => {}
-            // Tips. You can separate error numbers by simply specifying the line number.
-            // テクニック。 エラー番号は行番号を振っておくだけで少しはばらけます。
-            Err(e) => panic!(Log::print_fatal(&format!(
-                "(Err.373) Failed to read line. / {}",
-                e
-            ))),
-        };
-
-        // p is the acronym for parser.
-        // p は parser の頭文字。
-        let mut p = CommandLineSeek::new(&line);
-
-        // It is in alphabetical order because it is easy to find.
-        // 探しやすいからアルファベット順です。
-        if p.starts_with("do") {
-            p.go_next_to("do ");
-            if let Some(rest) = p.rest() {
-                pos.do_(rest);
-            }
-        } else if p.starts_with("go") {
-            let mut search = Search::new(pos.pieces_num);
-            let (sq, result) = search.go(&mut pos);
-            Log::print_info(&format!(
-                "info string result={:?} nps={}",
-                result,
-                search.nps()
-            ));
-
-            Log::print_notice(&format!(
-                "bestmove {}",
-                if let Some(sq) = sq {
-                    sq.to_string()
-                } else {
-                    "resign".to_string()
-                }
-            ));
-        } else if p.starts_with("info-off") {
-            Log::set_level(Level::Notice);
-        } else if p.starts_with("info-on") {
-            Log::set_level(Level::Info);
-        } else if p.starts_with("position") {
-            p.go_next_to("position ");
-            if let Some(rest) = p.rest() {
-                if let Some(pos_val) = look_and_model::Position::from_xfen(rest) {
-                    pos = pos_val;
-                }
-            }
-        } else if p.starts_with("pos") {
-            Log::print_notice(&pos.pos());
-        } else if p.starts_with("quit") {
-            break;
-        } else if p.starts_with("undo") {
-            pos.undo();
-        } else if p.starts_with("uxi") {
-            Log::print_notice("uxiok tic-tac-toe v20200718.0.0");
-        } else if p.starts_with("xfen") {
-            Log::print_notice(&format!("{}", pos.to_xfen()));
-        } else {
-            Log::print_debug(&format!("Debug   | Invalid command=|{:?}|", p));
-        }
     }
 
     // Wait for logging to complete.
