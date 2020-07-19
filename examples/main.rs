@@ -1,8 +1,7 @@
 use casual_logger::{Level, Log};
 use kifuwarabe_tic_tac_toe::{
-    command_line_seek::CommandLineSeek,
+    engine::{Engine, Response},
     log::LogExt,
-    look_and_model::{Position, Search},
 };
 use std;
 
@@ -54,10 +53,7 @@ Let's input from `pos`.
 ",
     );
 
-    // Starting position.
-    // 初期局面。
-    let mut pos = Position::default();
-
+    let mut engine = Engine::default();
     // End the loop with 'quit'. Forced termination with [Ctrl]+[C].
     // 'quit' でループを終了。 [Ctrl]+[C] で強制終了。
     loop {
@@ -74,57 +70,12 @@ Let's input from `pos`.
             ))),
         };
 
-        // p is the acronym for parser.
-        // p は parser の頭文字。
-        let mut p = CommandLineSeek::new(&line);
-
-        // It is in alphabetical order because it is easy to find.
-        // 探しやすいからアルファベット順です。
-        if p.starts_with("do") {
-            p.go_next_to("do ");
-            if let Some(rest) = p.rest() {
-                pos.do_(rest);
-            }
-        } else if p.starts_with("go") {
-            let mut search = Search::new(pos.pieces_num);
-            let (sq, result) = search.go(&mut pos);
-            Log::print_info(&format!(
-                "info string result={:?} nps={}",
-                result,
-                search.nps()
-            ));
-
-            Log::print_notice(&format!(
-                "bestmove {}",
-                if let Some(sq) = sq {
-                    sq.to_string()
-                } else {
-                    "resign".to_string()
-                }
-            ));
-        } else if p.starts_with("info-off") {
-            Log::set_level(Level::Notice);
-        } else if p.starts_with("info-on") {
-            Log::set_level(Level::Info);
-        } else if p.starts_with("position") {
-            p.go_next_to("position ");
-            if let Some(rest) = p.rest() {
-                if let Some(pos_val) = Position::from_xfen(rest) {
-                    pos = pos_val;
+        if let Some(response) = engine.enter(&line) {
+            match response {
+                Response::Quit => {
+                    break;
                 }
             }
-        } else if p.starts_with("pos") {
-            Log::print_notice(&pos.pos());
-        } else if p.starts_with("quit") {
-            break;
-        } else if p.starts_with("undo") {
-            pos.undo();
-        } else if p.starts_with("uxi") {
-            Log::print_notice("uxiok tic-tac-toe v20200718.0.0");
-        } else if p.starts_with("xfen") {
-            Log::print_notice(&format!("{}", pos.to_xfen()));
-        } else {
-            Log::print_debug(&format!("Debug   | Invalid command=|{:?}|", p));
         }
     }
 

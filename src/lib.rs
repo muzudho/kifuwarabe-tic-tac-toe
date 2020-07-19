@@ -24,6 +24,7 @@ extern crate regex;
 
 pub mod command_line_seek;
 mod computer_player;
+pub mod engine;
 pub mod log;
 pub mod look_and_model;
 mod performance_measurement;

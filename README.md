@@ -180,13 +180,13 @@ Find out how to install Rust:
 
 ## How to use
 
-Input:  
+Terminal:  
 
 ```shell
-cargo run --release
+cargo run --example main
 ```
 
-Output:  
+In game:  
 
 ```plain
 Kifuwarabe's tic-tac-toe
