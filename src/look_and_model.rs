@@ -24,7 +24,7 @@ impl fmt::Display for Piece {
 
 /// It is a game that can be fully analyzed, so please use the result instead of the evaluation value.  
 /// 完全解析できるゲームなので、評価値ではなく結果を使います。  
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum GameResult {
     Win,
     Draw,

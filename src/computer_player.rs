@@ -52,6 +52,10 @@ impl Search {
             // I only look at the empty square.
             // 空きマスだけを見ます。
             if let None = pos.board[sq] {
+                let mut cut_off = None;
+                let mut info_leaf = false;
+                let mut info_result = None;
+                let mut info_comment = None;
                 // Let's put a stone for now.
                 // とりあえず石を置きましょう。
                 pos.do_move(sq);
@@ -85,35 +89,25 @@ impl Search {
 
                     // (3) Outputs backward search information.
                     // (三) 後ろ向き探索の情報を出力します。
-                    if Log::enabled(Level::Info) {
-                        Log::print_info(&self.info_str(
-                            self.nps(),
-                            &pos.pv,
-                            SearchDirection::Backward,
-                            sq,
-                            false,
-                            Some(pos.pieces_num),
-                            Some(GameResult::Win),
-                            pos.turn,
-                            None,
-                        ));
-                    }
+                    info_result = Some(GameResult::Win);
+
                     // (4) The search ends.
                     // (四) 探索を終了します。
-                    return (Some(sq as u8), GameResult::Win);
+                    cut_off = Some(CutOff::Win);
                 } else if SQUARES_NUM <= pos.pieces_num {
                     // Draw if there is no place to put.
                     // 置く場所が無ければ引き分け。
 
                     // (1) Outputs information for forward search.
                     // (一) 前向き探索の情報を出力します。
+                    info_leaf = true;
                     if Log::enabled(Level::Info) {
                         Log::print_info(&self.info_str(
                             self.nps(),
                             &pos.pv,
                             SearchDirection::Forward,
                             sq,
-                            true,
+                            info_leaf,
                             None,
                             Some(GameResult::Draw),
                             pos.turn,
@@ -127,22 +121,11 @@ impl Search {
 
                     // (3) Outputs backward search information.
                     // (三) 後ろ向き探索の情報を出力します。
-                    if Log::enabled(Level::Info) {
-                        Log::print_info(&self.info_str(
-                            self.nps(),
-                            &pos.pv,
-                            SearchDirection::Backward,
-                            sq,
-                            false,
-                            Some(pos.pieces_num),
-                            Some(GameResult::Draw),
-                            pos.turn,
-                            None,
-                        ));
-                    }
+                    info_result = Some(GameResult::Draw);
+
                     // (4) The search ends.
                     // (四) 探索を終了します。
-                    return (Some(sq as u8), GameResult::Draw);
+                    cut_off = Some(CutOff::Draw);
                 } else {
                     // I will continue.
                     // まだ続けます。
@@ -177,41 +160,21 @@ impl Search {
                             // 相手を負かしました。
                             // (3) Outputs backward search information.
                             // (三) 後ろ向き探索の情報を出力します。
-                            if Log::enabled(Level::Info) {
-                                Log::print_info(&self.info_str(
-                                    self.nps(),
-                                    &pos.pv,
-                                    SearchDirection::Backward,
-                                    sq,
-                                    false,
-                                    Some(pos.pieces_num),
-                                    Some(GameResult::Win),
-                                    pos.turn,
-                                    Some("Hooray!"),
-                                ));
-                            }
+                            info_result = Some(GameResult::Win);
+                            info_comment = Some("Hooray!");
+
                             // (4) The search ends.
                             // (四) 探索を終了します。
-                            return (Some(sq as u8), GameResult::Win);
+                            cut_off = Some(CutOff::Win);
                         }
                         GameResult::Draw => {
                             // If neither is wrong, draw.
                             // お互いがミスしなければ引き分け。
                             // (3) Outputs backward search information.
                             // (三) 後ろ向き探索の情報を出力します。
-                            if Log::enabled(Level::Info) {
-                                Log::print_info(&self.info_str(
-                                    self.nps(),
-                                    &pos.pv,
-                                    SearchDirection::Backward,
-                                    sq,
-                                    false,
-                                    Some(pos.pieces_num),
-                                    Some(GameResult::Draw),
-                                    pos.turn,
-                                    Some("Fmmm."),
-                                ));
-                            }
+                            info_result = Some(GameResult::Draw);
+                            info_comment = Some("Fmmm.");
+
                             // (4) I will continue.
                             // (四) まだ続けます。
                             match best_result {
@@ -227,21 +190,43 @@ impl Search {
                         GameResult::Win => {
                             // Don't choose to lose.
                             // 自分が負ける手は選びません。
+
+                            // (3) Outputs backward search information.
+                            // (三) 後ろ向き探索の情報を出力します。
+                            info_result = Some(GameResult::Lose);
+                            info_comment = Some("Damn!");
+
                             // (4) I will continue.
                             // (四) まだ続けます。
-                            if Log::enabled(Level::Info) {
-                                Log::print_info(&self.info_str(
-                                    self.nps(),
-                                    &pos.pv,
-                                    SearchDirection::Backward,
-                                    sq,
-                                    false,
-                                    Some(pos.pieces_num),
-                                    Some(GameResult::Lose),
-                                    pos.turn,
-                                    Some("Damn!"),
-                                ));
-                            }
+                        }
+                    }
+                }
+
+                // (3) Outputs backward search information.
+                // (三) 後ろ向き探索の情報を出力します。
+                if Log::enabled(Level::Info) {
+                    Log::print_info(&self.info_str(
+                        self.nps(),
+                        &pos.pv,
+                        SearchDirection::Backward,
+                        sq,
+                        info_leaf,
+                        Some(pos.pieces_num),
+                        info_result,
+                        pos.turn,
+                        info_comment,
+                    ));
+                }
+
+                // (4) Depending on the condition, the sibling node search is skipped.
+                // (四) 条件によっては、兄弟ノードの検索がスキップされます。
+                if let Some(cut_off) = cut_off {
+                    match cut_off {
+                        CutOff::Win => {
+                            return (Some(sq as u8), GameResult::Win);
+                        }
+                        CutOff::Draw => {
+                            return (Some(sq as u8), GameResult::Draw);
                         }
                     }
                 }
@@ -252,4 +237,15 @@ impl Search {
         // 手番の終わり。
         (best_sq, best_result)
     }
+}
+
+/// The reason for ending the forward search.
+/// 前向き探索を終了した理由。
+enum CutOff {
+    /// End with a win.
+    /// 勝ちにつき、終了。
+    Win,
+    /// End with a draw.
+    /// 引き分けにつき、終了。
+    Draw,
 }
