@@ -52,8 +52,10 @@ impl Search {
             // I only look at the empty square.
             // 空きマスだけを見ます。
             if let None = pos.board[sq] {
-                let mut cut_off = None;
+                let mut forward_cut_off = None;
+                let mut backward_cut_off = None;
                 let mut info_leaf = false;
+                let mut info_backwarding = None;
                 let mut info_result = None;
                 let mut info_comment = None;
                 // Let's put a stone for now.
@@ -63,12 +65,13 @@ impl Search {
 
                 // Determine if opponent have won.
                 // 対戦相手が勝ったかどうかを確認します。
-                if pos.is_opponent_win() {
-                    // The opponent wins.
-                    // 対戦相手の勝ち。
-
-                    // (1) Outputs information for forward search.
-                    // (一) 前向き探索の情報を出力します。
+                let opponent_win = pos.is_opponent_win();
+                // Draw if there is no place to put.
+                // 置く場所が無ければ引き分け。
+                let filled_board = SQUARES_NUM <= pos.pieces_num;
+                // (1) Outputs information for forward search.
+                // (一) 前向き探索の情報を出力します。
+                if opponent_win {
                     if Log::enabled(Level::Info) {
                         Log::print_info(&self.info_str(
                             self.nps(),
@@ -82,24 +85,7 @@ impl Search {
                             Some("Resign."),
                         ));
                     }
-
-                    // (2) Remove the placed stone.
-                    // (二) 置いた石は取り除きます。
-                    pos.undo_move();
-
-                    // (3) Outputs backward search information.
-                    // (三) 後ろ向き探索の情報を出力します。
-                    info_result = Some(GameResult::Win);
-
-                    // (4) The search ends.
-                    // (四) 探索を終了します。
-                    cut_off = Some(CutOff::Win);
-                } else if SQUARES_NUM <= pos.pieces_num {
-                    // Draw if there is no place to put.
-                    // 置く場所が無ければ引き分け。
-
-                    // (1) Outputs information for forward search.
-                    // (一) 前向き探索の情報を出力します。
+                } else if filled_board {
                     info_leaf = true;
                     if Log::enabled(Level::Info) {
                         Log::print_info(&self.info_str(
@@ -114,24 +100,7 @@ impl Search {
                             Some("It is ok."),
                         ));
                     }
-
-                    // (2) Remove the placed stone.
-                    // (二) 置いた石は取り除きます。
-                    pos.undo_move();
-
-                    // (3) Outputs backward search information.
-                    // (三) 後ろ向き探索の情報を出力します。
-                    info_result = Some(GameResult::Draw);
-
-                    // (4) The search ends.
-                    // (四) 探索を終了します。
-                    cut_off = Some(CutOff::Draw);
                 } else {
-                    // I will continue.
-                    // まだ続けます。
-
-                    // (1) Outputs information for forward search.
-                    // (一) 前向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
                         Log::print_info(&self.info_str(
                             self.nps(),
@@ -145,15 +114,32 @@ impl Search {
                             Some("Search."),
                         ));
                     }
+                }
 
+                if opponent_win {
+                    // The opponent wins.
+                    // 対戦相手の勝ち。
+                    forward_cut_off = Some(ForwardCutOff::OpponentWin);
+                } else if filled_board {
+                    // Draw.
+                    // 引き分けた。
+                    info_result = Some(GameResult::Draw);
+                    forward_cut_off = Some(ForwardCutOff::Draw);
+                } else {
                     // It's opponent's turn.
                     // 相手の番です。
                     let (_opponent_sq, opponent_game_result) = self.node(pos);
 
-                    // (2) Remove the placed stone.
-                    // (二) 置いた石は取り除きます。
-                    pos.undo_move();
+                    // I will continue.
+                    // まだ続けます。
+                    info_backwarding = Some(opponent_game_result);
+                }
 
+                // (2) Remove the placed stone.
+                // (二) 置いた石は取り除きます。
+                pos.undo_move();
+
+                if let Some(opponent_game_result) = info_backwarding {
                     match opponent_game_result {
                         GameResult::Lose => {
                             // I beat the opponent.
@@ -165,7 +151,7 @@ impl Search {
 
                             // (4) The search ends.
                             // (四) 探索を終了します。
-                            cut_off = Some(CutOff::Win);
+                            backward_cut_off = Some(BackwardCutOff::YouWin);
                         }
                         GameResult::Draw => {
                             // If neither is wrong, draw.
@@ -220,13 +206,19 @@ impl Search {
 
                 // (4) Depending on the condition, the sibling node search is skipped.
                 // (四) 条件によっては、兄弟ノードの検索がスキップされます。
-                if let Some(cut_off) = cut_off {
-                    match cut_off {
-                        CutOff::Win => {
+                if let Some(forward_cut_off) = forward_cut_off {
+                    match forward_cut_off {
+                        ForwardCutOff::OpponentWin => {
                             return (Some(sq as u8), GameResult::Win);
                         }
-                        CutOff::Draw => {
+                        ForwardCutOff::Draw => {
                             return (Some(sq as u8), GameResult::Draw);
+                        }
+                    }
+                } else if let Some(backward_cut_off) = backward_cut_off {
+                    match backward_cut_off {
+                        BackwardCutOff::YouWin => {
+                            return (Some(sq as u8), GameResult::Win);
                         }
                     }
                 }
@@ -241,11 +233,19 @@ impl Search {
 
 /// The reason for ending the forward search.
 /// 前向き探索を終了した理由。
-enum CutOff {
-    /// End with a win.
-    /// 勝ちにつき、終了。
-    Win,
+enum ForwardCutOff {
+    /// End with a opponent win.
+    /// 相手の勝ちにつき、終了。
+    OpponentWin,
     /// End with a draw.
     /// 引き分けにつき、終了。
     Draw,
+}
+
+/// The reason for ending the backward search.
+/// 後ろ向き探索を終了した理由。
+enum BackwardCutOff {
+    /// End with a you win.
+    /// あなたの勝ちにつき、終了。
+    YouWin,
 }
