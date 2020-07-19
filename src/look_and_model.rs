@@ -218,11 +218,11 @@ impl Search {
         leaf: bool,
         pieces_num: Option<usize>,
         result: Option<GameResult>,
-        turn: Option<Piece>,
+        turn: Piece,
         comment: Option<&str>,
     ) -> String {
         format!(
-            "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}]{}{}{}{}{}{} }}",
+            "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}]{}{}{}{}{} }}",
             nps,
             self.nodes,
             pv,
@@ -249,15 +249,10 @@ impl Search {
             } else {
                 "                 ".to_string()
             },
-            if let Some(turn) = turn {
-                format!(", \"turn\":\"{}\"", turn)
-            } else {
-                "            ".to_string()
-            },
             if let Some(comment) = comment {
-                format!(", \"comment\":\"{}\"", comment).to_string()
+                format!(", \"{}\":\"{}\"", turn, comment).to_string()
             } else {
-                "".to_string()
+                format!(", \"{}\":\"\"", turn).to_string()
             },
         )
         .to_string()

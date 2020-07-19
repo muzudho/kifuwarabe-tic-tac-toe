@@ -107,7 +107,7 @@ fn main() {
             false,
             None,
             None,
-            None,
+            Piece::Nought,
             Some("Hello!"),
         ));
         // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
@@ -119,7 +119,7 @@ fn main() {
             true,
             None,
             Some(GameResult::Win),
-            None,
+            Piece::Cross,
             Some("Hello!"),
         ));
         // info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
@@ -131,7 +131,7 @@ fn main() {
             false,
             Some(pos.pieces_num),
             Some(GameResult::Win),
-            Some(pos.turn),
+            Piece::Nought,
             Some("Hello!"),
         ));
         // info nps    789 nodes      0 pv                   |       | <- from height 1 | + [1] | win  | + "Hello!"

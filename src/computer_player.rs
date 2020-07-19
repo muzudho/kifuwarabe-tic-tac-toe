@@ -74,7 +74,7 @@ impl Search {
                             true,
                             None,
                             Some(GameResult::Win),
-                            None,
+                            pos.turn,
                             Some("Resign."),
                         ));
                     }
@@ -94,7 +94,7 @@ impl Search {
                             false,
                             Some(pos.pieces_num),
                             Some(GameResult::Win),
-                            Some(pos.turn),
+                            pos.turn,
                             None,
                         ));
                     }
@@ -116,7 +116,7 @@ impl Search {
                             true,
                             None,
                             Some(GameResult::Draw),
-                            None,
+                            pos.turn,
                             Some("It is ok."),
                         ));
                     }
@@ -136,7 +136,7 @@ impl Search {
                             false,
                             Some(pos.pieces_num),
                             Some(GameResult::Draw),
-                            Some(pos.turn),
+                            pos.turn,
                             None,
                         ));
                     }
@@ -158,7 +158,7 @@ impl Search {
                             false,
                             None,
                             None,
-                            None,
+                            pos.turn,
                             Some("Search."),
                         ));
                     }
@@ -186,7 +186,7 @@ impl Search {
                                     false,
                                     Some(pos.pieces_num),
                                     Some(GameResult::Win),
-                                    Some(pos.turn),
+                                    pos.turn,
                                     Some("Hooray!"),
                                 ));
                             }
@@ -208,7 +208,7 @@ impl Search {
                                     false,
                                     Some(pos.pieces_num),
                                     Some(GameResult::Draw),
-                                    Some(pos.turn),
+                                    pos.turn,
                                     Some("Fmmm."),
                                 ));
                             }
@@ -238,7 +238,7 @@ impl Search {
                                     false,
                                     Some(pos.pieces_num),
                                     Some(GameResult::Lose),
-                                    Some(pos.turn),
+                                    pos.turn,
                                     Some("Damn!"),
                                 ));
                             }
