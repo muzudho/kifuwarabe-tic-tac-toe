@@ -205,21 +205,21 @@ impl Search {
     }
 }
 
-/// The reason for ending the forward search.
-/// 前向き探索を終了した理由。
+/// The reason for ending the forward search.  
+/// 前向き探索を終了した理由。  
 enum ForwardCutOff {
-    /// End with a opponent win.
-    /// 相手の勝ちにつき、終了。
+    /// End with a opponent win.  
+    /// 相手の勝ちにつき、終了。  
     OpponentWin,
-    /// End with a draw.
-    /// 引き分けにつき、終了。
+    /// End with a draw.  
+    /// 引き分けにつき、終了。  
     Draw,
 }
 
-/// The reason for ending the backward search.
-/// 後ろ向き探索を終了した理由。
+/// The reason for ending the backward search.  
+/// 後ろ向き探索を終了した理由。  
 enum BackwardCutOff {
-    /// End with a you win.
-    /// あなたの勝ちにつき、終了。
+    /// End with a you win.  
+    /// あなたの勝ちにつき、終了。  
     YouWin,
 }

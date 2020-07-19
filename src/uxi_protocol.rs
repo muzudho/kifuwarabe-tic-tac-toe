@@ -213,7 +213,7 @@ impl Position {
             return;
         }
 
-        self.do_move(sq);
+        self.redo_move(sq);
 
         // Win/loss judgment. Let's implement this after creating Position::result and is_opponent_win().
         // 勝ち負け判定。 これは Position::result, is_opponent_win() を作ったあとで実装しましょう。

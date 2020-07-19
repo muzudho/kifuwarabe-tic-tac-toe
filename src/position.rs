@@ -8,12 +8,6 @@ impl Position {
     /// Place the stone.  
     /// １手指します。  
     pub fn do_move(&mut self, sq: usize) {
-        // I placed a stone.
-        // 石を置いた。
-        self.board[sq] = Some(self.turn);
-        // Write on the game record.
-        // 棋譜に書きます。
-        self.history[self.pieces_num] = sq as u8;
         // Write on the pv.
         // 読み筋に書きます。
         if self.pv.is_empty() {
@@ -21,6 +15,20 @@ impl Position {
         } else {
             self.pv.push_str(&format!(",{}", sq).to_string());
         }
+        self.redo_move(sq);
+    }
+
+    /// Place the stone.  
+    /// Do not write to the pv.  
+    /// １手指します。  
+    /// 読み筋への書き込みを行いません。  
+    pub fn redo_move(&mut self, sq: usize) {
+        // I placed a stone.
+        // 石を置いた。
+        self.board[sq] = Some(self.turn);
+        // Write on the game record.
+        // 棋譜に書きます。
+        self.history[self.pieces_num] = sq as u8;
         // After writing on the game, count the stones you have placed.
         // 棋譜に書いたあと、置いた石を数えます。
         self.pieces_num += 1;
