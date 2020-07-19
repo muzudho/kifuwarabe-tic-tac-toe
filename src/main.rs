@@ -34,7 +34,7 @@ mod win_lose_judgment;
 use casual_logger::{Level, Log};
 use command_line_seek::CommandLineSeek;
 use log::LogExt;
-use look_and_model::{GameResult, Piece, Position, Search};
+use look_and_model::{GameResult, Piece, Position, Search, SearchDirection};
 use std;
 use std::{thread, time};
 use test::test_win_lose_judgement;
@@ -99,23 +99,39 @@ fn main() {
         Log::print_debug(&Search::info_header(&pos));
         // info nps ...... nodes ...... pv O X O X O X O X O
         // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしろだぜ☆（＾～＾）
-        Log::print_debug(&search.info_forward(123, &pos, &pos.pv, 1, Some("Hello!")));
-        // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
-        Log::print_debug(&search.info_forward_leaf(
-            456,
-            &pos,
+        Log::print_debug(&search.info_str(
+            123,
             &pos.pv,
+            SearchDirection::Forward,
             1,
-            GameResult::Win,
+            false,
+            None,
+            None,
+            None,
+            Some("Hello!"),
+        ));
+        // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
+        Log::print_debug(&search.info_str(
+            456,
+            &pos.pv,
+            SearchDirection::Forward,
+            1,
+            true,
+            None,
+            Some(GameResult::Win),
+            None,
             Some("Hello!"),
         ));
         // info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
-        Log::print_debug(&search.info_backward(
+        Log::print_debug(&search.info_str(
             789,
-            &pos,
             &pos.pv,
+            SearchDirection::Backward,
             1,
-            GameResult::Win,
+            false,
+            Some(pos.pieces_num),
+            Some(GameResult::Win),
+            Some(pos.turn),
             Some("Hello!"),
         ));
         // info nps    789 nodes      0 pv                   |       | <- from height 1 | + [1] | win  | + "Hello!"

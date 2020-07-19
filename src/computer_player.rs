@@ -2,7 +2,9 @@
 //! See 'Search' struct in 'look_and_model' for details.  
 //! コンピューターの思考部です。  
 //! 詳しくは 'look_and_model' の 'Search' 構造体 を見てください。  
-use crate::look_and_model::{GameResult, Position, Search, BOARD_LEN, SQUARES_NUM};
+use crate::look_and_model::{
+    GameResult, Position, Search, SearchDirection, BOARD_LEN, SQUARES_NUM,
+};
 use crate::LogExt;
 use casual_logger::{Level, Log};
 
@@ -55,11 +57,6 @@ impl Search {
                 pos.do_move(sq);
                 self.nodes += 1;
 
-                // Prior knowledge. Proceeding from the root toward the leaves is called a forward search.
-                // The process of returning from the leaves toward the root is called backward search.
-                // 予備知識。 根から葉に向かって進んでいることを前向き探索と呼びます。
-                // 葉から根に戻っていることを後ろ向き探索と呼びます。
-
                 // Determine if opponent have won.
                 // 対戦相手が勝ったかどうかを確認します。
                 if pos.is_opponent_win() {
@@ -69,12 +66,15 @@ impl Search {
                     // (1) Outputs information for forward search.
                     // (一) 前向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
-                        Log::print_info(&self.info_forward_leaf(
+                        Log::print_info(&self.info_str(
                             self.nps(),
-                            pos,
                             &pos.pv,
+                            SearchDirection::Forward,
                             sq,
-                            GameResult::Win,
+                            true,
+                            None,
+                            Some(GameResult::Win),
+                            None,
                             Some("Resign."),
                         ));
                     }
@@ -86,12 +86,15 @@ impl Search {
                     // (3) Outputs backward search information.
                     // (三) 後ろ向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
-                        Log::print_info(&self.info_backward(
+                        Log::print_info(&self.info_str(
                             self.nps(),
-                            pos,
                             &pos.pv,
+                            SearchDirection::Backward,
                             sq,
-                            GameResult::Win,
+                            false,
+                            Some(pos.pieces_num),
+                            Some(GameResult::Win),
+                            Some(pos.turn),
                             None,
                         ));
                     }
@@ -105,12 +108,15 @@ impl Search {
                     // (1) Outputs information for forward search.
                     // (一) 前向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
-                        Log::print_info(&self.info_forward_leaf(
+                        Log::print_info(&self.info_str(
                             self.nps(),
-                            pos,
                             &pos.pv,
+                            SearchDirection::Forward,
                             sq,
-                            GameResult::Draw,
+                            true,
+                            None,
+                            Some(GameResult::Draw),
+                            None,
                             Some("It is ok."),
                         ));
                     }
@@ -122,12 +128,15 @@ impl Search {
                     // (3) Outputs backward search information.
                     // (三) 後ろ向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
-                        Log::print_info(&self.info_backward(
+                        Log::print_info(&self.info_str(
                             self.nps(),
-                            pos,
                             &pos.pv,
+                            SearchDirection::Backward,
                             sq,
-                            GameResult::Draw,
+                            false,
+                            Some(pos.pieces_num),
+                            Some(GameResult::Draw),
+                            Some(pos.turn),
                             None,
                         ));
                     }
@@ -141,90 +150,98 @@ impl Search {
                     // (1) Outputs information for forward search.
                     // (一) 前向き探索の情報を出力します。
                     if Log::enabled(Level::Info) {
-                        Log::print_info(&self.info_forward(
+                        Log::print_info(&self.info_str(
                             self.nps(),
-                            pos,
                             &pos.pv,
+                            SearchDirection::Forward,
                             sq,
+                            false,
+                            None,
+                            None,
+                            None,
                             Some("Search."),
                         ));
                     }
-                }
 
-                // It's opponent's turn.
-                // 相手の番です。
-                let (_opponent_sq, opponent_game_result) = self.node(pos);
+                    // It's opponent's turn.
+                    // 相手の番です。
+                    let (_opponent_sq, opponent_game_result) = self.node(pos);
 
-                // (2) Remove the placed stone.
-                // (二) 置いた石は取り除きます。
-                pos.undo_move();
+                    // (2) Remove the placed stone.
+                    // (二) 置いた石は取り除きます。
+                    pos.undo_move();
 
-                match opponent_game_result {
-                    GameResult::Lose => {
-                        // I beat the opponent.
-                        // 相手を負かしました。
-
-                        // (3) Outputs backward search information.
-                        // (三) 後ろ向き探索の情報を出力します。
-                        if Log::enabled(Level::Info) {
-                            Log::print_info(&self.info_backward(
-                                self.nps(),
-                                pos,
-                                &pos.pv,
-                                sq,
-                                GameResult::Win,
-                                Some("Hooray!"),
-                            ));
-                        }
-
-                        // (4) The search ends.
-                        // (四) 探索を終了します。
-                        return (Some(sq as u8), GameResult::Win);
-                    }
-                    GameResult::Draw => {
-                        // If neither is wrong, draw.
-                        // お互いがミスしなければ引き分け。
-
-                        // (3) Outputs backward search information.
-                        // (三) 後ろ向き探索の情報を出力します。
-                        if Log::enabled(Level::Info) {
-                            Log::print_info(&self.info_backward(
-                                self.nps(),
-                                pos,
-                                &pos.pv,
-                                sq,
-                                GameResult::Draw,
-                                Some("Fmmm."),
-                            ));
-                        }
-
-                        // (4) I will continue.
-                        // (四) まだ続けます。
-                        match best_result {
-                            GameResult::Lose => {
-                                // If it gets better, change it to this. Generally called 'Update alpha evaluation'.
-                                // 良くなるならこの手に変えます。一般的には 'α評価値の更新' と呼びます。
-                                best_sq = Some(sq as u8);
-                                best_result = GameResult::Draw;
+                    match opponent_game_result {
+                        GameResult::Lose => {
+                            // I beat the opponent.
+                            // 相手を負かしました。
+                            // (3) Outputs backward search information.
+                            // (三) 後ろ向き探索の情報を出力します。
+                            if Log::enabled(Level::Info) {
+                                Log::print_info(&self.info_str(
+                                    self.nps(),
+                                    &pos.pv,
+                                    SearchDirection::Backward,
+                                    sq,
+                                    false,
+                                    Some(pos.pieces_num),
+                                    Some(GameResult::Win),
+                                    Some(pos.turn),
+                                    Some("Hooray!"),
+                                ));
                             }
-                            _ => {}
+                            // (4) The search ends.
+                            // (四) 探索を終了します。
+                            return (Some(sq as u8), GameResult::Win);
                         }
-                    }
-                    GameResult::Win => {
-                        // Don't choose to lose.
-                        // 自分が負ける手は選びません。
-
-                        // (4) I will continue.
-                        // (四) まだ続けます。
-                        if Log::enabled(Level::Info) {
-                            Log::print_info(&self.info_backward(
-                                self.nps(),
-                                pos,
-                                &pos.pv,
-                                sq,
-                                GameResult::Lose,
-                                Some("Damn!"),
-                            ));
+                        GameResult::Draw => {
+                            // If neither is wrong, draw.
+                            // お互いがミスしなければ引き分け。
+                            // (3) Outputs backward search information.
+                            // (三) 後ろ向き探索の情報を出力します。
+                            if Log::enabled(Level::Info) {
+                                Log::print_info(&self.info_str(
+                                    self.nps(),
+                                    &pos.pv,
+                                    SearchDirection::Backward,
+                                    sq,
+                                    false,
+                                    Some(pos.pieces_num),
+                                    Some(GameResult::Draw),
+                                    Some(pos.turn),
+                                    Some("Fmmm."),
+                                ));
+                            }
+                            // (4) I will continue.
+                            // (四) まだ続けます。
+                            match best_result {
+                                GameResult::Lose => {
+                                    // If it gets better, change it to this. Generally called 'Update alpha evaluation'.
+                                    // 良くなるならこの手に変えます。一般的には 'α評価値の更新' と呼びます。
+                                    best_sq = Some(sq as u8);
+                                    best_result = GameResult::Draw;
+                                }
+                                _ => {}
+                            }
+                        }
+                        GameResult::Win => {
+                            // Don't choose to lose.
+                            // 自分が負ける手は選びません。
+                            // (4) I will continue.
+                            // (四) まだ続けます。
+                            if Log::enabled(Level::Info) {
+                                Log::print_info(&self.info_str(
+                                    self.nps(),
+                                    &pos.pv,
+                                    SearchDirection::Backward,
+                                    sq,
+                                    false,
+                                    Some(pos.pieces_num),
+                                    Some(GameResult::Lose),
+                                    Some(pos.turn),
+                                    Some("Damn!"),
+                                ));
+                            }
                         }
                     }
                 }

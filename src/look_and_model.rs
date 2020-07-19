@@ -157,6 +157,19 @@ impl Position {
     }
 }
 
+/// Proceeding from the root toward the leaves is called a forward search.
+/// The process of returning from the leaves toward the root is called backward search.
+/// 根から葉に向かって進んでいることを前向き探索と呼びます。
+/// 葉から根に戻っていることを後ろ向き探索と呼びます。
+pub enum SearchDirection {
+    /// Forward search.
+    /// 前向き探索。
+    Forward,
+    /// Backward search.
+    /// 後ろ向き探索。
+    Backward,
+}
+
 /// Search.  
 /// 探索部。  
 pub struct Search {
@@ -194,53 +207,53 @@ impl Search {
         }
     }
 
-    /// Information during a forward search.
-    /// 前向き探索中の情報。
-    pub fn info_forward(
+    /// Information during a forward/backward search.
+    /// 前向き/後ろ向き 探索中の情報。
+    pub fn info_str(
         &self,
         nps: u64,
-        pos: &Position,
         pv: &str,
+        search_direction: SearchDirection,
         sq: usize,
+        leaf: bool,
+        pieces_num: Option<usize>,
+        result: Option<GameResult>,
+        turn: Option<Piece>,
         comment: Option<&str>,
     ) -> String {
         format!(
-            "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}], \"push\":\"{}\",               \"pieces\":{},                  \"turn\":\"{}\"{} }}",
+            "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}]{}{}{}{}{}{} }}",
             nps,
             self.nodes,
             pv,
-            sq,
-            pos.pieces_num,
-            pos.turn,
-            if let Some(comment) = comment {
-                format!(", \"comment\":\"{}\"",comment).to_string()
-            } else {
-                "".to_string()
+            match search_direction {
+                SearchDirection::Forward => {
+                    format!(", \"push\":\"{}\"", sq)
+                }
+                SearchDirection::Backward => {
+                    format!(", \"pop\" :\"{}\"", sq)
+                }
             },
-        )
-        .to_string()
-    }
-
-    /// It's a leaf. Information during a forward search.
-    /// 葉。前向き探索中の情報。
-    pub fn info_forward_leaf(
-        &self,
-        nps: u64,
-        pos: &Position,
-        pv: &str,
-        sq: usize,
-        result: GameResult,
-        comment: Option<&str>,
-    ) -> String {
-        format!(
-            "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}], \"push\":\"{}\", \"leaf\": true, \"pieces\":{}, \"result\":{:6}, \"turn\":\"{}\"{} }}",
-            nps,
-            self.nodes,
-            pv,
-            sq,
-            pos.pieces_num,
-            format!("\"{}\"",result.to_string()),
-            pos.turn,
+            if leaf {
+                ", \"leaf\": true"
+            } else {
+                "              "
+            },
+            if let Some(pieces_num) = pieces_num {
+                format!(", \"pieces\":{}", pieces_num)
+            } else {
+                "            ".to_string()
+            },
+            if let Some(result) = result {
+                format!(", \"result\":{:6}", format!("\"{}\"", result.to_string()))
+            } else {
+                "                 ".to_string()
+            },
+            if let Some(turn) = turn {
+                format!(", \"turn\":\"{}\"", turn)
+            } else {
+                "            ".to_string()
+            },
             if let Some(comment) = comment {
                 format!(", \"comment\":\"{}\"", comment).to_string()
             } else {
@@ -248,33 +261,5 @@ impl Search {
             },
         )
         .to_string()
-    }
-    /// Information during a backward search.
-    /// 後ろ向き探索中の情報。
-    pub fn info_backward(
-        &self,
-        nps: u64,
-        pos: &Position,
-        pv: &str,
-        sq: usize,
-        result: GameResult,
-        comment: Option<&str>,
-    ) -> String {
-        return format!(
-            "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}], \"pop\" :\"{}\",               \"pieces\":{}, \"result\":{:6}, \"turn\":\"{}\"{} }}",
-            nps,
-            self.nodes,
-            pv,
-            sq,
-            pos.pieces_num,
-            format!("\"{}\"",result.to_string()),
-            pos.turn,
-            if let Some(comment) = comment {
-                format!(", \"comment\":\"{}\"", comment).to_string()
-            } else {
-                "".to_string()
-            }
-        )
-        .to_string();
     }
 }
