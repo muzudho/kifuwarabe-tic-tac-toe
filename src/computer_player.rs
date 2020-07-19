@@ -52,7 +52,6 @@ impl Search {
             // I only look at the empty square.
             // 空きマスだけを見ます。
             if let None = pos.board[sq] {
-                let mut forward_cut_off = None;
                 let mut backward_cut_off = None;
                 let mut info_leaf = false;
                 let mut info_backwarding = None;
@@ -63,75 +62,55 @@ impl Search {
                 pos.do_move(sq);
                 self.nodes += 1;
 
-                // Determine if opponent have won.
-                // 対戦相手が勝ったかどうかを確認します。
-                let opponent_win = pos.is_opponent_win();
-                // Draw if there is no place to put.
-                // 置く場所が無ければ引き分け。
-                let filled_board = SQUARES_NUM <= pos.pieces_num;
-                // (1) Outputs information for forward search.
-                // (一) 前向き探索の情報を出力します。
-                if opponent_win {
-                    if Log::enabled(Level::Info) {
-                        Log::print_info(&self.info_str(
-                            self.nps(),
-                            &pos.pv,
-                            SearchDirection::Forward,
-                            sq,
-                            true,
-                            None,
-                            Some(GameResult::Win),
-                            pos.turn,
-                            Some("Resign."),
-                        ));
-                    }
-                } else if filled_board {
-                    info_leaf = true;
-                    if Log::enabled(Level::Info) {
-                        Log::print_info(&self.info_str(
-                            self.nps(),
-                            &pos.pv,
-                            SearchDirection::Forward,
-                            sq,
-                            info_leaf,
-                            None,
-                            Some(GameResult::Draw),
-                            pos.turn,
-                            Some("It is ok."),
-                        ));
-                    }
-                } else {
-                    if Log::enabled(Level::Info) {
-                        Log::print_info(&self.info_str(
-                            self.nps(),
-                            &pos.pv,
-                            SearchDirection::Forward,
-                            sq,
-                            false,
-                            None,
-                            None,
-                            pos.turn,
-                            Some("Search."),
-                        ));
-                    }
-                }
-
-                if opponent_win {
+                // Find out why you are not doing a forward search.
+                // If not, I will search.
+                // 前向き検索を行わない理由を調べてください。
+                // 無ければ探索します。
+                let forward_cut_off = if pos.is_opponent_win() {
                     // The opponent wins.
                     // 対戦相手の勝ち。
-                    forward_cut_off = Some(ForwardCutOff::OpponentWin);
-                } else if filled_board {
-                    // Draw.
-                    // 引き分けた。
-                    info_result = Some(GameResult::Draw);
-                    forward_cut_off = Some(ForwardCutOff::Draw);
+                    if Log::enabled(Level::Info) {
+                        info_result = Some(GameResult::Win);
+                        info_comment = Some("Resign.");
+                    }
+                    Some(ForwardCutOff::OpponentWin)
+                } else if SQUARES_NUM <= pos.pieces_num {
+                    // Draw if there is no place to put.
+                    // 置く場所が無ければ引き分け。
+                    if Log::enabled(Level::Info) {
+                        info_leaf = true;
+                        info_result = Some(GameResult::Draw);
+                        info_comment = Some("It is ok.");
+                    }
+                    Some(ForwardCutOff::Draw)
                 } else {
-                    // It's opponent's turn.
-                    // 相手の番です。
+                    if Log::enabled(Level::Info) {
+                        info_comment = Some("Search.");
+                    }
+                    None
+                };
+
+                // (1) Outputs information for forward search.
+                // (一) 前向き探索の情報を出力します。
+                Log::print_info(&self.info_str(
+                    self.nps(),
+                    &pos.pv,
+                    SearchDirection::Forward,
+                    sq,
+                    info_leaf,
+                    None,
+                    info_result,
+                    pos.turn,
+                    info_comment,
+                ));
+
+                if let None = forward_cut_off {
+                    // If you move forward, it's your opponent's turn.
+                    // 前向きに探索したら、次は対戦相手の番です。
                     let (_opponent_sq, opponent_game_result) = self.node(pos);
 
-                    // I will continue.
-                    // まだ続けます。
+                    // I'm back.
+                    // 戻ってきました。
                     info_backwarding = Some(opponent_game_result);
                 }
 
@@ -144,25 +123,19 @@ impl Search {
                         GameResult::Lose => {
                             // I beat the opponent.
                             // 相手を負かしました。
-                            // (3) Outputs backward search information.
-                            // (三) 後ろ向き探索の情報を出力します。
                             info_result = Some(GameResult::Win);
                             info_comment = Some("Hooray!");
 
-                            // (4) The search ends.
-                            // (四) 探索を終了します。
+                            // The search ends.
+                            // 探索を終了します。
                             backward_cut_off = Some(BackwardCutOff::YouWin);
                         }
                         GameResult::Draw => {
                             // If neither is wrong, draw.
                             // お互いがミスしなければ引き分け。
-                            // (3) Outputs backward search information.
-                            // (三) 後ろ向き探索の情報を出力します。
                             info_result = Some(GameResult::Draw);
                             info_comment = Some("Fmmm.");
 
-                            // (4) I will continue.
-                            // (四) まだ続けます。
                             match best_result {
                                 GameResult::Lose => {
                                     // If it gets better, change it to this. Generally called 'Update alpha evaluation'.
@@ -172,18 +145,17 @@ impl Search {
                                 }
                                 _ => {}
                             }
+                            // I will continue.
+                            // まだ続けます。
                         }
                         GameResult::Win => {
                             // Don't choose to lose.
                             // 自分が負ける手は選びません。
-
-                            // (3) Outputs backward search information.
-                            // (三) 後ろ向き探索の情報を出力します。
                             info_result = Some(GameResult::Lose);
                             info_comment = Some("Damn!");
 
-                            // (4) I will continue.
-                            // (四) まだ続けます。
+                            // I will continue.
+                            // まだ続けます。
                         }
                     }
                 }

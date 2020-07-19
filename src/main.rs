@@ -382,16 +382,20 @@ Let's input from `pos`.
         } else if p.starts_with("go") {
             let mut search = Search::new(pos.pieces_num);
             let (sq, result) = search.go(&mut pos);
-            if let Some(sq) = sq {
-                Log::print_info(&format!(
-                    "info string result={:?} nps={}",
-                    result,
-                    search.nps()
-                ));
-                Log::print_notice(&format!("bestmove {}", sq));
-            } else {
-                Log::print_notice("resign");
-            }
+            Log::print_info(&format!(
+                "info string result={:?} nps={}",
+                result,
+                search.nps()
+            ));
+
+            Log::print_notice(&format!(
+                "bestmove {}",
+                if let Some(sq) = sq {
+                    sq.to_string()
+                } else {
+                    "resign".to_string()
+                }
+            ));
         } else if p.starts_with("info-off") {
             Log::set_level(Level::Notice);
         } else if p.starts_with("info-on") {
