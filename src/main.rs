@@ -99,8 +99,9 @@ fn main() {
         Log::print_debug(&Search::info_header(&pos));
         // info nps ...... nodes ...... pv O X O X O X O X O
         // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしろだぜ☆（＾～＾）
-        Log::print_debug(&search.info_str(
+        Log::print_debug(&Search::info_str(
             123,
+            search.nodes,
             &pos.pv,
             SearchDirection::Forward,
             1,
@@ -111,8 +112,9 @@ fn main() {
             Some("Hello!"),
         ));
         // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
-        Log::print_debug(&search.info_str(
+        Log::print_debug(&Search::info_str(
             456,
+            search.nodes,
             &pos.pv,
             SearchDirection::Forward,
             1,
@@ -123,8 +125,9 @@ fn main() {
             Some("Hello!"),
         ));
         // info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
-        Log::print_debug(&search.info_str(
+        Log::print_debug(&Search::info_str(
             789,
+            search.nodes,
             &pos.pv,
             SearchDirection::Backward,
             1,

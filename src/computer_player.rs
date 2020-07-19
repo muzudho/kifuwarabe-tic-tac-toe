@@ -92,8 +92,9 @@ impl Search {
 
                 // (1) Outputs information for forward search.
                 // (一) 前向き探索の情報を出力します。
-                Log::print_info(&self.info_str(
+                Log::print_info(&Search::info_str(
                     self.nps(),
+                    self.nodes,
                     &pos.pv,
                     SearchDirection::Forward,
                     sq,
@@ -163,8 +164,9 @@ impl Search {
                 // (3) Outputs backward search information.
                 // (三) 後ろ向き探索の情報を出力します。
                 if Log::enabled(Level::Info) {
-                    Log::print_info(&self.info_str(
+                    Log::print_info(&Search::info_str(
                         self.nps(),
+                        self.nodes,
                         &pos.pv,
                         SearchDirection::Backward,
                         sq,

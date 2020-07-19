@@ -210,8 +210,8 @@ impl Search {
     /// Information during a forward/backward search.
     /// 前向き/後ろ向き 探索中の情報。
     pub fn info_str(
-        &self,
         nps: u64,
+        nodes: u32,
         pv: &str,
         search_direction: SearchDirection,
         sq: usize,
@@ -224,7 +224,7 @@ impl Search {
         format!(
             "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}]{}{}{}{}{} }}",
             nps,
-            self.nodes,
+            nodes,
             pv,
             match search_direction {
                 SearchDirection::Forward => {
