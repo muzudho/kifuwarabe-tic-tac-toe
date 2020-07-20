@@ -88,6 +88,10 @@ pub struct Position {
     /// Principal variation.
     /// 今読んでる読み筋。
     pub pv: String,
+
+    /// Display info during search. It is not info level in the log.  
+    /// 探索中の info 表示を行います。 ログの情報レベルのことではありません。  
+    pub info_enabled: bool,
 }
 impl Default for Position {
     fn default() -> Self {
@@ -100,6 +104,7 @@ impl Default for Position {
             history: [0; SQUARES_NUM],
             pieces_num: 0,
             pv: String::new(),
+            info_enabled: true,
         }
     }
 }

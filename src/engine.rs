@@ -6,7 +6,7 @@ use crate::{
     log::LogExt,
     look_and_model::{Position, Search},
 };
-use casual_logger::{Level, Log};
+use casual_logger::Log;
 
 /// ThinkingEngine.  
 /// 思考エンジン。  
@@ -102,9 +102,9 @@ Let's input from `pos`.
                 }
             ));
         } else if p.starts_with("info-off") {
-            Log::set_level(Level::Notice);
+            self.pos.info_enabled = false;
         } else if p.starts_with("info-on") {
-            Log::set_level(Level::Info);
+            self.pos.info_enabled = true;
         } else if p.starts_with("position") {
             p.go_next_to("position ");
             if let Some(rest) = p.rest() {

@@ -1,6 +1,6 @@
 [package]
 name = "kifuwarabe_tic_tac_toe"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["むずでょ <muzudho1@gmail.com>"]
 edition = "2018"
 description = """
@@ -20,4 +20,4 @@ categories = ["game-engines"]
 lazy_static = "1.4.0"
 chrono = "0.4"
 regex = "1"
-casual_logger = "0.5.0"
+casual_logger = "0.5.3"

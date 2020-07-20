@@ -290,5 +290,5 @@ fn main() {
 
     // Wait for logging to complete.
     // ロギングが完了するまで待ちます。
-    Log::wait();
+    Log::flush();
 }
