@@ -20,4 +20,4 @@ categories = ["game-engines"]
 lazy_static = "1.4.0"
 chrono = "0.4"
 regex = "1"
-casual_logger = "0.5.3"
+casual_logger = "0.6.1"
