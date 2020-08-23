@@ -409,14 +409,14 @@ It is difficult to compare the behavior. Instead, it is useful to get the logs a
 **But logger's difficult to make, so use library.**  
 
 * [x] Step 1. Use logger library.
-  * [x] Use casual_logger library.
-* [x] Take a look at the 'log.rs' file.
-  * [x] Extend the logger.
+  * [x] Use casual_logger library at 'Cargo.toml', 'main.rs'.
+  * [x] Create the 'log.rs' file.
+    * [x] Extend the logger.
 
 The first thing you have to create is your motive.  
 It is important to start with the appearance.  
 
-* [x] Step 2. Take a look at the 'look_and_model.rs' file.
+* [x] Step 2. Create the 'look_and_model.rs' file.
   * [x] Piece - "O", "X".
   * [x] Game result - Win/Draw/Lose.
   * [x] Position - It's the board.
@@ -432,7 +432,7 @@ Being able to control your position means being able to play.
 
 Let's enter commands into the computer. Create a command line parser.  
 
-* [x] Step 4. 'command_line_parser.rs'
+* [x] Step 4. 'command_line_seek.rs'
   * [x] Input.
   * [x] Starts with.
   * [x] Go next to.
@@ -442,8 +442,8 @@ People who are looking for something 10 minutes a day are looking for something 
 Before creating the game itself, let's first create the replay function. Let's get it for a week.  
 
 * [x] Step 5. 'uxi_protocol.rs'
-  * [x] To XFEN.
   * [x] Do. (Before 'From XFEN') Excludes legal moves and winning/losing decisions.
+  * [x] To XFEN.
   * [x] From XFEN.
   * [x] Undo.
 
