@@ -2,6 +2,7 @@ use casual_logger::{Level, Log};
 use kifuwarabe_tic_tac_toe::{
     engine::{Engine, Response},
     log::LogExt,
+    test::test,
 };
 use std;
 
@@ -20,6 +21,12 @@ fn main() {
     // Remove old log files. This is determined by the date in the filename.
     // 古いログファイルを削除します。これは、ファイル名の日付によって決定されます。
     Log::remove_old_logs();
+
+    // Test.
+    // テスト。
+    if Log::enabled(Level::Debug) {
+        test();
+    }
 
     let mut engine = Engine::default();
     engine.title();

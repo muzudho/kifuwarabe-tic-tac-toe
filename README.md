@@ -413,10 +413,14 @@ It is difficult to compare the behavior. Instead, it is useful to get the logs a
   * [x] Create the 'log.rs' file.
     * [x] Extend the logger.
 
+Let's proceed with development while testing.  
+
+* [x] Step 2. Create the `test.rs` file.
+
 The first thing you have to create is your motive.  
 It is important to start with the appearance.  
 
-* [x] Step 2. Create the 'look_and_model.rs' file.
+* [x] Step 3. Create the 'look_and_model.rs' file.
   * [x] Piece - "O", "X".
   * [x] Game result - Win/Draw/Lose.
   * [x] Position - It's the board.
@@ -425,14 +429,14 @@ It is important to start with the appearance.
 If you want to play immediately, you have the talent of a game creator.  
 Being able to control your position means being able to play.  
 
-* [x] Step 3. 'position.rs'
+* [x] Step 4. 'position.rs'
   * [x] do_move
   * [x] undo_move
   * [x] opponent
 
 Let's enter commands into the computer. Create a command line parser.  
 
-* [x] Step 4. 'command_line_seek.rs'
+* [x] Step 5. 'command_line_seek.rs'
   * [x] Input.
   * [x] Starts with.
   * [x] Go next to.
@@ -441,7 +445,7 @@ Let's enter commands into the computer. Create a command line parser.
 People who are looking for something 10 minutes a day are looking for something for a week in a year.  
 Before creating the game itself, let's first create the replay function. Let's get it for a week.  
 
-* [x] Step 5. 'uxi_protocol.rs'
+* [x] Step 6. 'uxi_protocol.rs'
   * [x] Do. (Before 'From XFEN') Excludes legal moves and winning/losing decisions.
   * [x] To XFEN.
   * [x] From XFEN.
@@ -449,7 +453,7 @@ Before creating the game itself, let's first create the replay function. Let's g
 
 Let's make a principal command.  
 
-* [x] Step 6. 'examples/main.rs' command line.
+* [x] Step 7. 'examples/main.rs' command line.
   * [x] position.
   * [x] pos.
   * [x] do.
@@ -459,20 +463,20 @@ Let's make a principal command.
 
 Before you make a computer player, let's judge the outcome. And let's test.  
 
-* [x] Step 7. 'win_lose_judgment.rs'
+* [x] Step 8. 'win_lose_judgment.rs'
   * [x] Win.
   * [x] Draw - Not win, not lose, can not play.
   * [ ] Lose. - Not win is lose.
 
 Before creating a computer player, let's create a mechanism to measure performance.  
 
-* [x] Step 8. 'performance_measurement.rs'
+* [x] Step 9. 'performance_measurement.rs'
   * [x] Seconds. - Stopwatch.
   * [x] Node per second.
 
 Finally, let's make a computer player.  
 
-* [x] Step 9. 'computer_player.rs'
+* [x] Step 10. 'computer_player.rs'
   * [x] Search.
   * [ ] Evaluation - None.
 * [x] 'main.py'
