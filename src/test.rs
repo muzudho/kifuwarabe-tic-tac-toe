@@ -4,289 +4,274 @@
 use crate::command_line_seek::CommandLineSeek;
 use crate::log::LogExt;
 use crate::look_and_model::{GameResult, Piece, Position, Search, SearchDirection};
-use casual_logger::{Level, Log};
+use casual_logger::Log;
 use std;
 use std::{thread, time};
 
-/// Test.  
-/// テスト。  
+/// It is a unit test. I am writing it here because it is a hassle.
+/// Check it against the explanation in README.md.
+/// 単体テストです。めんどくさいのでここに書いています。
+/// README.mdの解説と照らし合わせてみてください。
 pub fn test() {
-    // Log file name.
-    // ログ ファイル名。
-    Log::set_file_name("kifuwarabe-tic-tac-toe-debug");
-    // Log level.
-    // ログ レベル。
-    Log::set_level(Level::Debug);
-    // Log file retention days.
-    // ログ ファイル保持日数。
-    Log::set_retention_days(2);
-    // Remove old log files. This is determined by the date in the filename.
-    // 古いログファイルを削除します。これは、ファイル名の日付によって決定されます。
-    Log::remove_old_logs();
+    // Step 1.
+    Log::debugln("Hello, world!!");
+    Log::print_debug("こんにちわ、世界！！");
+    // こんにちわ、世界！！
 
-    // It is a unit test. I am writing it here because it is a hassle.
-    // Check it against the explanation in README.md.
-    // 単体テストです。めんどくさいのでここに書いています。
-    // README.mdの解説と照らし合わせてみてください。
-    if Log::enabled(Level::Debug) {
-        // Step 1.
-        Log::debugln("Hello, world!!");
-        Log::print_debug("こんにちわ、世界！！");
-        // こんにちわ、世界！！
+    // Step 2 is this.
 
-        // Step 2.
-        Log::print_debug(&format!("Nought=|{}|", Piece::Nought));
-        // Nought=|O|
-        Log::print_debug(&format!("Cross =|{}|", Piece::Cross));
-        // Cross =|X|
-        Log::print_debug(&format!("Win   =|{}|", GameResult::Win));
-        // Win   =|win|
-        Log::print_debug(&format!("Draw  =|{}|", GameResult::Draw));
-        // Draw  =|draw|
-        Log::print_debug(&format!("Lose  =|{}|", GameResult::Lose));
-        // Lose  =|lose|
+    // Step 3.
+    Log::print_debug(&format!("Nought=|{}|", Piece::Nought));
+    // Nought=|O|
+    Log::print_debug(&format!("Cross =|{}|", Piece::Cross));
+    // Cross =|X|
+    Log::print_debug(&format!("Win   =|{}|", GameResult::Win));
+    // Win   =|win|
+    Log::print_debug(&format!("Draw  =|{}|", GameResult::Draw));
+    // Draw  =|draw|
+    Log::print_debug(&format!("Lose  =|{}|", GameResult::Lose));
+    // Lose  =|lose|
 
-        let mut pos = Position::default();
-        Log::print_debug(&pos.pos());
-        // [Next 1 move(s) | Go O]
-        //
-        // +---+---+---+
-        // |   |   |   | マスを選んでください。例 `do 7`
-        // +---+---+---+
-        // |   |   |   |    7 8 9
-        // +---+---+---+    4 5 6
-        // |   |   |   |    1 2 3
-        // +---+---+---+
-        // If not None is returned, .unwrap() skips the None check.
-        // ぜったい None が返ってこないときは .unwrap() で None チェックを飛ばします。
-        Log::print_debug(&Position::result(GameResult::Win, Some(Piece::Nought)).unwrap());
-        // win O
+    let mut pos = Position::default();
+    Log::print_debug(&pos.pos());
+    // [Next 1 move(s) | Go O]
+    //
+    // +---+---+---+
+    // |   |   |   | マスを選んでください。例 `do 7`
+    // +---+---+---+
+    // |   |   |   |    7 8 9
+    // +---+---+---+    4 5 6
+    // |   |   |   |    1 2 3
+    // +---+---+---+
+    // If not None is returned, .unwrap() skips the None check.
+    // ぜったい None が返ってこないときは .unwrap() で None チェックを飛ばします。
+    Log::print_debug(&Position::result(GameResult::Win, Some(Piece::Nought)).unwrap());
+    // win O
 
-        let search = Search::new(pos.pieces_num);
-        Log::print_debug(&format!("pv=|{}|", pos.pv));
-        // pv=||
-        Log::print_debug(&Search::info_header(&pos));
-        // info nps ...... nodes ...... pv O X O X O X O X O
-        // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしろだぜ☆（＾～＾）
-        Log::print_debug(&Search::info_str(
-            123,
-            search.nodes,
-            &pos.pv,
-            SearchDirection::Forward,
-            1,
-            false,
-            None,
-            None,
-            Piece::Nought,
-            Some("Hello!"),
-        ));
-        // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
-        Log::print_debug(&Search::info_str(
-            456,
-            search.nodes,
-            &pos.pv,
-            SearchDirection::Forward,
-            1,
-            true,
-            None,
-            Some(GameResult::Win),
-            Piece::Cross,
-            Some("Hello!"),
-        ));
-        // info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
-        Log::print_debug(&Search::info_str(
-            789,
-            search.nodes,
-            &pos.pv,
-            SearchDirection::Backward,
-            1,
-            false,
-            Some(pos.pieces_num),
-            Some(GameResult::Win),
-            Piece::Nought,
-            Some("Hello!"),
-        ));
-        // info nps    789 nodes      0 pv                   |       | <- from height 1 | + [1] | win  | + "Hello!"
+    let search = Search::new(pos.pieces_num);
+    Log::print_debug(&format!("pv=|{}|", pos.pv));
+    // pv=||
+    Log::print_debug(&Search::info_header(&pos));
+    // info nps ...... nodes ...... pv O X O X O X O X O
+    // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしろだぜ☆（＾～＾）
+    Log::print_debug(&Search::info_str(
+        123,
+        search.nodes,
+        &pos.pv,
+        SearchDirection::Forward,
+        1,
+        false,
+        None,
+        None,
+        Piece::Nought,
+        Some("Hello!"),
+    ));
+    // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
+    Log::print_debug(&Search::info_str(
+        456,
+        search.nodes,
+        &pos.pv,
+        SearchDirection::Forward,
+        1,
+        true,
+        None,
+        Some(GameResult::Win),
+        Piece::Cross,
+        Some("Hello!"),
+    ));
+    // info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
+    Log::print_debug(&Search::info_str(
+        789,
+        search.nodes,
+        &pos.pv,
+        SearchDirection::Backward,
+        1,
+        false,
+        Some(pos.pieces_num),
+        Some(GameResult::Win),
+        Piece::Nought,
+        Some("Hello!"),
+    ));
+    // info nps    789 nodes      0 pv                   |       | <- from height 1 | + [1] | win  | + "Hello!"
 
-        // Step 3.
-        pos.do_move(1);
-        Log::print_debug(&pos.pos());
-        // [Next 2 move(s) | Go x]
-        //
-        //         +---+---+---+ Please select a square. Example `do 7`
-        //         |   |   |   | マスを選んでください。例 `do 7`
-        //         +---+---+---+
-        //         |   |   |   |    7 8 9
-        //         +---+---+---+    4 5 6
-        //         | o |   |   |    1 2 3
-        //         +---+---+---+
-        pos.undo_move();
-        Log::print_debug(&pos.pos());
-        // [Next 1 move(s) | Go o]
-        //
-        //         +---+---+---+ Please select a square. Example `do 7`
-        //         |   |   |   | マスを選んでください。例 `do 7`
-        //         +---+---+---+
-        //         |   |   |   |    7 8 9
-        //         +---+---+---+    4 5 6
-        //         |   |   |   |    1 2 3
-        //         +---+---+---+
-        Log::print_debug(&format!("opponent={}", pos.opponent()));
+    // Step 4.
+    pos.do_move(1);
+    Log::print_debug(&pos.pos());
+    // [Next 2 move(s) | Go x]
+    //
+    //         +---+---+---+ Please select a square. Example `do 7`
+    //         |   |   |   | マスを選んでください。例 `do 7`
+    //         +---+---+---+
+    //         |   |   |   |    7 8 9
+    //         +---+---+---+    4 5 6
+    //         | o |   |   |    1 2 3
+    //         +---+---+---+
+    pos.undo_move();
+    Log::print_debug(&pos.pos());
+    // [Next 1 move(s) | Go o]
+    //
+    //         +---+---+---+ Please select a square. Example `do 7`
+    //         |   |   |   | マスを選んでください。例 `do 7`
+    //         +---+---+---+
+    //         |   |   |   |    7 8 9
+    //         +---+---+---+    4 5 6
+    //         |   |   |   |    1 2 3
+    //         +---+---+---+
+    Log::print_debug(&format!("opponent={}", pos.opponent()));
 
-        // Step 4.
-        let mut p = CommandLineSeek::new("Go to the Moon!");
-        Log::print_debug(&format!("Go to   =|{}|", p.starts_with("Go to")));
-        // Go to   =|True|
-        Log::print_debug(&format!("Goto    =|{}|", p.starts_with("Goto")));
-        // Goto    =|False|
-        Log::print_debug(&format!("p.starts=|{}|", p.current()));
-        // p.starts=|0|
-        Log::print_debug(&format!(
-            "p.rest  =|{}|",
-            if let Some(rest) = p.rest() { rest } else { "" }
-        ));
-        // p.rest  =|Go to the Moon!|
-        p.go_next_to("Go to");
-        Log::print_debug(&format!("p.starts=|{}|", p.current()));
-        // p.starts=|5|
-        Log::print_debug(&format!(
-            "p.rest  =|{}|",
-            if let Some(rest) = p.rest() { rest } else { "" }
-        ));
-        // p.rest  =| the Moon!|
+    // Step 5.
+    let mut p = CommandLineSeek::new("Go to the Moon!");
+    Log::print_debug(&format!("Go to   =|{}|", p.starts_with("Go to")));
+    // Go to   =|True|
+    Log::print_debug(&format!("Goto    =|{}|", p.starts_with("Goto")));
+    // Goto    =|False|
+    Log::print_debug(&format!("p.starts=|{}|", p.current()));
+    // p.starts=|0|
+    Log::print_debug(&format!(
+        "p.rest  =|{}|",
+        if let Some(rest) = p.rest() { rest } else { "" }
+    ));
+    // p.rest  =|Go to the Moon!|
+    p.go_next_to("Go to");
+    Log::print_debug(&format!("p.starts=|{}|", p.current()));
+    // p.starts=|5|
+    Log::print_debug(&format!(
+        "p.rest  =|{}|",
+        if let Some(rest) = p.rest() { rest } else { "" }
+    ));
+    // p.rest  =| the Moon!|
 
-        // Step 5.
-        Log::print_debug(&format!("xfen=|{}|", pos.to_xfen()));
-        // xfen=|xfen 3/3/3 o|
-        pos.do_("2");
-        Log::print_debug(&pos.pos());
-        // [Next 2 move(s) | Go x]
-        //
-        // +---+---+---+ Please select a square. Example `do 7`
-        // |   |   |   | マスを選んでください。例 `do 7`
-        // +---+---+---+
-        // |   |   |   |    7 8 9
-        // +---+---+---+    4 5 6
-        // |   | o |   |    1 2 3
-        // +---+---+---+
-        let xfen = "xfen xo1/xox/oxo o";
-        pos = if let Some(pos) = Position::from_xfen(xfen) {
-            pos
+    // Step 6.
+    Log::print_debug(&format!("xfen=|{}|", pos.to_xfen()));
+    // xfen=|xfen 3/3/3 o|
+    pos.do_("2");
+    Log::print_debug(&pos.pos());
+    // [Next 2 move(s) | Go x]
+    //
+    // +---+---+---+ Please select a square. Example `do 7`
+    // |   |   |   | マスを選んでください。例 `do 7`
+    // +---+---+---+
+    // |   |   |   |    7 8 9
+    // +---+---+---+    4 5 6
+    // |   | o |   |    1 2 3
+    // +---+---+---+
+    let xfen = "xfen xo1/xox/oxo o";
+    pos = if let Some(pos) = Position::from_xfen(xfen) {
+        pos
+    } else {
+        panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
+    };
+    Log::print_debug(&pos.pos());
+    // [Next 9 move(s) | Go o]
+    //
+    // +---+---+---+ Please select a square. Example `do 7`
+    // | x | o |   | マスを選んでください。例 `do 7`
+    // +---+---+---+
+    // | x | o | x |    7 8 9
+    // +---+---+---+    4 5 6
+    // | o | x | o |    1 2 3
+    // +---+---+---+
+    let xfen = "xfen 3/3/3 x moves 1 7 4 8 9 3 6 2 5";
+    pos = if let Some(pos) = Position::from_xfen(xfen) {
+        pos
+    } else {
+        panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
+    };
+    Log::print_debug(&pos.pos());
+    // win x
+    // [Next 10 move(s) | Go o]
+    //
+    // +---+---+---+ Please select a square. Example `do 7`
+    // | o | o | x | マスを選んでください。例 `do 7`
+    // +---+---+---+
+    // | x | x | x |    7 8 9
+    // +---+---+---+    4 5 6
+    // | x | o | o |    1 2 3
+    // +---+---+---+
+    pos.undo();
+    Log::print_debug(&pos.pos());
+    // [Next 9 move(s) | Go x]
+    //
+    // +---+---+---+ Please select a square. Example `do 7`
+    // | o | o | x | マスを選んでください。例 `do 7`
+    // +---+---+---+
+    // | x |   | x |    7 8 9
+    // +---+---+---+    4 5 6
+    // | x | o | o |    1 2 3
+    // +---+---+---+
+
+    // Step 7.
+    // Step 8.
+    let xfen = "xfen o2/xox/oxo x";
+    pos = if let Some(pos) = Position::from_xfen(xfen) {
+        pos
+    } else {
+        panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
+    };
+    Log::print_debug(&format!("win=|{}|", pos.is_opponent_win()));
+    // win=|True|
+    let xfen = "xfen xox/oxo/oxo x";
+    pos = if let Some(pos) = Position::from_xfen(xfen) {
+        pos
+    } else {
+        panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
+    };
+    Log::print_debug(&format!("draw=|{}|", pos.is_draw()));
+    // draw=|True|
+
+    // Step 9.
+    // Since we have not searched, both nodes and nps will be 0.
+    // 探索してないので、 nodes も nps も 0 になります。
+    thread::sleep(time::Duration::from_secs(1));
+    Log::print_debug(&format!("nodes={}", search.nodes));
+    // nodes=0
+    Log::print_debug(&format!("sec  ={}", search.sec()));
+    // sec  =1
+    Log::print_debug(&format!("nps  ={}", search.nps()));
+    // nps  =0
+
+    // Step 10.
+    let xfen = "xfen 3/3/3 o moves 1 5 2 3 7 4";
+    pos = if let Some(pos) = Position::from_xfen(xfen) {
+        pos
+    } else {
+        panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
+    };
+    let mut search = Search::new(pos.pieces_num);
+    let (sq, result) = search.go(&mut pos);
+    // info string "nps":......, "nodes":......, "pv":[O,X,O,X,O,X,O,X,O]
+    // info json { "nps":     1, "nodes":     1, "pv":[6                ], "push":"6",               "pieces":7,                  "turn":"X", "comment":"Search." }
+    // info json { "nps":     2, "nodes":     2, "pv":[6,8              ], "push":"8",               "pieces":8,                  "turn":"O", "comment":"Search." }
+    // info json { "nps":     3, "nodes":     3, "pv":[6,8,9            ], "push":"9", "leaf": true, "pieces":9, "result":"draw", "turn":"X", "comment":"It is ok." }
+    // info json { "nps":     3, "nodes":     3, "pv":[6,8              ], "pop" :"9",               "pieces":8, "result":"draw", "turn":"O" }
+    // info json { "nps":     3, "nodes":     3, "pv":[6                ], "pop" :"8",               "pieces":7, "result":"draw", "turn":"X", "comment":"Fmmm." }
+    // info json { "nps":     4, "nodes":     4, "pv":[6,9              ], "push":"9",               "pieces":8,                  "turn":"O", "comment":"Search." }
+    // info json { "nps":     5, "nodes":     5, "pv":[6,9,8            ], "push":"8", "leaf": true, "pieces":9, "result":"draw", "turn":"X", "comment":"It is ok." }
+    // info json { "nps":     5, "nodes":     5, "pv":[6,9              ], "pop" :"8",               "pieces":8, "result":"draw", "turn":"O" }
+    // info json { "nps":     5, "nodes":     5, "pv":[6                ], "pop" :"9",               "pieces":7, "result":"draw", "turn":"X", "comment":"Fmmm." }
+    // info json { "nps":     5, "nodes":     5, "pv":[                 ], "pop" :"6",               "pieces":6, "result":"draw", "turn":"O", "comment":"Fmmm." }
+    // info json { "nps":     6, "nodes":     6, "pv":[8                ], "push":"8",               "pieces":7,                  "turn":"X", "comment":"Search." }
+    // info json { "nps":     7, "nodes":     7, "pv":[8,6              ], "push":"6", "leaf": true, "pieces":8, "result":"win" , "turn":"O", "comment":"Resign." }
+    // info json { "nps":     7, "nodes":     7, "pv":[8                ], "pop" :"6",               "pieces":7, "result":"win" , "turn":"X" }
+    // info json { "nps":     7, "nodes":     7, "pv":[                 ], "pop" :"8",               "pieces":6, "result":"lose", "turn":"O", "comment":"Damn!" }
+    // info json { "nps":     8, "nodes":     8, "pv":[9                ], "push":"9",               "pieces":7,                  "turn":"X", "comment":"Search." }
+    // info json { "nps":     9, "nodes":     9, "pv":[9,6              ], "push":"6", "leaf": true, "pieces":8, "result":"win" , "turn":"O", "comment":"Resign." }
+    // info json { "nps":     9, "nodes":     9, "pv":[9                ], "pop" :"6",               "pieces":7, "result":"win" , "turn":"X" }
+    // info json { "nps":     9, "nodes":     9, "pv":[                 ], "pop" :"9",               "pieces":6, "result":"lose", "turn":"O", "comment":"Damn!" }
+    Log::print_debug(&format!("result=|{}|", result));
+    // result=|draw|
+    Log::print_debug(&format!(
+        "bestmove=|{}|",
+        if let Some(sq) = sq {
+            format!("{}", sq).to_string()
         } else {
-            panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
-        };
-        Log::print_debug(&pos.pos());
-        // [Next 9 move(s) | Go o]
-        //
-        // +---+---+---+ Please select a square. Example `do 7`
-        // | x | o |   | マスを選んでください。例 `do 7`
-        // +---+---+---+
-        // | x | o | x |    7 8 9
-        // +---+---+---+    4 5 6
-        // | o | x | o |    1 2 3
-        // +---+---+---+
-        let xfen = "xfen 3/3/3 x moves 1 7 4 8 9 3 6 2 5";
-        pos = if let Some(pos) = Position::from_xfen(xfen) {
-            pos
-        } else {
-            panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
-        };
-        Log::print_debug(&pos.pos());
-        // win x
-        // [Next 10 move(s) | Go o]
-        //
-        // +---+---+---+ Please select a square. Example `do 7`
-        // | o | o | x | マスを選んでください。例 `do 7`
-        // +---+---+---+
-        // | x | x | x |    7 8 9
-        // +---+---+---+    4 5 6
-        // | x | o | o |    1 2 3
-        // +---+---+---+
-        pos.undo();
-        Log::print_debug(&pos.pos());
-        // [Next 9 move(s) | Go x]
-        //
-        // +---+---+---+ Please select a square. Example `do 7`
-        // | o | o | x | マスを選んでください。例 `do 7`
-        // +---+---+---+
-        // | x |   | x |    7 8 9
-        // +---+---+---+    4 5 6
-        // | x | o | o |    1 2 3
-        // +---+---+---+
+            "resign".to_string()
+        }
+    ));
+    // bestmove=|6|
 
-        // Step 6.
-        // Step 7.
-        let xfen = "xfen o2/xox/oxo x";
-        pos = if let Some(pos) = Position::from_xfen(xfen) {
-            pos
-        } else {
-            panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
-        };
-        Log::print_debug(&format!("win=|{}|", pos.is_opponent_win()));
-        // win=|True|
-        let xfen = "xfen xox/oxo/oxo x";
-        pos = if let Some(pos) = Position::from_xfen(xfen) {
-            pos
-        } else {
-            panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
-        };
-        Log::print_debug(&format!("draw=|{}|", pos.is_draw()));
-        // draw=|True|
-
-        // Step 8.
-        // Since we have not searched, both nodes and nps will be 0.
-        // 探索してないので、 nodes も nps も 0 になります。
-        thread::sleep(time::Duration::from_secs(1));
-        Log::print_debug(&format!("nodes={}", search.nodes));
-        // nodes=0
-        Log::print_debug(&format!("sec  ={}", search.sec()));
-        // sec  =1
-        Log::print_debug(&format!("nps  ={}", search.nps()));
-        // nps  =0
-
-        // Step 9.
-        let xfen = "xfen 3/3/3 o moves 1 5 2 3 7 4";
-        pos = if let Some(pos) = Position::from_xfen(xfen) {
-            pos
-        } else {
-            panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
-        };
-        let mut search = Search::new(pos.pieces_num);
-        let (sq, result) = search.go(&mut pos);
-        // info string "nps":......, "nodes":......, "pv":[O,X,O,X,O,X,O,X,O]
-        // info json { "nps":     1, "nodes":     1, "pv":[6                ], "push":"6",               "pieces":7,                  "turn":"X", "comment":"Search." }
-        // info json { "nps":     2, "nodes":     2, "pv":[6,8              ], "push":"8",               "pieces":8,                  "turn":"O", "comment":"Search." }
-        // info json { "nps":     3, "nodes":     3, "pv":[6,8,9            ], "push":"9", "leaf": true, "pieces":9, "result":"draw", "turn":"X", "comment":"It is ok." }
-        // info json { "nps":     3, "nodes":     3, "pv":[6,8              ], "pop" :"9",               "pieces":8, "result":"draw", "turn":"O" }
-        // info json { "nps":     3, "nodes":     3, "pv":[6                ], "pop" :"8",               "pieces":7, "result":"draw", "turn":"X", "comment":"Fmmm." }
-        // info json { "nps":     4, "nodes":     4, "pv":[6,9              ], "push":"9",               "pieces":8,                  "turn":"O", "comment":"Search." }
-        // info json { "nps":     5, "nodes":     5, "pv":[6,9,8            ], "push":"8", "leaf": true, "pieces":9, "result":"draw", "turn":"X", "comment":"It is ok." }
-        // info json { "nps":     5, "nodes":     5, "pv":[6,9              ], "pop" :"8",               "pieces":8, "result":"draw", "turn":"O" }
-        // info json { "nps":     5, "nodes":     5, "pv":[6                ], "pop" :"9",               "pieces":7, "result":"draw", "turn":"X", "comment":"Fmmm." }
-        // info json { "nps":     5, "nodes":     5, "pv":[                 ], "pop" :"6",               "pieces":6, "result":"draw", "turn":"O", "comment":"Fmmm." }
-        // info json { "nps":     6, "nodes":     6, "pv":[8                ], "push":"8",               "pieces":7,                  "turn":"X", "comment":"Search." }
-        // info json { "nps":     7, "nodes":     7, "pv":[8,6              ], "push":"6", "leaf": true, "pieces":8, "result":"win" , "turn":"O", "comment":"Resign." }
-        // info json { "nps":     7, "nodes":     7, "pv":[8                ], "pop" :"6",               "pieces":7, "result":"win" , "turn":"X" }
-        // info json { "nps":     7, "nodes":     7, "pv":[                 ], "pop" :"8",               "pieces":6, "result":"lose", "turn":"O", "comment":"Damn!" }
-        // info json { "nps":     8, "nodes":     8, "pv":[9                ], "push":"9",               "pieces":7,                  "turn":"X", "comment":"Search." }
-        // info json { "nps":     9, "nodes":     9, "pv":[9,6              ], "push":"6", "leaf": true, "pieces":8, "result":"win" , "turn":"O", "comment":"Resign." }
-        // info json { "nps":     9, "nodes":     9, "pv":[9                ], "pop" :"6",               "pieces":7, "result":"win" , "turn":"X" }
-        // info json { "nps":     9, "nodes":     9, "pv":[                 ], "pop" :"9",               "pieces":6, "result":"lose", "turn":"O", "comment":"Damn!" }
-        Log::print_debug(&format!("result=|{}|", result));
-        // result=|draw|
-        Log::print_debug(&format!(
-            "bestmove=|{}|",
-            if let Some(sq) = sq {
-                format!("{}", sq).to_string()
-            } else {
-                "resign".to_string()
-            }
-        ));
-        // bestmove=|6|
-
-        // End.
-        test_win_lose_judgement();
-    }
+    // End.
+    test_win_lose_judgement();
 
     // Wait for logging to complete.
     // ロギングが完了するまで待ちます。
