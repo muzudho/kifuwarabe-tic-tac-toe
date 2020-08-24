@@ -1,4 +1,4 @@
-//! Win/Loss judgment.  
+//! Win/Lose judgment.  
 //! 勝敗判定。  
 use crate::look_and_model::{Position, BOARD_LEN};
 
