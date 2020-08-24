@@ -34,15 +34,17 @@ pub fn test() {
 
     let mut pos = Position::default();
     Log::print_debug(&pos.pos());
-    // [Next 1 move(s) | Go O]
-    //
-    // +---+---+---+
-    // |   |   |   | マスを選んでください。例 `do 7`
-    // +---+---+---+
-    // |   |   |   |    7 8 9
-    // +---+---+---+    4 5 6
-    // |   |   |   |    1 2 3
-    // +---+---+---+
+    /*
+    [Next 1 move(s) | Go O]
+
+    +---+---+---+
+    |   |   |   | マスを選んでください。例 `do 7`
+    +---+---+---+
+    |   |   |   |    7 8 9
+    +---+---+---+    4 5 6
+    |   |   |   |    1 2 3
+    +---+---+---+
+    */
     // If not None is returned, .unwrap() skips the None check.
     // ぜったい None が返ってこないときは .unwrap() で None チェックを飛ばします。
     Log::print_debug(&Position::result(GameResult::Win, Some(Piece::Nought)).unwrap());
@@ -97,27 +99,32 @@ pub fn test() {
     // Step 4.
     pos.do_move(1);
     Log::print_debug(&pos.pos());
-    // [Next 2 move(s) | Go x]
-    //
-    //         +---+---+---+ Please select a square. Example `do 7`
-    //         |   |   |   | マスを選んでください。例 `do 7`
-    //         +---+---+---+
-    //         |   |   |   |    7 8 9
-    //         +---+---+---+    4 5 6
-    //         | o |   |   |    1 2 3
-    //         +---+---+---+
+    /*
+    [Next 2 move(s) | Go x]
+
+    +---+---+---+ Please select a square. Example `do 7`
+    |   |   |   | マスを選んでください。例 `do 7`
+    +---+---+---+
+    |   |   |   |    7 8 9
+    +---+---+---+    4 5 6
+    | o |   |   |    1 2 3
+    +---+---+---+
+    */
     pos.undo_move();
     Log::print_debug(&pos.pos());
-    // [Next 1 move(s) | Go o]
-    //
-    //         +---+---+---+ Please select a square. Example `do 7`
-    //         |   |   |   | マスを選んでください。例 `do 7`
-    //         +---+---+---+
-    //         |   |   |   |    7 8 9
-    //         +---+---+---+    4 5 6
-    //         |   |   |   |    1 2 3
-    //         +---+---+---+
-    Log::print_debug(&format!("opponent={}", pos.opponent()));
+    /*
+    [Next 1 move(s) | Go o]
+
+    +---+---+---+ Please select a square. Example `do 7`
+    |   |   |   | マスを選んでください。例 `do 7`
+    +---+---+---+
+    |   |   |   |    7 8 9
+    +---+---+---+    4 5 6
+    |   |   |   |    1 2 3
+    +---+---+---+
+    */
+    Log::print_debug(&format!("opponent=|{}|", pos.opponent()));
+    // opponent=|X|
 
     // Step 5.
     let mut p = CommandLineSeek::new("Go to the Moon!");
@@ -146,15 +153,17 @@ pub fn test() {
     // xfen=|xfen 3/3/3 o|
     pos.do_("2");
     Log::print_debug(&pos.pos());
-    // [Next 2 move(s) | Go x]
-    //
-    // +---+---+---+ Please select a square. Example `do 7`
-    // |   |   |   | マスを選んでください。例 `do 7`
-    // +---+---+---+
-    // |   |   |   |    7 8 9
-    // +---+---+---+    4 5 6
-    // |   | o |   |    1 2 3
-    // +---+---+---+
+    /*
+    [Next 2 move(s) | Go x]
+
+    +---+---+---+ Please select a square. Example `do 7`
+    |   |   |   | マスを選んでください。例 `do 7`
+    +---+---+---+
+    |   |   |   |    7 8 9
+    +---+---+---+    4 5 6
+    |   | o |   |    1 2 3
+    +---+---+---+
+    */
     let xfen = "xfen xo1/xox/oxo o";
     pos = if let Some(pos) = Position::from_xfen(xfen) {
         pos
@@ -162,15 +171,17 @@ pub fn test() {
         panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
     };
     Log::print_debug(&pos.pos());
-    // [Next 9 move(s) | Go o]
-    //
-    // +---+---+---+ Please select a square. Example `do 7`
-    // | x | o |   | マスを選んでください。例 `do 7`
-    // +---+---+---+
-    // | x | o | x |    7 8 9
-    // +---+---+---+    4 5 6
-    // | o | x | o |    1 2 3
-    // +---+---+---+
+    /*
+    [Next 9 move(s) | Go o]
+
+    +---+---+---+ Please select a square. Example `do 7`
+    | x | o |   | マスを選んでください。例 `do 7`
+    +---+---+---+
+    | x | o | x |    7 8 9
+    +---+---+---+    4 5 6
+    | o | x | o |    1 2 3
+    +---+---+---+
+    */
     let xfen = "xfen 3/3/3 x moves 1 7 4 8 9 3 6 2 5";
     pos = if let Some(pos) = Position::from_xfen(xfen) {
         pos
@@ -178,27 +189,31 @@ pub fn test() {
         panic!(Log::print_fatal(&format!("Invalid xfen=|{}|", xfen)))
     };
     Log::print_debug(&pos.pos());
-    // win x
-    // [Next 10 move(s) | Go o]
-    //
-    // +---+---+---+ Please select a square. Example `do 7`
-    // | o | o | x | マスを選んでください。例 `do 7`
-    // +---+---+---+
-    // | x | x | x |    7 8 9
-    // +---+---+---+    4 5 6
-    // | x | o | o |    1 2 3
-    // +---+---+---+
+    /*
+    win x
+    [Next 10 move(s) | Go o]
+
+    +---+---+---+ Please select a square. Example `do 7`
+    | o | o | x | マスを選んでください。例 `do 7`
+    +---+---+---+
+    | x | x | x |    7 8 9
+    +---+---+---+    4 5 6
+    | x | o | o |    1 2 3
+    +---+---+---+
+    */
     pos.undo();
     Log::print_debug(&pos.pos());
-    // [Next 9 move(s) | Go x]
-    //
-    // +---+---+---+ Please select a square. Example `do 7`
-    // | o | o | x | マスを選んでください。例 `do 7`
-    // +---+---+---+
-    // | x |   | x |    7 8 9
-    // +---+---+---+    4 5 6
-    // | x | o | o |    1 2 3
-    // +---+---+---+
+    /*
+    [Next 9 move(s) | Go x]
+
+    +---+---+---+ Please select a square. Example `do 7`
+    | o | o | x | マスを選んでください。例 `do 7`
+    +---+---+---+
+    | x |   | x |    7 8 9
+    +---+---+---+    4 5 6
+    | x | o | o |    1 2 3
+    +---+---+---+
+    */
 
     // Step 7.
     // Step 8.
@@ -239,25 +254,27 @@ pub fn test() {
     };
     let mut search = Search::new(pos.pieces_num);
     let (sq, result) = search.go(&mut pos);
-    // info string "nps":......, "nodes":......, "pv":[O,X,O,X,O,X,O,X,O]
-    // info json { "nps":     1, "nodes":     1, "pv":[6                ], "push":"6",               "pieces":7,                  "turn":"X", "comment":"Search." }
-    // info json { "nps":     2, "nodes":     2, "pv":[6,8              ], "push":"8",               "pieces":8,                  "turn":"O", "comment":"Search." }
-    // info json { "nps":     3, "nodes":     3, "pv":[6,8,9            ], "push":"9", "leaf": true, "pieces":9, "result":"draw", "turn":"X", "comment":"It is ok." }
-    // info json { "nps":     3, "nodes":     3, "pv":[6,8              ], "pop" :"9",               "pieces":8, "result":"draw", "turn":"O" }
-    // info json { "nps":     3, "nodes":     3, "pv":[6                ], "pop" :"8",               "pieces":7, "result":"draw", "turn":"X", "comment":"Fmmm." }
-    // info json { "nps":     4, "nodes":     4, "pv":[6,9              ], "push":"9",               "pieces":8,                  "turn":"O", "comment":"Search." }
-    // info json { "nps":     5, "nodes":     5, "pv":[6,9,8            ], "push":"8", "leaf": true, "pieces":9, "result":"draw", "turn":"X", "comment":"It is ok." }
-    // info json { "nps":     5, "nodes":     5, "pv":[6,9              ], "pop" :"8",               "pieces":8, "result":"draw", "turn":"O" }
-    // info json { "nps":     5, "nodes":     5, "pv":[6                ], "pop" :"9",               "pieces":7, "result":"draw", "turn":"X", "comment":"Fmmm." }
-    // info json { "nps":     5, "nodes":     5, "pv":[                 ], "pop" :"6",               "pieces":6, "result":"draw", "turn":"O", "comment":"Fmmm." }
-    // info json { "nps":     6, "nodes":     6, "pv":[8                ], "push":"8",               "pieces":7,                  "turn":"X", "comment":"Search." }
-    // info json { "nps":     7, "nodes":     7, "pv":[8,6              ], "push":"6", "leaf": true, "pieces":8, "result":"win" , "turn":"O", "comment":"Resign." }
-    // info json { "nps":     7, "nodes":     7, "pv":[8                ], "pop" :"6",               "pieces":7, "result":"win" , "turn":"X" }
-    // info json { "nps":     7, "nodes":     7, "pv":[                 ], "pop" :"8",               "pieces":6, "result":"lose", "turn":"O", "comment":"Damn!" }
-    // info json { "nps":     8, "nodes":     8, "pv":[9                ], "push":"9",               "pieces":7,                  "turn":"X", "comment":"Search." }
-    // info json { "nps":     9, "nodes":     9, "pv":[9,6              ], "push":"6", "leaf": true, "pieces":8, "result":"win" , "turn":"O", "comment":"Resign." }
-    // info json { "nps":     9, "nodes":     9, "pv":[9                ], "pop" :"6",               "pieces":7, "result":"win" , "turn":"X" }
-    // info json { "nps":     9, "nodes":     9, "pv":[                 ], "pop" :"9",               "pieces":6, "result":"lose", "turn":"O", "comment":"Damn!" }
+    /*
+    info string "nps":......, "nodes":......, "pv":[O,X,O,X,O,X,O,X,O]
+    info json { "nps":     1, "nodes":     1, "pv":[6                ], "push":"6",               "pieces":7,                  "turn":"X", "comment":"Search." }
+    info json { "nps":     2, "nodes":     2, "pv":[6,8              ], "push":"8",               "pieces":8,                  "turn":"O", "comment":"Search." }
+    info json { "nps":     3, "nodes":     3, "pv":[6,8,9            ], "push":"9", "leaf": true, "pieces":9, "result":"draw", "turn":"X", "comment":"It is ok." }
+    info json { "nps":     3, "nodes":     3, "pv":[6,8              ], "pop" :"9",               "pieces":8, "result":"draw", "turn":"O" }
+    info json { "nps":     3, "nodes":     3, "pv":[6                ], "pop" :"8",               "pieces":7, "result":"draw", "turn":"X", "comment":"Fmmm." }
+    info json { "nps":     4, "nodes":     4, "pv":[6,9              ], "push":"9",               "pieces":8,                  "turn":"O", "comment":"Search." }
+    info json { "nps":     5, "nodes":     5, "pv":[6,9,8            ], "push":"8", "leaf": true, "pieces":9, "result":"draw", "turn":"X", "comment":"It is ok." }
+    info json { "nps":     5, "nodes":     5, "pv":[6,9              ], "pop" :"8",               "pieces":8, "result":"draw", "turn":"O" }
+    info json { "nps":     5, "nodes":     5, "pv":[6                ], "pop" :"9",               "pieces":7, "result":"draw", "turn":"X", "comment":"Fmmm." }
+    info json { "nps":     5, "nodes":     5, "pv":[                 ], "pop" :"6",               "pieces":6, "result":"draw", "turn":"O", "comment":"Fmmm." }
+    info json { "nps":     6, "nodes":     6, "pv":[8                ], "push":"8",               "pieces":7,                  "turn":"X", "comment":"Search." }
+    info json { "nps":     7, "nodes":     7, "pv":[8,6              ], "push":"6", "leaf": true, "pieces":8, "result":"win" , "turn":"O", "comment":"Resign." }
+    info json { "nps":     7, "nodes":     7, "pv":[8                ], "pop" :"6",               "pieces":7, "result":"win" , "turn":"X" }
+    info json { "nps":     7, "nodes":     7, "pv":[                 ], "pop" :"8",               "pieces":6, "result":"lose", "turn":"O", "comment":"Damn!" }
+    info json { "nps":     8, "nodes":     8, "pv":[9                ], "push":"9",               "pieces":7,                  "turn":"X", "comment":"Search." }
+    info json { "nps":     9, "nodes":     9, "pv":[9,6              ], "push":"6", "leaf": true, "pieces":8, "result":"win" , "turn":"O", "comment":"Resign." }
+    info json { "nps":     9, "nodes":     9, "pv":[9                ], "pop" :"6",               "pieces":7, "result":"win" , "turn":"X" }
+    info json { "nps":     9, "nodes":     9, "pv":[                 ], "pop" :"9",               "pieces":6, "result":"lose", "turn":"O", "comment":"Damn!" }
+    */
     Log::print_debug(&format!("result=|{}|", result));
     // result=|draw|
     Log::print_debug(&format!(

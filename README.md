@@ -416,6 +416,7 @@ It is difficult to compare the behavior. Instead, it is useful to get the logs a
 Let's proceed with development while testing.  
 
 * [x] Step 2. Create the `test.rs` file.
+  * Add little by little as you progress through the steps.  
 
 The first thing you have to create is your motive.  
 It is important to start with the appearance.  
@@ -437,7 +438,6 @@ Being able to control your position means being able to play.
 Let's enter commands into the computer. Create a command line parser.  
 
 * [x] Step 5. 'command_line_seek.rs'
-  * [x] Input.
   * [x] Starts with.
   * [x] Go next to.
   * [x] Rest.
@@ -453,7 +453,7 @@ Before creating the game itself, let's first create the replay function. Let's g
 
 Let's make a principal command.  
 
-* [x] Step 7. 'examples/main.rs' command line.
+* [x] Step 7. 'src/main.rs' or 'examples/main.rs' command line.
   * [x] position.
   * [x] pos.
   * [x] do.
