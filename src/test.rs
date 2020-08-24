@@ -217,6 +217,7 @@ pub fn test() {
 
     // Step 7.
     // Step 8.
+    // Step 9.
     let xfen = "xfen o2/xox/oxo x";
     pos = if let Some(pos) = Position::from_xfen(xfen) {
         pos
@@ -234,7 +235,7 @@ pub fn test() {
     Log::print_debug(&format!("draw=|{}|", pos.is_draw()));
     // draw=|True|
 
-    // Step 9.
+    // Step 10.
     // Since we have not searched, both nodes and nps will be 0.
     // 探索してないので、 nodes も nps も 0 になります。
     thread::sleep(time::Duration::from_secs(1));
@@ -245,7 +246,7 @@ pub fn test() {
     Log::print_debug(&format!("nps  ={}", search.nps()));
     // nps  =0
 
-    // Step 10.
+    // Step 11.
     let xfen = "xfen 3/3/3 o moves 1 5 2 3 7 4";
     pos = if let Some(pos) = Position::from_xfen(xfen) {
         pos

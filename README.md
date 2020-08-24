@@ -453,7 +453,8 @@ Before creating the game itself, let's first create the replay function. Let's g
 
 Let's make a principal command.  
 
-* [x] Step 7. 'src/main.rs' or 'examples/main.rs' command line.
+* [x] Step 7. Create the 'engine.rs' file.
+* [x] Step 8. 'src/main.rs' or 'examples/main.rs' command line.
   * [x] position.
   * [x] pos.
   * [x] do.
@@ -463,20 +464,20 @@ Let's make a principal command.
 
 Before you make a computer player, let's judge the outcome. And let's test.  
 
-* [x] Step 8. 'win_lose_judgment.rs'
+* [x] Step 9. 'win_lose_judgment.rs'
   * [x] Win.
   * [x] Draw - Not win, not lose, can not play.
   * [ ] Lose. - Not win is lose.
 
 Before creating a computer player, let's create a mechanism to measure performance.  
 
-* [x] Step 9. 'performance_measurement.rs'
+* [x] Step 10. 'performance_measurement.rs'
   * [x] Seconds. - Stopwatch.
   * [x] Node per second.
 
 Finally, let's make a computer player.  
 
-* [x] Step 10. 'computer_player.rs'
+* [x] Step 11. 'computer_player.rs'
   * [x] Search.
   * [ ] Evaluation - None.
 * [x] 'main.py'
