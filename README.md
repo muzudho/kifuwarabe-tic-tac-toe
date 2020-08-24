@@ -453,14 +453,14 @@ Before creating the game itself, let's first create the replay function. Let's g
 
 Let's make a principal command.  
 
-* [x] Step 7. Create the 'engine.rs' file.
-* [x] Step 8. 'src/main.rs' or 'examples/main.rs' command line.
+* [x] Step 7. Create the 'engine.rs' file. Command line.
   * [x] position.
   * [x] pos.
   * [x] do.
   * [x] undo.
   * [x] uxi.
   * [x] xfen.
+* [x] Step 8. Create the 'src/main.rs' or 'examples/main.rs'.
 
 Before you make a computer player, let's judge the outcome. And let's test.  
 
