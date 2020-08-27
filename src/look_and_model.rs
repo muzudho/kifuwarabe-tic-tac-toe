@@ -219,7 +219,6 @@ impl Search {
         nodes: u32,
         pv: &str,
         search_direction: SearchDirection,
-        sq: usize,
         search_info: &SearchInfo,
     ) -> String {
         format!(
@@ -229,10 +228,10 @@ impl Search {
             pv,
             match search_direction {
                 SearchDirection::Forward => {
-                    format!(", \"push\":\"{}\"", sq)
+                    format!(", \"push\":\"{}\"", search_info.chosen_sq)
                 }
                 SearchDirection::Backward => {
-                    format!(", \"pop\" :\"{}\"", sq)
+                    format!(", \"pop\" :\"{}\"", search_info.chosen_sq)
                 }
             },
             if search_info.leaf {
@@ -261,6 +260,10 @@ impl Search {
 }
 
 pub struct SearchInfo {
+    /// Chosen square.  
+    /// 選んだマス。  
+    pub chosen_sq: usize,
+
     /// Is leaf?  
     /// 葉ですか？  
     pub leaf: bool,
@@ -284,6 +287,7 @@ pub struct SearchInfo {
 impl SearchInfo {
     pub fn new() -> Self {
         SearchInfo {
+            chosen_sq: 0,
             leaf: false,
             pieces_num: None,
             result: None,
