@@ -53,7 +53,6 @@ impl Search {
             // 空きマスだけを見ます。
             if let None = pos.board[sq] {
                 let mut backward_cut_off = None;
-                let mut info_leaf = false;
                 let mut info_backwarding = None;
                 let mut search_info = SearchInfo::new();
                 // Let's put a stone for now.
@@ -77,7 +76,7 @@ impl Search {
                     // Draw if there is no place to put.
                     // 置く場所が無ければ引き分け。
                     if Log::enabled(Level::Info) && pos.info_enabled {
-                        info_leaf = true;
+                        search_info.leaf = true;
                         search_info.result = Some(GameResult::Draw);
                         search_info.comment = Some("It is ok.".to_string());
                     }
@@ -100,7 +99,6 @@ impl Search {
                         &pos.pv,
                         SearchDirection::Forward,
                         sq,
-                        info_leaf,
                         &search_info,
                     ));
                 }
@@ -188,7 +186,6 @@ impl Search {
                         &pos.pv,
                         SearchDirection::Backward,
                         sq,
-                        info_leaf,
                         &search_info,
                     ));
                 }

@@ -220,7 +220,6 @@ impl Search {
         pv: &str,
         search_direction: SearchDirection,
         sq: usize,
-        leaf: bool,
         search_info: &SearchInfo,
     ) -> String {
         format!(
@@ -236,7 +235,7 @@ impl Search {
                     format!(", \"pop\" :\"{}\"", sq)
                 }
             },
-            if leaf {
+            if search_info.leaf {
                 ", \"leaf\": true"
             } else {
                 "              "
@@ -262,6 +261,10 @@ impl Search {
 }
 
 pub struct SearchInfo {
+    /// Is leaf?  
+    /// 葉ですか？  
+    pub leaf: bool,
+
     /// Number of pieces on the board.  
     /// 盤上の石の数。  
     pub pieces_num: Option<usize>,
@@ -281,6 +284,7 @@ pub struct SearchInfo {
 impl SearchInfo {
     pub fn new() -> Self {
         SearchInfo {
+            leaf: false,
             pieces_num: None,
             result: None,
             turn: Piece::Nought,
