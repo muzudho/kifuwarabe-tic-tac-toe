@@ -3,7 +3,7 @@
 
 use crate::command_line_seek::CommandLineSeek;
 use crate::log::LogExt;
-use crate::look_and_model::{GameResult, Piece, Position, Search, SearchDirection};
+use crate::look_and_model::{GameResult, Piece, Position, Search, SearchDirection, SearchInfo};
 use casual_logger::Log;
 use std;
 use std::{thread, time};
@@ -55,7 +55,9 @@ pub fn test() {
     // pv=||
     Log::print_debug(&Search::info_header(&pos));
     // info nps ...... nodes ...... pv O X O X O X O X O
-    // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしろだぜ☆（＾～＾）
+    // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしてください。
+    let mut search_info = SearchInfo::new();
+    search_info.comment = Some("Hello!".to_string());
     Log::print_debug(&Search::info_str(
         123,
         search.nodes,
@@ -66,9 +68,11 @@ pub fn test() {
         None,
         None,
         Piece::Nought,
-        Some("Hello!"),
+        &search_info,
     ));
     // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
+    search_info = SearchInfo::new();
+    search_info.comment = Some("Hello!".to_string());
     Log::print_debug(&Search::info_str(
         456,
         search.nodes,
@@ -79,9 +83,11 @@ pub fn test() {
         None,
         Some(GameResult::Win),
         Piece::Cross,
-        Some("Hello!"),
+        &search_info,
     ));
     // info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
+    search_info = SearchInfo::new();
+    search_info.comment = Some("Hello!".to_string());
     Log::print_debug(&Search::info_str(
         789,
         search.nodes,
@@ -92,7 +98,7 @@ pub fn test() {
         Some(pos.pieces_num),
         Some(GameResult::Win),
         Piece::Nought,
-        Some("Hello!"),
+        &search_info,
     ));
     // info nps    789 nodes      0 pv                   |       | <- from height 1 | + [1] | win  | + "Hello!"
 

@@ -4,7 +4,7 @@
 //! 詳しくは 'look_and_model' の 'Search' 構造体 を見てください。  
 use crate::log::LogExt;
 use crate::look_and_model::{
-    GameResult, Position, Search, SearchDirection, BOARD_LEN, SQUARES_NUM,
+    GameResult, Position, Search, SearchDirection, SearchInfo, BOARD_LEN, SQUARES_NUM,
 };
 use casual_logger::{Level, Log};
 
@@ -56,7 +56,7 @@ impl Search {
                 let mut info_leaf = false;
                 let mut info_backwarding = None;
                 let mut info_result = None;
-                let mut info_comment = None;
+                let mut search_info = SearchInfo::new();
                 // Let's put a stone for now.
                 // とりあえず石を置きましょう。
                 pos.do_move(sq);
@@ -71,7 +71,7 @@ impl Search {
                     // 対戦相手の勝ち。
                     if Log::enabled(Level::Info) && pos.info_enabled {
                         info_result = Some(GameResult::Win);
-                        info_comment = Some("Resign.");
+                        search_info.comment = Some("Resign.".to_string());
                     }
                     Some(ForwardCutOff::OpponentWin)
                 } else if SQUARES_NUM <= pos.pieces_num {
@@ -80,12 +80,12 @@ impl Search {
                     if Log::enabled(Level::Info) && pos.info_enabled {
                         info_leaf = true;
                         info_result = Some(GameResult::Draw);
-                        info_comment = Some("It is ok.");
+                        search_info.comment = Some("It is ok.".to_string());
                     }
                     Some(ForwardCutOff::Draw)
                 } else {
                     if Log::enabled(Level::Info) && pos.info_enabled {
-                        info_comment = Some("Search.");
+                        search_info.comment = Some("Search.".to_string());
                     }
                     None
                 };
@@ -103,7 +103,7 @@ impl Search {
                         None,
                         info_result,
                         pos.turn,
-                        info_comment,
+                        &search_info,
                     ));
                 }
 
@@ -166,19 +166,19 @@ impl Search {
                                 // I beat the opponent.
                                 // 相手を負かしました。
                                 info_result = Some(GameResult::Win);
-                                info_comment = Some("Hooray!");
+                                search_info.comment = Some("Hooray!".to_string());
                             }
                             GameResult::Draw => {
                                 // If neither is wrong, draw.
                                 // お互いがミスしなければ引き分け。
                                 info_result = Some(GameResult::Draw);
-                                info_comment = Some("Fmmm.");
+                                search_info.comment = Some("Fmmm.".to_string());
                             }
                             GameResult::Win => {
                                 // Don't choose to lose.
                                 // 自分が負ける手は選びません。
                                 info_result = Some(GameResult::Lose);
-                                info_comment = Some("Damn!");
+                                search_info.comment = Some("Damn!".to_string());
                             }
                         }
                     }
@@ -192,7 +192,7 @@ impl Search {
                         Some(pos.pieces_num),
                         info_result,
                         pos.turn,
-                        info_comment,
+                        &search_info,
                     ));
                 }
 

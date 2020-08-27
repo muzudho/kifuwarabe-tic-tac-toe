@@ -425,7 +425,8 @@ It is important to start with the appearance.
   * [x] Piece - "O", "X".
   * [x] Game result - Win/Draw/Lose.
   * [x] Position - It's the board.
-  * [x] Search - Computer player search info.
+  * [x] Search - Computer player search.
+  * [x] Search info - Computer player search info.
 
 If you want to play immediately, you have the talent of a game creator.  
 Being able to control your position means being able to play.  

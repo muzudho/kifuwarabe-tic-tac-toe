@@ -224,7 +224,7 @@ impl Search {
         pieces_num: Option<usize>,
         result: Option<GameResult>,
         turn: Piece,
-        comment: Option<&str>,
+        search_info: &SearchInfo,
     ) -> String {
         format!(
             "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}]{}{}{}{}{} }}",
@@ -254,12 +254,23 @@ impl Search {
             } else {
                 "                 ".to_string()
             },
-            if let Some(comment) = comment {
+            if let Some(comment) = &search_info.comment {
                 format!(", \"{}\":\"{}\"", turn, comment).to_string()
             } else {
                 format!(", \"{}\":\"\"", turn).to_string()
             },
         )
         .to_string()
+    }
+}
+
+pub struct SearchInfo {
+    /// Comment.  
+    /// コメント。  
+    pub comment: Option<String>,
+}
+impl SearchInfo {
+    pub fn new() -> Self {
+        SearchInfo { comment: None }
     }
 }
