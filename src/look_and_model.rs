@@ -223,7 +223,6 @@ impl Search {
         leaf: bool,
         pieces_num: Option<usize>,
         result: Option<GameResult>,
-        turn: Piece,
         search_info: &SearchInfo,
     ) -> String {
         format!(
@@ -255,9 +254,9 @@ impl Search {
                 "                 ".to_string()
             },
             if let Some(comment) = &search_info.comment {
-                format!(", \"{}\":\"{}\"", turn, comment).to_string()
+                format!(", \"{}\":\"{}\"", search_info.turn, comment).to_string()
             } else {
-                format!(", \"{}\":\"\"", turn).to_string()
+                format!(", \"{}\":\"\"", search_info.turn).to_string()
             },
         )
         .to_string()
@@ -265,12 +264,19 @@ impl Search {
 }
 
 pub struct SearchInfo {
+    /// Turn.  
+    /// 手番。  
+    pub turn: Piece,
+
     /// Comment.  
     /// コメント。  
     pub comment: Option<String>,
 }
 impl SearchInfo {
     pub fn new() -> Self {
-        SearchInfo { comment: None }
+        SearchInfo {
+            turn: Piece::Nought,
+            comment: None,
+        }
     }
 }

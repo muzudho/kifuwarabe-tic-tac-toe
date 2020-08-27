@@ -57,6 +57,7 @@ pub fn test() {
     // info nps ...... nodes ...... pv O X O X O X O X O
     // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしてください。
     let mut search_info = SearchInfo::new();
+    search_info.turn = Piece::Nought;
     search_info.comment = Some("Hello!".to_string());
     Log::print_debug(&Search::info_str(
         123,
@@ -67,11 +68,11 @@ pub fn test() {
         false,
         None,
         None,
-        Piece::Nought,
         &search_info,
     ));
     // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
     search_info = SearchInfo::new();
+    search_info.turn = Piece::Cross;
     search_info.comment = Some("Hello!".to_string());
     Log::print_debug(&Search::info_str(
         456,
@@ -82,11 +83,11 @@ pub fn test() {
         true,
         None,
         Some(GameResult::Win),
-        Piece::Cross,
         &search_info,
     ));
     // info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
     search_info = SearchInfo::new();
+    search_info.turn = Piece::Nought;
     search_info.comment = Some("Hello!".to_string());
     Log::print_debug(&Search::info_str(
         789,
@@ -97,7 +98,6 @@ pub fn test() {
         false,
         Some(pos.pieces_num),
         Some(GameResult::Win),
-        Piece::Nought,
         &search_info,
     ));
     // info nps    789 nodes      0 pv                   |       | <- from height 1 | + [1] | win  | + "Hello!"
