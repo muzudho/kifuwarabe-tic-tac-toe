@@ -221,7 +221,6 @@ impl Search {
         search_direction: SearchDirection,
         sq: usize,
         leaf: bool,
-        pieces_num: Option<usize>,
         search_info: &SearchInfo,
     ) -> String {
         format!(
@@ -242,7 +241,7 @@ impl Search {
             } else {
                 "              "
             },
-            if let Some(pieces_num) = pieces_num {
+            if let Some(pieces_num) = search_info.pieces_num {
                 format!(", \"pieces\":{}", pieces_num)
             } else {
                 "            ".to_string()
@@ -263,6 +262,10 @@ impl Search {
 }
 
 pub struct SearchInfo {
+    /// Number of pieces on the board.  
+    /// 盤上の石の数。  
+    pub pieces_num: Option<usize>,
+
     /// Result.  
     /// 結果。  
     pub result: Option<GameResult>,
@@ -278,6 +281,7 @@ pub struct SearchInfo {
 impl SearchInfo {
     pub fn new() -> Self {
         SearchInfo {
+            pieces_num: None,
             result: None,
             turn: Piece::Nought,
             comment: None,
