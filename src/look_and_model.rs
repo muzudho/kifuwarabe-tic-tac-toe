@@ -214,10 +214,10 @@ impl Search {
 
     /// Information during a forward/backward search.
     /// 前向き/後ろ向き 探索中の情報。
-    pub fn info_str(nps: u64, search_info: &SearchInfo) -> String {
+    pub fn info_str(search_info: &SearchInfo) -> String {
         format!(
             "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}]{}{}{}{}{} }}",
-            nps,
+            search_info.nps,
             search_info.nodes,
             search_info.pv,
             match search_info.search_direction {
@@ -254,6 +254,10 @@ impl Search {
 }
 
 pub struct SearchInfo {
+    /// Node par seconds.  
+    /// 秒間当たりの探索ノード数。  
+    pub nps: u64,
+
     /// Searched nodes.  
     /// 探索状態ノード数。  
     pub nodes: u32,
@@ -294,6 +298,7 @@ impl SearchInfo {
     pub fn new() -> Self {
         SearchInfo {
             search_direction: SearchDirection::Forward,
+            nps: 0,
             nodes: 0,
             pv: "".to_string(),
             chosen_sq: 0,

@@ -91,13 +91,14 @@ impl Search {
                 // (1) Outputs information for forward search.
                 // (一) 前向き探索の情報を出力します。
                 if pos.info_enabled {
+                    search_info.nps = self.nps();
                     search_info.nodes = self.nodes;
                     search_info.pv = pos.pv.to_string();
                     search_info.search_direction = SearchDirection::Forward;
                     search_info.chosen_sq = sq;
                     search_info.pieces_num = None;
                     search_info.turn = pos.turn;
-                    Log::print_info(&Search::info_str(self.nps(), &search_info));
+                    Log::print_info(&Search::info_str(&search_info));
                 }
 
                 if let None = forward_cut_off {
@@ -175,13 +176,14 @@ impl Search {
                             }
                         }
                     }
+                    search_info.nps = self.nps();
                     search_info.nodes = self.nodes;
                     search_info.pv = pos.pv.to_string();
                     search_info.search_direction = SearchDirection::Backward;
                     search_info.chosen_sq = sq;
                     search_info.pieces_num = Some(pos.pieces_num);
                     search_info.turn = pos.turn;
-                    Log::print_info(&Search::info_str(self.nps(), &search_info));
+                    Log::print_info(&Search::info_str(&search_info));
                 }
 
                 // (4) Depending on the condition, the sibling node search is skipped.
