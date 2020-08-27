@@ -67,7 +67,7 @@ pub fn test() {
     search_info.result = None;
     search_info.turn = Piece::Nought;
     search_info.comment = Some("Hello!".to_string());
-    Log::print_debug(&Search::info_str(&search_info));
+    Log::print_debug(&search_info.to_string());
     // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
     search_info = SearchInfo::new();
     search_info.nps = 456;
@@ -80,7 +80,7 @@ pub fn test() {
     search_info.result = Some(GameResult::Win);
     search_info.turn = Piece::Cross;
     search_info.comment = Some("Hello!".to_string());
-    Log::print_debug(&Search::info_str(&search_info));
+    Log::print_debug(&search_info.to_string());
     // info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
     search_info = SearchInfo::new();
     search_info.nps = 789;
@@ -93,7 +93,7 @@ pub fn test() {
     search_info.result = Some(GameResult::Win);
     search_info.turn = Piece::Nought;
     search_info.comment = Some("Hello!".to_string());
-    Log::print_debug(&Search::info_str(&search_info));
+    Log::print_debug(&search_info.to_string());
     // info nps    789 nodes      0 pv                   |       | <- from height 1 | + [1] | win  | + "Hello!"
 
     // Step 4.

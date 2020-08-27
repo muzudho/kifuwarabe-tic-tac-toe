@@ -211,46 +211,6 @@ impl Search {
             }
         }
     }
-
-    /// Information during a forward/backward search.
-    /// 前向き/後ろ向き 探索中の情報。
-    pub fn info_str(search_info: &SearchInfo) -> String {
-        format!(
-            "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}]{}{}{}{}{} }}",
-            search_info.nps,
-            search_info.nodes,
-            search_info.pv,
-            match search_info.search_direction {
-                SearchDirection::Forward => {
-                    format!(", \"push\":\"{}\"", search_info.chosen_sq)
-                }
-                SearchDirection::Backward => {
-                    format!(", \"pop\" :\"{}\"", search_info.chosen_sq)
-                }
-            },
-            if search_info.leaf {
-                ", \"leaf\": true"
-            } else {
-                "              "
-            },
-            if let Some(pieces_num) = search_info.pieces_num {
-                format!(", \"pieces\":{}", pieces_num)
-            } else {
-                "            ".to_string()
-            },
-            if let Some(result) = search_info.result {
-                format!(", \"result\":{:6}", format!("\"{}\"", result.to_string()))
-            } else {
-                "                 ".to_string()
-            },
-            if let Some(comment) = &search_info.comment {
-                format!(", \"{}\":\"{}\"", search_info.turn, comment).to_string()
-            } else {
-                format!(", \"{}\":\"\"", search_info.turn).to_string()
-            },
-        )
-        .to_string()
-    }
 }
 
 pub struct SearchInfo {
@@ -308,5 +268,45 @@ impl SearchInfo {
             turn: Piece::Nought,
             comment: None,
         }
+    }
+
+    /// Information during a forward/backward search.
+    /// 前向き/後ろ向き 探索中の情報。
+    pub fn to_string(&self) -> String {
+        format!(
+            "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}]{}{}{}{}{} }}",
+            self.nps,
+            self.nodes,
+            self.pv,
+            match self.search_direction {
+                SearchDirection::Forward => {
+                    format!(", \"push\":\"{}\"", self.chosen_sq)
+                }
+                SearchDirection::Backward => {
+                    format!(", \"pop\" :\"{}\"", self.chosen_sq)
+                }
+            },
+            if self.leaf {
+                ", \"leaf\": true"
+            } else {
+                "              "
+            },
+            if let Some(pieces_num) = self.pieces_num {
+                format!(", \"pieces\":{}", pieces_num)
+            } else {
+                "            ".to_string()
+            },
+            if let Some(result) = self.result {
+                format!(", \"result\":{:6}", format!("\"{}\"", result.to_string()))
+            } else {
+                "                 ".to_string()
+            },
+            if let Some(comment) = &self.comment {
+                format!(", \"{}\":\"{}\"", self.turn, comment).to_string()
+            } else {
+                format!(", \"{}\":\"\"", self.turn).to_string()
+            },
+        )
+        .to_string()
     }
 }

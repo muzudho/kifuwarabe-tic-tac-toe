@@ -98,7 +98,7 @@ impl Search {
                     search_info.chosen_sq = sq;
                     search_info.pieces_num = None;
                     search_info.turn = pos.turn;
-                    Log::print_info(&Search::info_str(&search_info));
+                    Log::print_info(&search_info.to_string());
                 }
 
                 if let None = forward_cut_off {
@@ -183,7 +183,7 @@ impl Search {
                     search_info.chosen_sq = sq;
                     search_info.pieces_num = Some(pos.pieces_num);
                     search_info.turn = pos.turn;
-                    Log::print_info(&Search::info_str(&search_info));
+                    Log::print_info(&search_info.to_string());
                 }
 
                 // (4) Depending on the condition, the sibling node search is skipped.
