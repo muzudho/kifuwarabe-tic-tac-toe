@@ -57,6 +57,7 @@ pub fn test() {
     // info nps ...... nodes ...... pv O X O X O X O X O
     // 適当な内容を入れて、入れ物として、入れた中身を見せてくれるか、チェックしてください。
     let mut search_info = SearchInfo::new();
+    search_info.nodes = search.nodes;
     search_info.pv = pos.pv.to_string();
     search_info.search_direction = SearchDirection::Forward;
     search_info.chosen_sq = 1;
@@ -65,9 +66,10 @@ pub fn test() {
     search_info.result = None;
     search_info.turn = Piece::Nought;
     search_info.comment = Some("Hello!".to_string());
-    Log::print_debug(&Search::info_str(123, search.nodes, &search_info));
+    Log::print_debug(&Search::info_str(123, &search_info));
     // info nps    123 nodes      0 pv                   | + [1] | ->   to height 1 |       |      | + "Hello!"
     search_info = SearchInfo::new();
+    search_info.nodes = search.nodes;
     search_info.pv = pos.pv.to_string();
     search_info.search_direction = SearchDirection::Forward;
     search_info.chosen_sq = 1;
@@ -76,9 +78,10 @@ pub fn test() {
     search_info.result = Some(GameResult::Win);
     search_info.turn = Piece::Cross;
     search_info.comment = Some("Hello!".to_string());
-    Log::print_debug(&Search::info_str(456, search.nodes, &search_info));
+    Log::print_debug(&Search::info_str(456, &search_info));
     // info nps    456 nodes      0 pv                   | + [1] | .       height 0 |       | win  | + "Hello!"
     search_info = SearchInfo::new();
+    search_info.nodes = search.nodes;
     search_info.pv = pos.pv.to_string();
     search_info.search_direction = SearchDirection::Backward;
     search_info.chosen_sq = 1;
@@ -87,7 +90,7 @@ pub fn test() {
     search_info.result = Some(GameResult::Win);
     search_info.turn = Piece::Nought;
     search_info.comment = Some("Hello!".to_string());
-    Log::print_debug(&Search::info_str(789, search.nodes, &search_info));
+    Log::print_debug(&Search::info_str(789, &search_info));
     // info nps    789 nodes      0 pv                   |       | <- from height 1 | + [1] | win  | + "Hello!"
 
     // Step 4.
