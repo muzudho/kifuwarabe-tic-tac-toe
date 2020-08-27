@@ -214,19 +214,13 @@ impl Search {
 
     /// Information during a forward/backward search.
     /// 前向き/後ろ向き 探索中の情報。
-    pub fn info_str(
-        nps: u64,
-        nodes: u32,
-        pv: &str,
-        search_direction: SearchDirection,
-        search_info: &SearchInfo,
-    ) -> String {
+    pub fn info_str(nps: u64, nodes: u32, pv: &str, search_info: &SearchInfo) -> String {
         format!(
             "info json {{ \"nps\":{: >6}, \"nodes\":{: >6}, \"pv\":[{: <17}]{}{}{}{}{} }}",
             nps,
             nodes,
             pv,
-            match search_direction {
+            match search_info.search_direction {
                 SearchDirection::Forward => {
                     format!(", \"push\":\"{}\"", search_info.chosen_sq)
                 }
@@ -260,6 +254,10 @@ impl Search {
 }
 
 pub struct SearchInfo {
+    /// Search direction.  
+    /// 探索方向。  
+    pub search_direction: SearchDirection,
+
     /// Chosen square.  
     /// 選んだマス。  
     pub chosen_sq: usize,
@@ -287,6 +285,7 @@ pub struct SearchInfo {
 impl SearchInfo {
     pub fn new() -> Self {
         SearchInfo {
+            search_direction: SearchDirection::Forward,
             chosen_sq: 0,
             leaf: false,
             pieces_num: None,
