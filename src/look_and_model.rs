@@ -1,6 +1,6 @@
 //! Display and data structure.  
 //! 表示と、データ構造です。  
-use crate::{GameResult, Piece, Position, BOARD_LEN, SQUARES_NUM};
+use crate::{GameResult, Piece, Position, Search, SearchDirection, BOARD_LEN, SQUARES_NUM};
 use std::fmt;
 use std::time::Instant;
 
@@ -94,32 +94,6 @@ impl Position {
     }
 }
 
-/// Proceeding from the root toward the leaves is called a forward search.
-/// The process of returning from the leaves toward the root is called backward search.
-/// 根から葉に向かって進んでいることを前向き探索と呼びます。
-/// 葉から根に戻っていることを後ろ向き探索と呼びます。
-pub enum SearchDirection {
-    /// Forward search.
-    /// 前向き探索。
-    Forward,
-    /// Backward search.
-    /// 後ろ向き探索。
-    Backward,
-}
-
-/// Search.  
-/// 探索部。  
-pub struct Search {
-    /// The number of stones on the board at the start of this search.  
-    /// この探索の開始時に盤の上に有った石の数。  
-    pub start_pieces_num: usize,
-    /// Number of state nodes searched.  
-    /// 探索した状態ノード数。  
-    pub nodes: u32,
-    /// Start the stopwatch when this structure is created.  
-    /// この構造体を生成した時点からストップ・ウォッチを開始します。  
-    pub stopwatch: Instant,
-}
 impl Search {
     pub fn new(start_pieces_num: usize) -> Self {
         Search {

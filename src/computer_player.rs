@@ -3,8 +3,8 @@
 //! コンピューターの思考部です。  
 //! 詳しくは 'look_and_model' の 'Search' 構造体 を見てください。  
 use crate::log::LogExt;
-use crate::look_and_model::{Search, SearchDirection, SearchInfo};
-use crate::{GameResult, Position, BOARD_LEN, SQUARES_NUM};
+use crate::look_and_model::SearchInfo;
+use crate::{GameResult, Position, Search, SearchDirection, BOARD_LEN, SQUARES_NUM};
 use casual_logger::{Level, Log};
 
 /// Search.  

@@ -33,6 +33,8 @@ pub mod test;
 mod uxi_protocol;
 mod win_lose_judgment;
 
+use std::time::Instant;
+
 /// The addresses of the squares start with 1 and end with 9.  
 /// The array starts at 0, so the size is 10.  
 /// マスの番地は1から始まり9で終わります。  
@@ -103,4 +105,31 @@ pub struct Position {
     /// Display info during search. It is not info level in the log.  
     /// 探索中の info 表示を行います。 ログの情報レベルのことではありません。  
     pub info_enabled: bool,
+}
+
+/// Proceeding from the root toward the leaves is called a forward search.
+/// The process of returning from the leaves toward the root is called backward search.
+/// 根から葉に向かって進んでいることを前向き探索と呼びます。
+/// 葉から根に戻っていることを後ろ向き探索と呼びます。
+pub enum SearchDirection {
+    /// Forward search.
+    /// 前向き探索。
+    Forward,
+    /// Backward search.
+    /// 後ろ向き探索。
+    Backward,
+}
+
+/// Search.  
+/// 探索部。  
+pub struct Search {
+    /// The number of stones on the board at the start of this search.  
+    /// この探索の開始時に盤の上に有った石の数。  
+    pub start_pieces_num: usize,
+    /// Number of state nodes searched.  
+    /// 探索した状態ノード数。  
+    pub nodes: u32,
+    /// Start the stopwatch when this structure is created.  
+    /// この構造体を生成した時点からストップ・ウォッチを開始します。  
+    pub stopwatch: Instant,
 }
