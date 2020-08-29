@@ -1,17 +1,9 @@
 //! Display and data structure.  
 //! 表示と、データ構造です。  
+use crate::Piece;
 use std::fmt;
 use std::time::Instant;
 
-/// Circle and cross mark. It corresponds to the stone in Go.  
-/// 丸と十字の印です。囲碁で言うところの石に当たります。  
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum Piece {
-    /// 〇
-    Nought,
-    /// ×
-    Cross,
-}
 impl fmt::Display for Piece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use crate::look_and_model::Piece::*;

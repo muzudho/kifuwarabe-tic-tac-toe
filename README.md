@@ -421,7 +421,7 @@ Let's proceed with development while testing.
 The first thing you have to create is your motive.  
 It is important to start with the appearance.  
 
-* [x] Step 3. Create the 'look_and_model.rs' file.
+* [x] Step 3. Create the 'main.rs'(or 'lib.rs') and 'look_and_model.rs' file.
   * [x] Piece - "O", "X".
   * [x] Game result - Win/Draw/Lose.
   * [x] Position - It's the board.

@@ -1,7 +1,8 @@
 //! Converts a position into a string or restores a string into a position.  
 //! 局面を文字列に変換したり、文字列を局面に復元します。  
 use crate::log::LogExt;
-use crate::look_and_model::{GameResult, Piece, Position};
+use crate::look_and_model::{GameResult, Position};
+use crate::Piece;
 use casual_logger::Log;
 
 /// A record of the game used to suspend or resume it.  

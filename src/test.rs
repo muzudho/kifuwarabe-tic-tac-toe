@@ -3,9 +3,9 @@
 
 use crate::command_line_seek::CommandLineSeek;
 use crate::log::LogExt;
-use crate::look_and_model::{GameResult, Piece, Position, Search, SearchDirection, SearchInfo};
+use crate::look_and_model::{GameResult, Position, Search, SearchDirection, SearchInfo};
+use crate::Piece;
 use casual_logger::Log;
-use std;
 use std::{thread, time};
 
 /// It is a unit test. I am writing it here because it is a hassle.

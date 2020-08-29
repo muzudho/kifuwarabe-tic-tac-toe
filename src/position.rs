@@ -1,6 +1,7 @@
 //! Position. A record of the game used to suspend or resume it.  
 //! 局面。 ゲームを中断したり、再開したりするときに使うゲームの記録です。  
-use crate::look_and_model::{Piece, Position};
+use crate::look_and_model::Position;
+use crate::Piece;
 
 /// Position. A record of the game used to suspend or resume it.  
 /// 局面。 ゲームを中断したり、再開したりするときに使うゲームの記録です。  

@@ -32,3 +32,13 @@ mod position;
 pub mod test;
 mod uxi_protocol;
 mod win_lose_judgment;
+
+/// Circle and cross mark. It corresponds to the stone in Go.  
+/// 丸と十字の印です。囲碁で言うところの石に当たります。  
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Piece {
+    /// 〇
+    Nought,
+    /// ×
+    Cross,
+}
