@@ -1,6 +1,7 @@
 //! Win/Lose judgment.  
 //! 勝敗判定。  
-use crate::look_and_model::{Position, BOARD_LEN};
+use crate::look_and_model::Position;
+use crate::BOARD_LEN;
 
 /// A record of the game used to suspend or resume it.  
 /// ゲームを中断したり、再開したりするときに使うゲームの記録です。  

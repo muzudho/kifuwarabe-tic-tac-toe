@@ -1,6 +1,6 @@
 //! Display and data structure.  
 //! 表示と、データ構造です。  
-use crate::Piece;
+use crate::{GameResult, Piece, BOARD_LEN, SQUARES_NUM};
 use std::fmt;
 use std::time::Instant;
 
@@ -14,14 +14,6 @@ impl fmt::Display for Piece {
     }
 }
 
-/// It is a game that can be fully analyzed, so please use the result instead of the evaluation value.  
-/// 完全解析できるゲームなので、評価値ではなく結果を使います。  
-#[derive(Clone, Copy, Debug)]
-pub enum GameResult {
-    Win,
-    Draw,
-    Lose,
-}
 impl fmt::Display for GameResult {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use crate::look_and_model::GameResult::*;
@@ -32,18 +24,6 @@ impl fmt::Display for GameResult {
         }
     }
 }
-
-/// The addresses of the squares start with 1 and end with 9.  
-/// The array starts at 0, so the size is 10.  
-/// マスの番地は1から始まり9で終わります。  
-/// 配列は 0 から始まるのでサイズは10です。  
-pub const BOARD_LEN: usize = 10;
-
-/// The maximum number of stones that can be placed on the board.  
-/// Since there are only 9 squares, it will be 9.  
-/// 盤上に置ける石の最大数。  
-/// ９マスしかないから９です。  
-pub const SQUARES_NUM: usize = 9;
 
 /// A record of the game used to suspend or resume it.  
 /// ゲームを中断したり、再開したりするときに使うゲームの記録です。  

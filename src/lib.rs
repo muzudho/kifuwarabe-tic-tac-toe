@@ -33,6 +33,18 @@ pub mod test;
 mod uxi_protocol;
 mod win_lose_judgment;
 
+/// The addresses of the squares start with 1 and end with 9.  
+/// The array starts at 0, so the size is 10.  
+/// マスの番地は1から始まり9で終わります。  
+/// 配列は 0 から始まるのでサイズは10です。  
+pub const BOARD_LEN: usize = 10;
+
+/// The maximum number of stones that can be placed on the board.  
+/// Since there are only 9 squares, it will be 9.  
+/// 盤上に置ける石の最大数。  
+/// ９マスしかないから９です。  
+pub const SQUARES_NUM: usize = 9;
+
 /// Circle and cross mark. It corresponds to the stone in Go.  
 /// 丸と十字の印です。囲碁で言うところの石に当たります。  
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -41,4 +53,13 @@ pub enum Piece {
     Nought,
     /// ×
     Cross,
+}
+
+/// It is a game that can be fully analyzed, so please use the result instead of the evaluation value.  
+/// 完全解析できるゲームなので、評価値ではなく結果を使います。  
+#[derive(Clone, Copy, Debug)]
+pub enum GameResult {
+    Win,
+    Draw,
+    Lose,
 }
