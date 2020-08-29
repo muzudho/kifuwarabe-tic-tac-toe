@@ -3,8 +3,8 @@
 
 use crate::command_line_seek::CommandLineSeek;
 use crate::log::LogExt;
-use crate::look_and_model::{Position, Search, SearchDirection, SearchInfo};
-use crate::{GameResult, Piece};
+use crate::look_and_model::{Search, SearchDirection, SearchInfo};
+use crate::{GameResult, Piece, Position};
 use casual_logger::Log;
 use std::{thread, time};
 

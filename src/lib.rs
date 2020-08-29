@@ -63,3 +63,44 @@ pub enum GameResult {
     Draw,
     Lose,
 }
+
+/// A record of the game used to suspend or resume it.  
+/// ゲームを中断したり、再開したりするときに使うゲームの記録です。  
+#[derive(Debug)]
+pub struct Position {
+    /// Turn. The stone to be placed next at the start.  
+    /// 開始局面での手番。次に置かれる石。  
+    pub starting_turn: Piece,
+
+    /// The board at the start. [0] is unused.  
+    /// 開始時の盤面。 [0] は未使用。  
+    pub starting_board: [Option<Piece>; BOARD_LEN],
+
+    /// The number of stones on the board at the start.  
+    /// 開始時に盤の上に有った石の数。  
+    pub starting_pieces_num: usize,
+
+    /// Turn. The stone to be placed next.  
+    /// 手番。次に置かれる石。  
+    pub turn: Piece,
+
+    /// The current board. [0] is unused.  
+    /// 現在の盤面。 [0] は未使用。  
+    pub board: [Option<Piece>; BOARD_LEN],
+
+    /// Match record. An array of addresses where the pieces will be placed.  
+    /// 棋譜。駒を置いた番地を並べたもの。  
+    pub history: [u8; SQUARES_NUM],
+
+    /// The number of stones currently on the board.  
+    /// 現在、盤の上に有る石の数。  
+    pub pieces_num: usize,
+
+    /// Principal variation.
+    /// 今読んでる読み筋。
+    pub pv: String,
+
+    /// Display info during search. It is not info level in the log.  
+    /// 探索中の info 表示を行います。 ログの情報レベルのことではありません。  
+    pub info_enabled: bool,
+}

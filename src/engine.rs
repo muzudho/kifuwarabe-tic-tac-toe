@@ -1,11 +1,7 @@
 //! ThinkingEngine.  
 //! 思考エンジン。  
 
-use crate::{
-    command_line_seek::CommandLineSeek,
-    log::LogExt,
-    look_and_model::{Position, Search},
-};
+use crate::{command_line_seek::CommandLineSeek, log::LogExt, look_and_model::Search, Position};
 use casual_logger::Log;
 
 /// ThinkingEngine.  
