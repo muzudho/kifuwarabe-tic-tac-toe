@@ -1,6 +1,8 @@
 //! Display and data structure.  
 //! 表示と、データ構造です。  
-use crate::{GameResult, Piece, Position, Search, SearchDirection, BOARD_LEN, SQUARES_NUM};
+use crate::{
+    GameResult, Piece, Position, Search, SearchDirection, SearchInfo, BOARD_LEN, SQUARES_NUM,
+};
 use std::fmt;
 use std::time::Instant;
 
@@ -119,47 +121,6 @@ impl Search {
     }
 }
 
-pub struct SearchInfo {
-    /// Node par seconds.  
-    /// 秒間当たりの探索ノード数。  
-    pub nps: u64,
-
-    /// Searched nodes.  
-    /// 探索状態ノード数。  
-    pub nodes: u32,
-
-    /// Principal variation.  
-    /// 読み筋の本筋。  
-    pub pv: String,
-
-    /// Search direction.  
-    /// 探索方向。  
-    pub search_direction: SearchDirection,
-
-    /// Chosen square.  
-    /// 選んだマス。  
-    pub chosen_sq: usize,
-
-    /// Is leaf?  
-    /// 葉ですか？  
-    pub leaf: bool,
-
-    /// Number of pieces on the board.  
-    /// 盤上の石の数。  
-    pub pieces_num: Option<usize>,
-
-    /// Result.  
-    /// 結果。  
-    pub result: Option<GameResult>,
-
-    /// Turn.  
-    /// 手番。  
-    pub turn: Piece,
-
-    /// Comment.  
-    /// コメント。  
-    pub comment: Option<String>,
-}
 impl SearchInfo {
     pub fn new() -> Self {
         SearchInfo {

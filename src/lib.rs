@@ -133,3 +133,45 @@ pub struct Search {
     /// この構造体を生成した時点からストップ・ウォッチを開始します。  
     pub stopwatch: Instant,
 }
+
+pub struct SearchInfo {
+    /// Node par seconds.  
+    /// 秒間当たりの探索ノード数。  
+    pub nps: u64,
+
+    /// Searched nodes.  
+    /// 探索状態ノード数。  
+    pub nodes: u32,
+
+    /// Principal variation.  
+    /// 読み筋の本筋。  
+    pub pv: String,
+
+    /// Search direction.  
+    /// 探索方向。  
+    pub search_direction: SearchDirection,
+
+    /// Chosen square.  
+    /// 選んだマス。  
+    pub chosen_sq: usize,
+
+    /// Is leaf?  
+    /// 葉ですか？  
+    pub leaf: bool,
+
+    /// Number of pieces on the board.  
+    /// 盤上の石の数。  
+    pub pieces_num: Option<usize>,
+
+    /// Result.  
+    /// 結果。  
+    pub result: Option<GameResult>,
+
+    /// Turn.  
+    /// 手番。  
+    pub turn: Piece,
+
+    /// Comment.  
+    /// コメント。  
+    pub comment: Option<String>,
+}
