@@ -1,16 +1,9 @@
 //! ThinkingEngine.  
 //! 思考エンジン。  
 
-use crate::{command_line_seek::CommandLineSeek, log::LogExt, Position, Search};
+use crate::{command_line_seek::CommandLineSeek, log::LogExt, Engine, Position, Search};
 use casual_logger::Log;
 
-/// ThinkingEngine.  
-/// 思考エンジン。  
-pub struct Engine {
-    /// Starting position.  
-    /// 初期局面。  
-    pos: Position,
-}
 impl Default for Engine {
     fn default() -> Self {
         Engine {
@@ -21,41 +14,6 @@ impl Default for Engine {
     }
 }
 impl Engine {
-    /// Display the title.  
-    /// タイトルを表示します。  
-    pub fn title(&self) {
-        Log::print_notice(
-            "Kifuwarabe's tic-tac-toe
-きふわらべの〇×ゲーム
-
-Command:
-コマンド:
-`do 7`      - Mark number 7.
-                手番のプレイヤーが、 7 番地に印を付けます。
-`go`        - The computer shows the next move.
-                コンピューターが次の1手を示します。
-`info-off`  - no info output.
-                info出力なし。
-`info-on`   - There is info output.(Default)
-                info出力あり(既定)。
-`pos`       - Position display.
-                局面表示。
-`position xfen 3/3/3 o moves 5 1 2 8 4 6 3 7 9`
-            - Starting position and moves.
-                初期局面と棋譜を入力。
-`undo`      - 1 back.
-                1手戻します。
-`uxi`       - Returns 'uxiok tic-tac-toe {protocol-version}'. It is a version of the protocol, not software.
-                'uxiok tic-tac-toe {protocol-version}' を返します。ソフトではなくプロトコルのバージョンです。
-`xfen`      - The current xfen string display.
-                現局面のxfen文字列表示。
-
-Let's input from `pos`.
-`pos` から入力してみましょう。
-",
-        );
-    }
-
     /// Enter the command line.  
     /// コマンドラインを与えてください。  
     ///

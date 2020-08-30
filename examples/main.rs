@@ -1,9 +1,5 @@
 use casual_logger::{Level, Log};
-use kifuwarabe_tic_tac_toe::{
-    engine::{Engine, Response},
-    log::LogExt,
-    test::test,
-};
+use kifuwarabe_tic_tac_toe::{engine::Response, log::LogExt, test::test, Engine};
 use std;
 
 /// This is the entry point to the program.  
@@ -29,7 +25,7 @@ fn main() {
     }
 
     let mut engine = Engine::default();
-    engine.title();
+    Log::print_notice(engine.title());
 
     // End the loop with 'quit'. Forced termination with [Ctrl]+[C].
     // 'quit' でループを終了。 [Ctrl]+[C] で強制終了。

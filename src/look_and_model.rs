@@ -1,10 +1,46 @@
 //! Display and data structure.  
 //! 表示と、データ構造です。  
 use crate::{
-    GameResult, Piece, Position, Search, SearchDirection, SearchInfo, BOARD_LEN, SQUARES_NUM,
+    Engine, GameResult, Piece, Position, Search, SearchDirection, SearchInfo, BOARD_LEN,
+    SQUARES_NUM,
 };
 use std::fmt;
 use std::time::Instant;
+
+impl Engine {
+    /// Display the title.  
+    /// タイトルを表示します。  
+    pub fn title(&self) -> &str {
+        "Kifuwarabe's tic-tac-toe
+きふわらべの〇×ゲーム
+
+Command:
+コマンド:
+`do 7`      - Mark number 7.
+                手番のプレイヤーが、 7 番地に印を付けます。
+`go`        - The computer shows the next move.
+                コンピューターが次の1手を示します。
+`info-off`  - no info output.
+                info出力なし。
+`info-on`   - There is info output.(Default)
+                info出力あり(既定)。
+`pos`       - Position display.
+                局面表示。
+`position xfen 3/3/3 o moves 5 1 2 8 4 6 3 7 9`
+            - Starting position and moves.
+                初期局面と棋譜を入力。
+`undo`      - 1 back.
+                1手戻します。
+`uxi`       - Returns 'uxiok tic-tac-toe {protocol-version}'. It is a version of the protocol, not software.
+                'uxiok tic-tac-toe {protocol-version}' を返します。ソフトではなくプロトコルのバージョンです。
+`xfen`      - The current xfen string display.
+                現局面のxfen文字列表示。
+
+Let's input from `pos`.
+`pos` から入力してみましょう。
+"
+    }
+}
 
 impl fmt::Display for Piece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

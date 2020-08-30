@@ -175,3 +175,11 @@ pub struct SearchInfo {
     /// コメント。  
     pub comment: Option<String>,
 }
+
+/// ThinkingEngine.  
+/// 思考エンジン。  
+pub struct Engine {
+    /// Starting position.  
+    /// 初期局面。  
+    pos: Position,
+}
