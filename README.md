@@ -3,8 +3,11 @@
 Programming computer shogi (Japanese chess) is difficult.  
 コンピュータ将棋のプログラミングは難しいです。  
 
-However, a strategy of gradually stepping up from a simple game is not appropriate.  
-ただし、単純なゲームから徐々にステップアップする戦略は適切ではありません。  
+How can I improve my programming skills?  
+プログラミングスキルを向上させるにはどうすればよいですか？  
+
+A strategy of gradually stepping up from a simple game is not appropriate.  
+単純なゲームから徐々にステップアップする戦略は適切ではありません。  
 
 The reason is that the right program to solve the problem depends entirely on the game. Unless you have general artificial intelligence.  
 その理由は、問題を解決するための適切なプログラムが完全にゲームに依存しているためです。汎用人工知能を持っていない限り。  
@@ -12,8 +15,8 @@ The reason is that the right program to solve the problem depends entirely on th
 I recommend that you write computer shogi software directly, rather than bypassing it.  
 迂回するのではなく、コンピューター将棋ソフトウェアを直接作成することをお勧めします。  
 
-Of course it's best to start by modifying the strongest library.  
-もちろん、最強のライブラリを変更することから始めるのが最善です。  
+Of course it's best to start by modifying the strongest library. Helps to find out what is missing.  
+もちろん、最強のライブラリを変更することから始めるのが最善です。 何が欠けているかを知るのに役立ちます。  
 
 However, if you want to overcome the weaknesses of basic programming skills unrelated to computer shogi, it makes sense to start with a simple program.  
 ただし、コンピュータ将棋とは関係のない基本的なプログラミングスキルの弱点を克服したい場合は、単純なプログラムから始めるのが理にかなっています。  
