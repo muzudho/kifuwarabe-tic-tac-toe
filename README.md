@@ -1,12 +1,37 @@
 # Kifuwarabe's tic-tac-toe
 
-A small example before developing computer chess and computer shogi.  
-Tic-tac-toe is an unspecified UXI protocol. X has no meaning.  
-Come see the repository.  
+Programming computer shogi (Japanese chess) is difficult.  
+コンピュータ将棋のプログラミングは難しいです。  
 
-This is the tic-tac-toe version of the AI.  
-Kifuwarabe(きふわらべ)'s original is a computer shogi/go thinking engine (AI).  
-There is **no** GUI (Graphical user interface), This is CUI (Characterbased user interface).  
+However, a strategy of gradually stepping up from a simple game is not appropriate.  
+ただし、単純なゲームから徐々にステップアップする戦略は適切ではありません。  
+
+The reason is that the right program to solve the problem depends entirely on the game. Unless you have general artificial intelligence.  
+その理由は、問題を解決するための適切なプログラムが完全にゲームに依存しているためです。汎用人工知能を持っていない限り。  
+
+I recommend that you write computer shogi software directly, rather than bypassing it.  
+迂回するのではなく、コンピューター将棋ソフトウェアを直接作成することをお勧めします。  
+
+Of course it's best to start by modifying the strongest library.  
+もちろん、最強のライブラリを変更することから始めるのが最善です。  
+
+However, if you want to overcome the weaknesses of basic programming skills unrelated to computer shogi, it makes sense to start with a simple program.  
+ただし、コンピュータ将棋とは関係のない基本的なプログラミングスキルの弱点を克服したい場合は、単純なプログラムから始めるのが理にかなっています。  
+
+For example, a tic-tac-toe game can be fully analyzed on your home computer, which is useful for checking your skills.  
+たとえば、三目並べゲームは自宅のコンピューターで完全に分析できるため、スキルをチェックするのに役立ちます。  
+
+Computer shogi, computer go program Kifuwarabe has been converted into tic-tac-toe.  
+コンピュータ将棋、コンピュータ囲碁プログラム「きふわらべ」を三目並べに変換しました。  
+
+It was implemented with an unspecified UXI protocol that imitates the UCI / USI protocol. X has no meaning.　 
+UCI / USIプロトコルを模した未指定のUXIプロトコルで実装しました。 X に意味はありません。  
+
+Come see the repository.  
+リポジトリをご覧ください。  
+
+There is **no** GUI (Graphical user interface). Thought engine only.  
+GUIは **ありません**。思考エンジンのみです。  
 
 ## Demonstration
 
